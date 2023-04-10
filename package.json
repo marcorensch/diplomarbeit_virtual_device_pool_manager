@@ -7,8 +7,10 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "install_server": "cd server && npm install",
     "install_client": "cd client && npm install",
-    "postinstall": "npm run install_server && npm run install_client",
-    "devStart": "conc -n=\"server,client\" -c=\"green,blue\" \"cd server && npm run devStart\" \"cd client && npm run serve\""
+    "install_setup": "cd setup && npm install",
+    "postinstall": "npm run install_setup && npm run install_server && npm run install_client",
+    "devStart": "conc -n=\"server,client\" -c=\"green,blue\" \"cd server && npm run devStart\" \"cd client && npm run serve\"",
+    "setup": "cd setup && npm run start"
   },
   "repository": {
     "type": "git",
@@ -32,7 +34,6 @@
   },
   "homepage": "https://github.com/marcorensch/diplomarbeit_virtual_device_pool_manager#readme",
   "dependencies": {
-    "concurrently": "^8.0.1",
-    "dotenv": "^16.0.3"
+    "concurrently": "^8.0.1"
   }
 }
