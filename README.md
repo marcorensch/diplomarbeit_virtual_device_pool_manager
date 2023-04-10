@@ -21,7 +21,17 @@ Git Repository zu meiner Diplomarbeit "Virtual Device Pool Manager" als Applikat
 
 ## Vorbereitung
 
+### Voraussetzungen
+
+Die Applikation wurde mit folgenden Versionen getestet:
+
+- [MariaDB 10.11.2](https://mariadb.org/)
+- [NodeJS 18.15.0](https://nodejs.org/en/)
+- [NPM 9.5.0](https://www.npmjs.com/)
+
 ## Installation
+
+### Datenbank
 
 ## Konfiguration
 
