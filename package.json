@@ -1,0 +1,30 @@
+{
+  "name": "virtual_device_pool_manager",
+  "version": "1.0.0",
+  "description": "Diplomarbeit 2023 von Marco Rensch",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marcorensch/diplomarbeit_virtual_device_pool_manager.git"
+  },
+  "keywords": [
+    "diplom",
+    "nds",
+    "app",
+    "virtual",
+    "device",
+    "pool",
+    "manager",
+    "msisdn",
+    "list"
+  ],
+  "author": "Marco Rensch",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/marcorensch/diplomarbeit_virtual_device_pool_manager/issues"
+  },
+  "homepage": "https://github.com/marcorensch/diplomarbeit_virtual_device_pool_manager#readme"
+}
