@@ -7,5 +7,3 @@ CREATE TABLE IF NOT EXISTS `sim_types`
     ENGINE = InnoDB
     DEFAULT CHARACTER SET = utf8
     COLLATE = utf8_general_ci;
-
-INSERT INTO `sim_types` (name) VALUES ('e-SIM'), ('p-SIM');

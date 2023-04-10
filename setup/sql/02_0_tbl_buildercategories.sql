@@ -7,9 +7,3 @@ CREATE TABLE IF NOT EXISTS `builder_categories`
     ENGINE=InnoDB
     DEFAULT CHARSET=utf8
     COLLATE=utf8_general_ci;
-
-INSERT INTO `builder_categories` (name)
-VALUES ('Location'),
-       ('Cabinet'),
-       ('Row'),
-       ('Slot');
