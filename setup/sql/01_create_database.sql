@@ -1,0 +1,1 @@
+CREATE DATABASE IF NOT EXISTS `virtual_device_pool_manager` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
