@@ -49,8 +49,13 @@ async function setupEnvironment() {
 
     console.log("This Script guides you through the setup of the server and the client. You can press enter to use the default value. (default:" + chalk.bold.cyan("value") + ")\n");
 
+    const apiHostname = await question("Server host (default: localhost): ") || "localhost";
     const serverPort = await question("Server port (default: 3000): ") || 3000;
     const useSSL = await question("Use SSL (default: false): ") || false;
+
+    const backendUri = useSSL ? `https://${apiHostname}:${serverPort}` : `http://${apiHostname}:${serverPort}`;
+
+    const createCerts = useSSL ? yesOptions.includes(await question("Create SSL certificates (default: false): ") || false) : false;
 
     const jwtSecret = crypto.randomBytes(64).toString('hex');
     const jwtRefreshSecret = crypto.randomBytes(64).toString('hex');
@@ -65,8 +70,8 @@ async function setupEnvironment() {
 
     rl.close();
 
-    const serverEnv = `SERVER_PORT=${serverPort}\nUSE_SSL=${useSSL}\nDATABASE_HOST=${databaseHost}\nDATABASE_PORT=${databasePort}\nDATABASE_NAME=virtual_device_pool_manager\nDATABASE_USER=${databaseUser}\nDATABASE_PASSWORD=${databasePassword}\nJWT_SECRET=${jwtSecret}\nJWT_REFRESH_SECRET=${jwtRefreshSecret}\nJWT_EXPIRATION=${jwtExpiration}\nJWT_REFRESH_EXPIRATION=${jwtRefreshExpiration}`;
-    const clientEnv = ` VUE_APP_SERVER_PORT=${serverPort}\nVUE_APP_USE_SSL=${useSSL}`;
+    const serverEnv = `API_URL=${backendUri}\nSERVER_PORT=${serverPort}\nUSE_SSL=${useSSL}\nDATABASE_HOST=${databaseHost}\nDATABASE_PORT=${databasePort}\nDATABASE_NAME=virtual_device_pool_manager\nDATABASE_USER=${databaseUser}\nDATABASE_PASSWORD=${databasePassword}\nJWT_SECRET=${jwtSecret}\nJWT_REFRESH_SECRET=${jwtRefreshSecret}\nJWT_EXPIRATION=${jwtExpiration}\nJWT_REFRESH_EXPIRATION=${jwtRefreshExpiration}`;
+    const clientEnv = ` VUE_APP_SERVER_PORT=${serverPort}\nVUE_APP_USE_SSL=${useSSL}\nVUE_APP_API_URI=${backendUri}`;
 
     try {
         await fs.promises.writeFile(path.join(pathToServer, '.env'), serverEnv);
@@ -85,6 +90,33 @@ async function setupEnvironment() {
     }
 
     console.log(chalk.bold.green("Parameters set!"));
+
+    if (createCerts) {
+        await createSSL(apiHostname);
+    }
+}
+
+async function createSSL(apiHostname) {
+    const {exec} = await import('child_process');
+
+    const sslPath = path.join(__dirname, '..', 'certs');
+
+    try {
+        await fs.promises.mkdir(sslPath);
+    } catch (e) {
+        console.error(e);
+        process.exit(1);
+    }
+
+    console.log(chalk.bold.yellow("Creating SSL certificates..."));
+
+    try {
+        await exec(`openssl req -x509 -newkey rsa:4096 -keyout ${path.join(sslPath, 'key.pem')} -out ${path.join(sslPath, 'cert.pem')} -days 365 -nodes -subj "/CN=${apiHostname}"`);
+        console.log(chalk.bold.green("SSL certificates created!"));
+    } catch (e) {
+        console.log(chalk.bold.red("Failed to create SSL certificates!"));
+        console.error(e);
+    }
 }
 
 async function installDatabase() {
@@ -125,7 +157,7 @@ async function installDatabase() {
 }
 
 async function getFiles(dir) {
-    const dirents = await fs.promises.readdir(dir, { withFileTypes: true });
+    const dirents = await fs.promises.readdir(dir, {withFileTypes: true});
     return dirents
         .filter(dirent => dirent.isFile())
         .map(dirent => dirent.name);
