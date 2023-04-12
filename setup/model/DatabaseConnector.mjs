@@ -27,10 +27,10 @@ export default class DatabaseConnector {
         }
     }
 
-    static async execute(sql) {
-        const connection = await DatabaseConnector.getConnection();
+    static async execute(sql, data, withDb = true) {
+        const connection = await DatabaseConnector.getConnection(withDb);
         try {
-            const result = await connection.query(sql);
+            const result = await connection.query(sql, data);
             return result;
         }catch (e) {
             console.log(e);

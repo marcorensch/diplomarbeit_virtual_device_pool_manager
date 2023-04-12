@@ -5,10 +5,11 @@ process.env.NODE_ENV = 'setup';
 import * as fs from "fs";
 import * as path from "path";
 import {fileURLToPath} from 'url';
-import crypto from "crypto";
 import * as readline from "readline";
 import {stdin as input, stdout as output} from "node:process";
 import chalk from "chalk";
+import crypto from "crypto";
+import bcrypt from "bcrypt";
 
 import DatabaseConnector from "./model/DatabaseConnector.mjs";
 
@@ -24,15 +25,17 @@ const yesOptions = ['y', 'yes', 'j', 'ja', 'true', '1', 1, true];
 async function main() {
     await setupEnvironment();
     await installDatabase();
+    await createAdminUser();
+
 
     console.log('\n-----------------------------------------------------------------------------');
     console.log(chalk.green.bold('The configuration files have been stored!'));
     console.log("The Server Configuration file can be found at: " + chalk.bold.blue(pathToServer + "/.env"));
     console.log("The Client Configuration file can be found at: " + chalk.bold.blue(pathToClient + "/.env"));
     console.log(chalk.bold('Note:') + '\nYou can change the configuration at any time by editing the .env file.');
-    console.log(chalk.bold.yellow('\nNEW SECRET TOKENS WHERE CREATED - SECRETS SHOULD NOT BE SHARED WITH ANYONE!'));
+    console.log(chalk.bold.yellow('\nNEW TOKEN SECRETS WHERE CREATED - SECRETS SHOULD NOT BE SHARED WITH ANYONE!'));
     console.log("\nPlease make sure your Database is running and the credentials are correct.");
-    console.log("You can now using " + chalk.bold("npm run devStart") + " to start your server.");
+    console.log("You can now using " + chalk.bold("npm run devStart") + " to start your server locally.");
     console.log('-----------------------------------------------------------------------------\n');
 
 }
@@ -51,7 +54,7 @@ async function setupEnvironment() {
 
     const apiHostname = await question("Server host (default: localhost): ") || "localhost";
     const serverPort = await question("Server port (default: 3000): ") || 3000;
-    const useSSL = await question("Use SSL (default: false): ") || false;
+    const useSSL = yesOptions.includes(await question("Use SSL (default: false): ") || false);
 
     const backendUri = useSSL ? `https://${apiHostname}:${serverPort}` : `http://${apiHostname}:${serverPort}`;
 
@@ -74,8 +77,8 @@ async function setupEnvironment() {
     const clientEnv = ` VUE_APP_SERVER_PORT=${serverPort}\nVUE_APP_USE_SSL=${useSSL}\nVUE_APP_API_URI=${backendUri}`;
 
     try {
-        await fs.promises.writeFile(path.join(pathToServer, '.env'), serverEnv);
-        await fs.promises.writeFile('.env', serverEnv);
+        await fs.promises.writeFile(path.join(pathToServer, '.env'), serverEnv), {encoding: 'utf8', flag: 'w'};
+        await fs.promises.writeFile('.env', serverEnv, {encoding: 'utf8', flag: 'w'});
         dotenv.config();
     } catch (e) {
         console.error(e);
@@ -102,7 +105,7 @@ async function createSSL(apiHostname) {
     const sslPath = path.join(__dirname, '..', 'certs');
 
     try {
-        await fs.promises.mkdir(sslPath);
+        if (!fs.existsSync(sslPath)) await fs.promises.mkdir(sslPath);
     } catch (e) {
         console.error(e);
         process.exit(1);
@@ -118,6 +121,25 @@ async function createSSL(apiHostname) {
         console.error(e);
     }
 }
+
+async function createAdminUser() {
+    const username = 'administrator';
+    const password = crypto.randomBytes(12).toString('hex');
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const adminUserRoleData = await DatabaseConnector.execute('SELECT id FROM roles WHERE name = ?', ['admin']);
+    const status = await DatabaseConnector.execute('INSERT INTO users (username, password, notes, hidden, role_id) VALUES (?, ?, ?, ?, ?)', [username, hashedPassword, '', '', adminUserRoleData[0].id]);
+
+    if (status.affectedRows === 1) {
+        console.log(chalk.bold.green("\n********************* Admin user created! *********************\n"));
+        console.log(chalk.bold.yellow("Username: " + username));
+        console.log(chalk.bold.yellow("Password: " + password));
+        console.log(chalk.bold("Please change the password after the first login!"));
+        console.log(chalk.bold.green("\n***************************************************************"));
+    } else {
+        console.log(chalk.bold.red("Failed to create admin user!"));
+        console.log(status);
+    }
+};
 
 async function installDatabase() {
     const rl = readline.createInterface({

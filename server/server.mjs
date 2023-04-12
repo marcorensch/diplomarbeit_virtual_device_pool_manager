@@ -5,7 +5,7 @@ import express from 'express';
 import chalk from "chalk";
 
 const app = express();
-const port = process.env.SERVERPORT || 3000;
+const port = process.env.SERVER_PORT || 3000;
 
 app.get('/', (req, res) => {
   res.send('Hello World');
