@@ -1,0 +1,29 @@
+@import "variables";
+@import "cards";
+@import "buttons";
+@import "forms";
+@import "helpers";
+
+* {
+  box-sizing: border-box;
+  font-family: @font-family-sans-serif;
+}
+
+div, p, span, a {
+  font-size: @font-size-default;
+}
+
+.nxd-mover{
+  cursor: move;
+  color: @color-grey-light;
+
+  &:hover{
+    color: @color-grey;
+  }
+}
+
+.login svg{
+  color: @color-primary;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
