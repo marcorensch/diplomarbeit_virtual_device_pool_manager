@@ -8,4 +8,5 @@
 
 <style lang="less">
 @import "../node_modules/uikit/src/less/uikit.less";
+@import "@/assets/less/main.less";
 </style>

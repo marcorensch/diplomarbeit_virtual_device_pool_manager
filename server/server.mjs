@@ -11,7 +11,7 @@ import cookieParser from "cookie-parser";
 import chalk from "chalk";
 import jwt from "jsonwebtoken";
 
-import userRouter from "./routes/user.mjs";
+import authRouter from "./routes/auth.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -41,7 +41,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cookieParser());
 
-app.use('/api/user', userRouter);
+app.use('/api/auth', authRouter);
 
 app.get('/', (req, res) => {
   res.send('Hello there! This isn\'t the page you\'re looking for. ⭐🧔⚔️');
