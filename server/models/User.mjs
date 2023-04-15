@@ -10,8 +10,6 @@ export default class User {
     }
 
     async checkPassword(password) {
-        const match = await bcrypt.compare(password, this.password);
-        console.log("Match:", match)
-        return match;
+        return await bcrypt.compare(password, this.password);
     }
 }
