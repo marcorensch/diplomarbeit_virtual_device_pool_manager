@@ -28,7 +28,6 @@ export default class DatabaseModel{
     }
 
     async query(sql, values) {
-        console.log(sql, values)
         const connection = await this.createConnection();
         try {
             return await connection.query(sql, values);
