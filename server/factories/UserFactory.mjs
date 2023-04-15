@@ -1,7 +1,7 @@
 import User from "../models/User.mjs";
 import DatabaseModel from "../models/DatabaseModel.mjs";
 export default class UserFactory {
-    static create(data) {
+    static async create(data) {
         const user = new User();
         user.id = data.id;
         user.username = data.username;
@@ -18,7 +18,7 @@ export default class UserFactory {
             const userData = await database.query("SELECT * FROM users WHERE id = ? LIMIT 1", [id]);
             if(userData.length === 0) return reject("User not found");
             userData[0].role = await this.getRoleById(userData[0].role_id);
-            resolve(this.create(userData[0]));
+            resolve( await this.create(userData[0]));
         });
     }
 
@@ -28,7 +28,7 @@ export default class UserFactory {
             const userData = await database.query("SELECT * FROM users WHERE username = ? LIMIT 1", [username]);
             if(userData.length === 0) return reject("User not found");
             userData[0].role = await this.getRoleById(userData[0].role_id);
-            resolve(this.create(userData[0]));
+            resolve( await this.create(userData[0]));
         });
     }
 
