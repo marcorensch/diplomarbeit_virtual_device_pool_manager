@@ -1,14 +1,16 @@
+import UserFactory from "../factories/UserFactory.mjs";
+
 export default class LoginValidator {
     static async validate(req, res, next) {
-        console.log(req.params)
         let {username, password} = req.body;
-        if(!username || !password) return res.status(400).send("Username or password missing");
-        console.log(username, password)
-        const user = {name:'test', id:1, role:'admin'}
-        if(!user) return res.status(400).send("User not found");
-        // if(!user.checkPassword(password)) return res.status(401).json(new ApiError('u-332'));
-
-        req.user = user;
-        next();
+        if (!username || !password) return res.status(400).send("Username or password missing");
+        try {
+            const user = await UserFactory.getUserByUsername(username);
+            if (!await user.checkPassword(password)) return res.status(401).send("Invalid password");
+            req.user = user;
+            next();
+        } catch (e) {
+            return res.status(401).send("Invalid username or password");
+        }
     }
 }
