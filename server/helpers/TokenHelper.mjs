@@ -7,9 +7,9 @@ export default class TokenHelper {
         return await database.query("INSERT INTO tokens (user_id, token, refresh_token) VALUES (?, ?, ?)", [user.id, user.token, user.refreshToken]);
     }
 
-    static async updateTokens(user) {
+    static async updateTokens(user, oldRefreshToken) {
         const database = new DatabaseModel();
-        return await database.query("UPDATE tokens SET token = ?, refresh_token = ? WHERE user_id = ?", [user.token, user.refreshToken, user.id]);
+        return await database.query("UPDATE tokens SET token = ?, refresh_token = ? WHERE user_id = ? AND refresh_token = ?", [user.token, user.refreshToken, user.id, oldRefreshToken]);
     }
 
     static async deleteTokens(user) {
@@ -18,11 +18,11 @@ export default class TokenHelper {
     }
 
     static async generateToken(user) {
-        return await jwt.sign({id: user.id, role: user.role}, process.env.JWT_SECRET, {expiresIn: process.env.JWT_EXPIRATION});
+        return await jwt.sign({user_id: user.id, user_role: user.role}, process.env.JWT_SECRET, {expiresIn: process.env.JWT_EXPIRATION});
     }
 
     static async generateRefreshToken(user) {
-        return await jwt.sign({id: user.id}, process.env.JWT_REFRESH_SECRET, {expiresIn: process.env.JWT_REFRESH_EXPIRATION});
+        return await jwt.sign({user_id: user.id}, process.env.JWT_REFRESH_SECRET, {expiresIn: process.env.JWT_REFRESH_EXPIRATION});
     }
 
     static async generateTokens(user) {

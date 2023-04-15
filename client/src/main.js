@@ -6,10 +6,14 @@ import router from "./router";
 import { createPinia } from "pinia";
 
 import { library } from "@fortawesome/fontawesome-svg-core";
-import { faUser } from "@fortawesome/free-solid-svg-icons";
+import {
+  faUser,
+  faUserPlus,
+  faUserShield,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
-library.add(faUser);
+library.add(faUser, faUserShield, faUserPlus);
 
 const pinia = createPinia();
 

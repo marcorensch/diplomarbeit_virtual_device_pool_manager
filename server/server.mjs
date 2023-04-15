@@ -12,6 +12,7 @@ import chalk from "chalk";
 
 import authRouter from "./routes/auth.mjs";
 import usersRouter from "./routes/users.mjs";
+import rolesRouter from "./routes/roles.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -40,6 +41,7 @@ app.use(cookieParser());
 
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
+app.use('/api/roles', rolesRouter);
 
 app.get('/', (req, res) => {
   res.send('Hello there! This isn\'t the page you\'re looking for. ⭐🧔⚔️');

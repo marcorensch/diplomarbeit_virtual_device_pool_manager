@@ -1,5 +1,6 @@
 import UserFactory from "../factories/UserFactory.mjs";
 import TokenHelper from "../helpers/TokenHelper.mjs";
+import { calculateExpirationMs } from "../helpers/Utilities.mjs";
 import jwt from "jsonwebtoken";
 
 export default class UserValidator {
@@ -10,7 +11,7 @@ export default class UserValidator {
         try {
             let user = await UserFactory.getUserByUsername(username);
             if (!await user.checkPassword(password)) return res.status(401).send("Invalid password");
-            user = await TokenHelper.generateTokens(user);
+            await TokenHelper.generateTokens(user);
             await TokenHelper.storeTokens(user)
             req.user = user;
             next();
@@ -21,15 +22,52 @@ export default class UserValidator {
 
     }
 
-    static async validateToken(req, res, next) {
-        let token = req.cookies['nxd-token'];
-        if (!token) return res.status(401).send("Missing token");
-        try{
-            const {id} = jwt.verify(token, process.env.JWT_SECRET);
-            req.user = await UserFactory.getUserById(id);
-            next();
+    static async validateTokens(req, res, next) {
+        const currentToken = req.cookies['nxd-token'];
+        const currentRefreshToken = req.cookies['nxd-refresh-token'];
+        let userId;
+        if (!currentToken || !currentRefreshToken) return res.status(401).send("Missing token");
+        try {
+            const tokenData = jwt.verify(currentToken, process.env.JWT_SECRET);
+            userId = tokenData.user_id;
+            req.tokenUpdated = false;
         } catch (e) {
-            return res.status(401).send("Invalid token");
+            try {
+                const refreshTokenData = jwt.verify(currentRefreshToken, process.env.JWT_REFRESH_SECRET);
+                userId = refreshTokenData.user_id;
+                req.tokenUpdated = true;
+            } catch (e) {
+                return res.status(401).send("Invalid token");
+            }
+        }
+
+        const user = await UserFactory.getUserById(userId);
+        await TokenHelper.generateTokens(user);
+        await TokenHelper.updateTokens(user, currentRefreshToken);
+        console.log("Updated tokens")
+        req.user = user;
+        next();
+
+    }
+
+    static async setCookies(req, res, next) {
+        if(req.tokenUpdated) {
+            res.cookie('nxd-token', req.user.token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+                maxAge: calculateExpirationMs(process.env.JWT_EXPIRATION)
+            })
+
+            res.cookie('nxd-refresh-token', req.user.refreshToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+                maxAge: calculateExpirationMs(process.env.JWT_REFRESH_EXPIRATION)
+            })
+            next();
+        } else {
+            next();
         }
     }
 
