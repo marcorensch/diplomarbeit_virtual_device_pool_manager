@@ -15,10 +15,7 @@ import authRouter from "./routes/auth.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 const port = process.env.SERVER_PORT || 3000;
-
-const items = [{name:'Obi Wan Kenobi', rank:'Master'}, {name:'Mace Windu', rank:'Master'}, {name:'Anakin Skywalker', rank:'Padawan'}]
 
 const corsOptions = {
   origin: "*",
