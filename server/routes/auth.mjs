@@ -1,12 +1,9 @@
-import * as dotenv from 'dotenv';
-dotenv.config();
-
 import express from "express";
-import LoginValidator from "../middlewares/LoginValidator.mjs";
+import UserValidator from "../middlewares/UserValidator.mjs";
 
 const router = express.Router();
 
-router.post('/login', LoginValidator.validate, async (req, res) => {
+router.post('/login', UserValidator.validate, async (req, res) => {
 
     res.cookie('nxd-token', req.user.token, {
         httpOnly: true,

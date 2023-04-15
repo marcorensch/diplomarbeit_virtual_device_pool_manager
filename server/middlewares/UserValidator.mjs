@@ -1,7 +1,8 @@
 import UserFactory from "../factories/UserFactory.mjs";
 import TokenHelper from "../helpers/TokenHelper.mjs";
+import jwt from "jsonwebtoken";
 
-export default class LoginValidator {
+export default class UserValidator {
     static async validate(req, res, next) {
         let {username, password} = req.body;
         if (!username || !password) return res.status(400).send("Username or password missing");
@@ -18,5 +19,22 @@ export default class LoginValidator {
             return res.status(500).send("Error while logging in");
         }
 
+    }
+
+    static async validateToken(req, res, next) {
+        let token = req.cookies['nxd-token'];
+        if (!token) return res.status(401).send("Missing token");
+        try{
+            const {id} = jwt.verify(token, process.env.JWT_SECRET);
+            req.user = await UserFactory.getUserById(id);
+            next();
+        } catch (e) {
+            return res.status(401).send("Invalid token");
+        }
+    }
+
+    static async isAdmin(req, res, next) {
+        if (req.user.role !== 'admin') return res.status(403).send("Unauthorized");
+        next();
     }
 }

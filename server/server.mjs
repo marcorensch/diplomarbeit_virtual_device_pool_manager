@@ -9,9 +9,9 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from "cookie-parser";
 import chalk from "chalk";
-import jwt from "jsonwebtoken";
 
 import authRouter from "./routes/auth.mjs";
+import usersRouter from "./routes/users.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -39,6 +39,7 @@ app.use(express.urlencoded({extended: true}));
 app.use(cookieParser());
 
 app.use('/api/auth', authRouter);
+app.use('/api/users', usersRouter);
 
 app.get('/', (req, res) => {
   res.send('Hello there! This isn\'t the page you\'re looking for. ⭐🧔⚔️');
