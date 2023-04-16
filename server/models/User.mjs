@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import DatabaseModel from "./DatabaseModel.mjs";
+import jwt from "jsonwebtoken";
 export default class User {
     constructor() {
         this.id = null;
@@ -15,6 +16,20 @@ export default class User {
 
     async checkPassword(password) {
         return await bcrypt.compare(password, this.password);
+    }
+
+    async generateToken() {
+        return await jwt.sign({user_id: this.id, user_role: this.role}, process.env.JWT_SECRET, {expiresIn: process.env.JWT_EXPIRATION});
+    }
+
+    async generateRefreshToken() {
+        return await jwt.sign({user_id: this.id}, process.env.JWT_REFRESH_SECRET, {expiresIn: process.env.JWT_REFRESH_EXPIRATION});
+    }
+
+    async generateTokens() {
+        this.token = await this.generateToken();
+        this.refreshToken = await this.generateRefreshToken();
+        return this;
     }
 
     async save() {

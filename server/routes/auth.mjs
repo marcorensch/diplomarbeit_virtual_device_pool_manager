@@ -3,7 +3,7 @@ import UserValidator from "../middlewares/UserValidator.mjs";
 
 const router = express.Router();
 
-router.post('/login', UserValidator.validate, UserValidator.setCookies, async (req, res) => {
+router.post('/login', UserValidator.validateLogin, UserValidator.setCookies, async (req, res) => {
 
     res.status(200).json({token: req.user.token, message: 'Login successful'});
 
