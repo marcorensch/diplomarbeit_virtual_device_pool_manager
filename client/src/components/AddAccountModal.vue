@@ -8,7 +8,7 @@
         </h2>
       </div>
       <div class="uk-modal-body">
-        <form id="add-account-form" class="uk-form">
+        <form id="add-account-form" class="uk-form" autocomplete="off">
           <div class="uk-grid uk-child-width-expand uk-grid-small">
             <div>
               <div class="uk-margin">
@@ -241,7 +241,6 @@ export default {
   methods: {
     showModal() {
       UIkit.modal("#addUserModal").show();
-      toast("Hello World");
     },
     async getUserRoles() {
       try {

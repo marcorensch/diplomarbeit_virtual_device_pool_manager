@@ -9,13 +9,16 @@ import { createPinia } from "pinia";
 
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
+  faTrash,
   faUser,
+  faUserEdit,
   faUserPlus,
   faUserShield,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
-library.add(faUser, faUserShield, faUserPlus);
+library.add(faUser, faUserShield, faUserPlus, faUserEdit);
+library.add(faTrash);
 
 const pinia = createPinia();
 const toastOptions = {};
