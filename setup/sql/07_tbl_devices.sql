@@ -11,6 +11,8 @@ CREATE TABLE IF NOT EXISTS `devices`
     params          text         NOT NULL,
     slot_id         int(11) DEFAULT NULL,
     number_id       int(11) DEFAULT NULL,
+    created_at      datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at      datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     CONSTRAINT `fk_device_same_as` FOREIGN KEY (same_as) REFERENCES `devices` (id) ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT `fk_device_manufacturer` FOREIGN KEY (manufacturer_id) REFERENCES `manufacturers` (id) ON DELETE SET NULL ON UPDATE CASCADE,
