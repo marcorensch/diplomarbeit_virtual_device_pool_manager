@@ -32,8 +32,7 @@ export default class DatabaseModel{
         try {
             return await connection.query(sql, values);
         }catch (e) {
-            console.log(e);
-            return [];
+            throw e;
         } finally {
             await connection.end();
         }

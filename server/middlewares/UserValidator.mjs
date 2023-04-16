@@ -37,7 +37,12 @@ export default class UserValidator {
         }
         if(!userId) return res.status(401).send("Invalid token");
 
-        user = await UserFactory.getUserById(userId);
+        try {
+            user = await UserFactory.getUserById(userId);
+        } catch (e) {
+            console.log(e)
+            return res.status(500).send("Error while authorising user");
+        }
         if(req.setCookies) await user.generateTokens();
         req.user = user;
         next();

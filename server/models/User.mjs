@@ -6,15 +6,31 @@ export default class User {
         this.id = null;
         this.username = null;
         this.password = null;
-        this.notes = null;
-        this.hidden = null;
+        this.email = null;
+        this.created_at = null;
+        this.updated_at = null;
+        this.firstname = "";
+        this.lastname = "";
+        this.notes = "";
+        this.hidden = "";
         this.role_id = null;
         this.role = null;
         this.token = null;
         this.refreshToken = null;
     }
 
+    setData(props) {
+        for (const prop in props) {
+            this[prop] = props[prop];
+        }
+    }
+
+    async encryptPassword(plainPassword) {
+        return await bcrypt.hash(plainPassword, 10);
+    }
     async checkPassword(password) {
+        console.log("password: " + password)
+        console.log("this.password: " + this.password)
         return await bcrypt.compare(password, this.password);
     }
 
@@ -34,12 +50,22 @@ export default class User {
 
     async save() {
         const database = new DatabaseModel();
+        try {
+            console.log("role id: " + this.role_id);
+            const roleData = await database.query("SELECT * FROM roles WHERE id = ? LIMIT 1", [this.role_id]);
+            if (roleData.length === 0) throw "Role not found";
+        } catch (e) {
+            throw e;
+        }
+
+        if(this.password === null) throw "Password is null";
+
         if (this.id) {
-            return await database.query("UPDATE users SET username = ?, password = ?, notes = ?, hidden = ?, role_id = ? WHERE id = ?",
-                [this.username, this.password, this.notes, this.hidden, this.role_id, this.id]);
+            return await database.query("UPDATE users SET username = ?, password = ?, firstname = ?, lastname = ?, email = ?, notes = ?, hidden = ?, role_id = ? WHERE id = ?",
+                [this.username, this.password, this.firstname, this.lastname, this.email, this.notes, this.hidden, this.role_id, this.id]);
         } else {
-            return await database.query("INSERT INTO users (username, password, notes, hidden, role_id) VALUES (?, ?, ?, ?, ?)",
-                [this.username, this.password, this.notes, this.hidden, this.role_id]);
+            return await database.query("INSERT INTO users (username, password, firstname, lastname, email, notes, hidden, role_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                [this.username, this.password, this.firstname, this.lastname, this.email, this.notes, this.hidden, this.role_id]);
         }
     }
 
