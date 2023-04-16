@@ -1,6 +1,7 @@
 import UserFactory from "../factories/UserFactory.mjs";
-import { calculateExpirationMs } from "../helpers/Utilities.mjs";
+import {calculateExpirationMs} from "../helpers/Utilities.mjs";
 import jwt from "jsonwebtoken";
+import mappings from "../helpers/permissions.mjs";
 
 export default class UserValidator {
     static async validateLogin(req, res, next) {
@@ -29,13 +30,13 @@ export default class UserValidator {
         if (!currentToken && !currentRefreshToken) return res.status(401).send("Missing token");
 
         userId = UserValidator.getUserIdFromToken(currentToken, process.env.JWT_SECRET);
-        if(!currentRefreshToken) return res.status(401).send("Missing refresh token");
-        if(!userId) {
+        if (!currentRefreshToken) return res.status(401).send("Missing refresh token");
+        if (!userId) {
             console.log("refresh token used")
             userId = UserValidator.getUserIdFromToken(currentRefreshToken, process.env.JWT_REFRESH_SECRET);
             req.setCookies = true;
         }
-        if(!userId) return res.status(401).send("Invalid token");
+        if (!userId) return res.status(401).send("Invalid token");
 
         try {
             user = await UserFactory.getUserById(userId);
@@ -43,22 +44,22 @@ export default class UserValidator {
             console.log(e)
             return res.status(500).send("Error while authorising user");
         }
-        if(req.setCookies) await user.generateTokens();
+        if (req.setCookies) await user.generateTokens();
         req.user = user;
         next();
     }
 
     static getUserIdFromToken(token, secret) {
-        try{
+        try {
             const tokenData = jwt.verify(token, secret);
             return tokenData.user_id;
-        } catch(e) {
+        } catch (e) {
             return null;
         }
     }
 
     static async setCookies(req, res, next) {
-        if(req.setCookies) {
+        if (req.setCookies) {
             res.cookie('nxd-token', req.user.token, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
@@ -81,5 +82,25 @@ export default class UserValidator {
     static async checkIsAdmin(req, res, next) {
         if (req.user.role !== 'admin') return res.status(403).send("Unauthorized");
         next();
+    }
+
+    static hasPermission(action) {
+        return function (req, res, next) {
+            if (!req.user?.role) return res.status(403).send("Unauthorized");
+            if (mappings.has(action)) {
+                switch (action) {
+                    case "DELETE_ACCOUNT":
+                        if (req.user.id === req.params.id) {
+                            if (!mappings.get("DELETE_OWN_ACCOUNT").includes(req.user.role)) return res.status(403).send("Unauthorized");
+                        } else {
+                            if (!mappings.get(action).includes(req.user.role)) return res.status(403).send("Unauthorized");
+                        }
+                        break;
+                }
+
+            }
+
+            next();
+        }
     }
 }

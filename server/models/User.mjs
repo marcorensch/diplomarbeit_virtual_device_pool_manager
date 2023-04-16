@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import DatabaseModel from "./DatabaseModel.mjs";
 import jwt from "jsonwebtoken";
+
 export default class User {
     constructor() {
         this.id = null;
