@@ -1,7 +1,7 @@
 import UserFactory from "../factories/UserFactory.mjs";
 import {calculateExpirationMs} from "../helpers/Utilities.mjs";
 import jwt from "jsonwebtoken";
-import mappings from "../helpers/permissions.mjs";
+import {PermissionHandler} from "../helpers/PermissionHandler.mjs";
 
 export default class UserValidator {
     static async validateLogin(req, res, next) {
@@ -87,18 +87,12 @@ export default class UserValidator {
     static hasPermission(action) {
         return function (req, res, next) {
             if (!req.user?.role) return res.status(403).send("Unauthorized");
-            if (mappings.has(action)) {
-                switch (action) {
-                    case "DELETE_ACCOUNT":
-                        if (req.user.id === req.params.id) {
-                            if (!mappings.get("DELETE_OWN_ACCOUNT").includes(req.user.role)) return res.status(403).send("Unauthorized");
-                        } else {
-                            if (!mappings.get(action).includes(req.user.role)) return res.status(403).send("Unauthorized");
-                        }
-                        break;
-                }
-
-            }
+            const permissionHandler = new PermissionHandler();
+            const permissionsMap = permissionHandler.getPermissions(req.user.role);
+            console.log(action);
+            console.log(permissionsMap);
+            console.log(permissionsMap.has(action));
+            if (!permissionsMap.has(action)) return res.status(403).send("Unauthorized");
 
             next();
         }

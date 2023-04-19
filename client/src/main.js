@@ -14,11 +14,12 @@ import {
   faUserEdit,
   faUserPlus,
   faUserShield,
+  faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 library.add(faUser, faUserShield, faUserPlus, faUserEdit);
-library.add(faTrash);
+library.add(faTrash, faXmark);
 
 const pinia = createPinia();
 const toastOptions = {};

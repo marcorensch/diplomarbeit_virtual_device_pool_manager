@@ -1,10 +1,9 @@
-// permissionHandler.js
 
 export const permissions = {
     // User Management
-    CREATE_USERS: 'canCreateUsers',
-    DELETE_USERS: 'canDeleteUsers',
-    UPDATE_USERS: 'canUpdateUsers',
+    CREATE_ACCOUNT: 'canCreateAccount',
+    DELETE_ACCOUNT: 'canDeleteAccount',
+    UPDATE_ACCOUNT: 'canUpdateAccount',
     DELETE_OWN_ACCOUNT: 'canDeleteOwnAccount',
     UPDATE_OWN_ACCOUNT: 'canUpdateOwnAccount',
     // Device Management
@@ -71,12 +70,14 @@ export class PermissionHandler {
     }
 
     getPermissions(userRoles) {
-        let allPermissions = []
+        userRoles = Array.isArray(userRoles) ? userRoles : [userRoles]
+        let allPermissions = new Map();
 
         userRoles.forEach(role => {
-            const rolePermissionsList = this.rolePermissions[role]
-            if (rolePermissionsList) {
-                allPermissions = allPermissions.concat(rolePermissionsList)
+            if (this.rolePermissions[role]) {
+                this.rolePermissions[role].forEach(permission => {
+                    allPermissions.set(permission, true)
+                })
             }
         })
 

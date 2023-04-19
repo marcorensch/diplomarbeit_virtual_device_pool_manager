@@ -10,7 +10,7 @@ router.get('/', UserValidator.validateTokens, UserValidator.checkIsAdmin, UserVa
     return res.status(200).json({users});
 });
 
-router.post('/', UserValidator.validateTokens, UserValidator.hasPermission('create_account'), UserValidator.setCookies, async (req, res) => {
+router.post('/', UserValidator.validateTokens, UserValidator.hasPermission('canCreateAccount'), UserValidator.setCookies, async (req, res) => {
     const {username, firstname, lastname, password, email, role_id, notes, hidden} = req.body;
     console.log(username, password, role_id)
     if (!username || !password || !role_id) return res.status(400).send("Missing data");

@@ -3,28 +3,60 @@
     <div class="uk-container">
       <div class="userlist">
         <h1>Userlist</h1>
-        <button
-          class="uk-button uk-button-primary"
-          @click="handleAddUserClicked"
+        <div
+          class="actions uk-background-muted uk-border-rounded uk-padding-small"
         >
-          <font-awesome-icon :icon="['fas', 'user-plus']" /> Add User
-        </button>
-        <table class="uk-table uk-table-striped uk-table-hover uk-table-middle">
+          <div class="uk-flex uk-flex-right uk-flex-middle uk-grid-small">
+            <div class="uk-width-medium uk-position-relative">
+              <input
+                type="text"
+                id="search_account"
+                class="uk-input"
+                placeholder="Filter accounts"
+                v-model="search_account"
+                @keyup="filterAccountList"
+              />
+              <div
+                class="uk-position-center-right"
+                style="margin-right: 15px"
+                @click="handleClearSearchAccClicked"
+              >
+                <font-awesome-icon :icon="['fas', 'xmark']" />
+              </div>
+            </div>
+            <div>
+              <button
+                class="uk-button uk-button-primary"
+                @click="handleAddAccClicked"
+              >
+                <font-awesome-icon :icon="['fas', 'user-plus']" /> Add Account
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <table
+          class="uk-table uk-table-striped uk-table-hover uk-table-small uk-table-middle"
+        >
           <thead>
             <tr>
-              <th>Username</th>
-              <th>Firstname</th>
-              <th>Lastname</th>
-              <th>Role</th>
-              <th>Actions</th>
+              <th class="uk-width-1-6">Username</th>
+              <th class="uk-width-1-6">Firstname</th>
+              <th class="uk-width-1-6">Lastname</th>
+              <th class="uk-width-expand">Role</th>
+              <th class="uk-table-shrink uk-text-nowrap">Actions</th>
             </tr>
           </thead>
-          <tbody>
-            <tr v-for="user in users" :key="user.id">
+          <tbody uk-scrollspy="cls: uk-animation-fade; delay: 200;">
+            <tr
+              v-for="user in users"
+              :key="user.id"
+              :class="{ 'uk-hidden': !user.isVisible }"
+            >
               <td>{{ user.username }}</td>
               <td>{{ user.firstname }}</td>
               <td>{{ user.lastname }}</td>
-              <td class="uk-width-large" :data-user-type="user.role">
+              <td :data-user-type="user.role">
                 <div v-if="user.role === 'admin'">
                   <font-awesome-icon :icon="['fas', 'user-shield']" /><span
                     class="uk-margin-small-left"
@@ -41,13 +73,19 @@
               <td>
                 <div class="uk-button-group">
                   <button class="uk-button uk-button-default">
-                    <font-awesome-icon :icon="['fas', 'user-edit']" />
+                    <font-awesome-icon
+                      class="uk-preserve-width"
+                      :icon="['fas', 'user-edit']"
+                    />
                   </button>
                   <button
                     class="uk-button uk-button-danger"
                     @click="handleDeleteAccountClicked(user)"
                   >
-                    <font-awesome-icon :icon="['fas', 'trash']" />
+                    <font-awesome-icon
+                      class="uk-preserve-width"
+                      :icon="['fas', 'trash']"
+                    />
                   </button>
                 </div>
               </td>
@@ -70,6 +108,16 @@ import UIkit from "uikit";
 
 const toast = useToast();
 
+function debounce(func, timeout = 400) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func.apply(this, args);
+    }, timeout);
+  };
+}
+
 export default {
   name: "UsersView",
   components: { AddAccountModal },
@@ -80,6 +128,7 @@ export default {
   },
   data() {
     return {
+      search_account: "",
       users: [],
     };
   },
@@ -87,13 +136,42 @@ export default {
     this.getUsers();
   },
   methods: {
-    async handleAddUserClicked() {
+    handleClearSearchAccClicked() {
+      this.search_account = "";
+      this.filterAccountList();
+    },
+    filterAccountList() {
+      debounce(() => {
+        const filter = this.search_account.toUpperCase();
+        this.users.forEach((user) => {
+          if (
+            user.username.toUpperCase().includes(filter) ||
+            user.firstname.toUpperCase().includes(filter) ||
+            user.lastname.toUpperCase().includes(filter)
+          ) {
+            user.isVisible = true;
+          } else {
+            user.isVisible = false;
+          }
+        });
+      })();
+    },
+    async handleAddAccClicked() {
       this.$refs.modal.showModal();
     },
     async getUsers() {
       try {
         const response = await axios.get("/api/users");
-        this.users = response.data.users;
+        this.users = response.data.users.map((user) => {
+          return {
+            id: user.id,
+            username: user.username,
+            firstname: user.firstname,
+            lastname: user.lastname,
+            role: user.role,
+            isVisible: true,
+          };
+        });
       } catch (error) {
         if (error.response.status === 401) {
           this.$router.push("/login");
@@ -103,7 +181,11 @@ export default {
     async handleDeleteAccountClicked(user) {
       const confirmation = await UIkit.modal
         .confirm(
-          `Are you sure you want to delete ${user.username}'s account?`,
+          `Are you sure you want to delete <b>${
+            user.firstname.length
+              ? user.firstname + "'s (" + user.username + ")"
+              : user.username + "'s"
+          }</b> account?`,
           {
             i18n: { ok: "Yes" },
           }
@@ -130,3 +212,19 @@ export default {
   },
 };
 </script>
+
+<style lang="less" scoped>
+.uk-button-group {
+  .uk-button {
+    min-width: unset;
+    &:not(:first-of-type) {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+    &:not(:last-of-type) {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+  }
+}
+</style>
