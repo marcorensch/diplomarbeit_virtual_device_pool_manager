@@ -1,10 +1,14 @@
 <template>
   <NavigationBar />
-  <router-view v-slot="{ Component, route }">
-    <transition :name="route.meta.transition || 'fade'" mode="out-in">
-      <component :is="Component" />
-    </transition>
-  </router-view>
+  <div class="uk-section">
+    <div class="uk-container">
+      <router-view v-slot="{ Component, route }">
+        <transition :name="route.meta.transition || 'fade'" mode="out-in">
+          <component :is="Component" />
+        </transition>
+      </router-view>
+    </div>
+  </div>
 </template>
 <script>
 import { useAuthStore } from "@/stores/auth";

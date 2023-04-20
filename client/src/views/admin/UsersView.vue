@@ -1,108 +1,97 @@
 <template>
-  <div class="uk-section">
-    <div class="uk-container">
-      <div class="userlist">
-        <h1>Userlist</h1>
-        <div
-          class="actions uk-background-muted uk-border-rounded uk-padding-small"
-        >
-          <div class="uk-flex uk-flex-right uk-flex-middle uk-grid-small">
-            <div class="uk-width-medium uk-position-relative">
-              <input
-                type="text"
-                id="search_account"
-                class="uk-input"
-                placeholder="Filter accounts"
-                v-model="search_account"
-                @keyup="filterAccountList"
-              />
-              <div
-                v-if="search_account.length > 0"
-                class="uk-position-center-right clear-search-icon"
-                style="margin-right: 15px"
-                @click="handleClearSearchAccClicked"
-                uk-tooltip="Clear search filter"
-              >
-                <font-awesome-icon :icon="['fas', 'xmark']" />
-              </div>
-            </div>
-            <div>
-              <button
-                class="uk-button uk-button-primary"
-                @click="handleAddAccClicked"
-              >
-                <font-awesome-icon :icon="['fas', 'user-plus']" /> Add Account
-              </button>
-            </div>
+  <div class="userlist">
+    <h1>Userlist</h1>
+    <div class="actions uk-background-muted uk-border-rounded uk-padding-small">
+      <div class="uk-flex uk-flex-right uk-flex-middle uk-grid-small">
+        <div class="uk-width-medium uk-position-relative">
+          <input
+            type="text"
+            id="search_account"
+            class="uk-input"
+            placeholder="Filter accounts"
+            v-model="search_account"
+            @keyup="filterAccountList"
+          />
+          <div
+            v-if="search_account.length > 0"
+            class="uk-position-center-right clear-search-icon"
+            style="margin-right: 15px"
+            @click="handleClearSearchAccClicked"
+            uk-tooltip="Clear search filter"
+          >
+            <font-awesome-icon :icon="['fas', 'xmark']" />
           </div>
         </div>
-
-        <table
-          class="uk-table uk-table-striped uk-table-hover uk-table-small uk-table-middle"
-        >
-          <thead>
-            <tr>
-              <th class="uk-width-1-6">Username</th>
-              <th class="uk-width-1-6">Firstname</th>
-              <th class="uk-width-1-6">Lastname</th>
-              <th class="uk-width-expand">Role</th>
-              <th class="uk-table-shrink uk-text-nowrap">Actions</th>
-            </tr>
-          </thead>
-          <tbody uk-scrollspy="cls: uk-animation-fade; delay: 200;">
-            <tr
-              v-for="user in users"
-              :key="user.id"
-              :class="{ 'uk-hidden': !user.isVisible }"
-            >
-              <td>{{ user.username }}</td>
-              <td>{{ user.firstname }}</td>
-              <td>{{ user.lastname }}</td>
-              <td :data-user-type="user.role">
-                <div v-if="user.role === 'ADMIN'">
-                  <font-awesome-icon :icon="['fas', 'user-shield']" /><span
-                    class="uk-margin-small-left"
-                    >Administrator
-                  </span>
-                </div>
-                <div v-else-if="user.role === 'USER'">
-                  <font-awesome-icon :icon="['fas', 'user']" /><span
-                    class="uk-margin-small-left"
-                    >User
-                  </span>
-                </div>
-                <div v-else>
-                  <font-awesome-icon :icon="['fas', 'user']" /><span
-                    class="uk-margin-small-left"
-                    >{{ user.role }}
-                  </span>
-                </div>
-              </td>
-              <td>
-                <div class="uk-button-group">
-                  <button class="uk-button uk-button-default">
-                    <font-awesome-icon
-                      class="uk-preserve-width"
-                      :icon="['fas', 'user-edit']"
-                    />
-                  </button>
-                  <button
-                    class="uk-button uk-button-danger"
-                    @click="handleDeleteAccountClicked(user)"
-                  >
-                    <font-awesome-icon
-                      class="uk-preserve-width"
-                      :icon="['fas', 'trash']"
-                    />
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <AddAccountModal ref="modal" @accountCreated="getUsers" />
+        <div>
+          <button
+            class="uk-button uk-button-primary"
+            @click="handleAddAccClicked"
+          >
+            <font-awesome-icon :icon="['fas', 'user-plus']" />
+            Add Account
+          </button>
+        </div>
       </div>
     </div>
+
+    <table
+      class="uk-table uk-table-striped uk-table-hover uk-table-small uk-table-middle"
+    >
+      <thead>
+        <tr>
+          <th class="uk-width-1-6">Username</th>
+          <th class="uk-width-1-6">Firstname</th>
+          <th class="uk-width-1-6">Lastname</th>
+          <th class="uk-width-expand">Role</th>
+          <th class="uk-table-shrink uk-text-nowrap">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          v-for="user in users"
+          :key="user.id"
+          :class="{ 'uk-hidden': !user.isVisible }"
+        >
+          <td>{{ user.username }}</td>
+          <td>{{ user.firstname }}</td>
+          <td>{{ user.lastname }}</td>
+          <td :data-user-type="user.role">
+            <div v-if="user.role === 'ADMIN'">
+              <font-awesome-icon :icon="['fas', 'user-shield']" />
+              <span class="uk-margin-small-left">Administrator </span>
+            </div>
+            <div v-else-if="user.role === 'USER'">
+              <font-awesome-icon :icon="['fas', 'user']" />
+              <span class="uk-margin-small-left">User </span>
+            </div>
+            <div v-else>
+              <font-awesome-icon :icon="['fas', 'user']" />
+              <span class="uk-margin-small-left">{{ user.role }} </span>
+            </div>
+          </td>
+          <td>
+            <div class="uk-button-group">
+              <button class="uk-button uk-button-default">
+                <font-awesome-icon
+                  class="uk-preserve-width"
+                  :icon="['fas', 'user-edit']"
+                />
+              </button>
+              <button
+                class="uk-button uk-button-danger"
+                @click="handleDeleteAccountClicked(user)"
+              >
+                <font-awesome-icon
+                  class="uk-preserve-width"
+                  :icon="['fas', 'trash']"
+                />
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <AddAccountModal ref="modal" @accountCreated="getUsers" />
   </div>
 </template>
 

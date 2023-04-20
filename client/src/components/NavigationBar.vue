@@ -3,7 +3,7 @@
     <div class="uk-container">
       <div uk-navbar>
         <div class="uk-navbar-left">
-          <ul class="uk-navbar-nav main-nav">
+          <ul class="uk-navbar-nav main-nav main-menu">
             <router-link
               :to="{ name: 'devices' }"
               custom
@@ -12,14 +12,14 @@
               <li
                 id="devices-link"
                 :class="{
-                  'uk-active active': isActive,
-                  'uk-active active': isExactActive,
+                  'uk-active active': isActive || isExactActive,
                 }"
               >
                 <a :href="href" @click="navigate"><span>Devices</span></a>
               </li>
             </router-link>
             <router-link
+              v-if="auth.hasPermission('canAccessAdmin')"
               :to="{ name: 'admin' }"
               custom
               v-slot="{ href, navigate, isActive, isExactActive }"
@@ -27,8 +27,7 @@
               <li
                 id="admin-home-link"
                 :class="{
-                  'uk-active active': isActive,
-                  'uk-active active': isExactActive,
+                  'uk-active active': isActive || isExactActive,
                 }"
               >
                 <a :href="href" @click="navigate"
@@ -37,6 +36,10 @@
               </li>
             </router-link>
             <router-link
+              v-if="
+                auth.hasPermission('canAccessAdmin') &&
+                auth.hasPermission('canAccessAccountList')
+              "
               :to="{ name: 'users' }"
               custom
               v-slot="{ href, navigate, isActive, isExactActive }"
@@ -44,8 +47,7 @@
               <li
                 id="admin-users-link"
                 :class="{
-                  'uk-active active': isActive,
-                  'uk-active active': isExactActive,
+                  'uk-active active': isActive || isExactActive,
                 }"
               >
                 <a :href="href" @click="navigate"><span>Users</span></a>
@@ -110,8 +112,7 @@
               <li
                 id="login-link"
                 :class="{
-                  'uk-active active': isActive,
-                  'uk-active active': isExactActive,
+                  'uk-active active': isActive || isExactActive,
                 }"
               >
                 <a :href="href" @click="navigate"><span>Login</span></a>
@@ -122,12 +123,6 @@
       </div>
     </div>
   </nav>
-
-  <div>
-    <router-link to="/login">Login</router-link> |
-    <router-link to="/admin">Administration</router-link> |
-    <router-link to="/admin/users">Users</router-link>
-  </div>
 </template>
 
 <script>
