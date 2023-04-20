@@ -2,6 +2,8 @@
 @import "cards";
 @import "buttons";
 @import "forms";
+@import "navbar";
+@import "tables";
 @import "helpers";
 
 * {
@@ -13,17 +15,89 @@ div, p, span, a {
   font-size: @font-size-default;
 }
 
-.nxd-mover{
+.nxd-mover {
   cursor: move;
   color: @color-grey-light;
 
-  &:hover{
+  &:hover {
     color: @color-grey;
   }
 }
 
-.login svg{
-  color: @color-primary;
-  font-size: 2rem;
-  margin-bottom: 1rem;
+.font-weight-light {
+  font-weight: @font-weight-light;
+}
+
+.font-weight-ultra-light {
+  font-weight: @font-weight-ultra-light;
+}
+
+.Vue-Toastification__container.top-right {
+  top: calc(80px + 1em) !important;
+}
+
+.uk-drop.uk-dropdown {
+  position: relative;
+  width: 260px;
+  background: @color-white;
+  box-shadow: rgba(0, 0, 0, .2) 0 0 4px 0;
+  padding: 0;
+  margin-right: -90px !important;
+
+  .arrow {
+    width: 15px;
+    height: 15px;
+    background: @color-white;
+    position: absolute;
+    z-index: -1;
+    top: -7px;
+    right: 24px;
+    transform: rotate(45deg);
+    box-shadow: rgba(0, 0, 0, .2) 0 0 4px 0;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+      background-color: transparent;
+
+      &:not(:last-of-type) {
+        border-bottom: 1px solid @color-grey-light;
+      }
+
+      &:hover {
+        background-color: @color-primary-hover;
+      }
+
+      a {
+        display: block;
+        positon: relative;
+        z-index: 1;
+        padding: 12px 24px;
+        background: @color-white;
+        color: @color-link-default;
+        text-decoration: none;
+        transition: color .25s ease-in-out, background .1s ease-in-out;
+
+        &:hover {
+          color: @color-white;
+          background: @color-primary;
+          transition: color .25s ease-in-out, background .1s ease-in-out;
+
+          .arrow {
+            background: @color-primary;
+            transition: background .1s ease-in-out;
+          }
+
+          .keystrokes {
+            opacity: 1;
+            transition: opacity .3s ease-in-out;
+          }
+        }
+      }
+    }
+  }
 }

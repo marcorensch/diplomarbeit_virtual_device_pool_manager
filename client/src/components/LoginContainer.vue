@@ -70,15 +70,14 @@
   </div>
 </template>
 <script>
-import { useUserStore } from "@/stores/user";
-
-const user = useUserStore();
+import { useAuthStore } from "@/stores/auth";
+const auth = useAuthStore();
 
 export default {
   name: "LoginContainer",
   data() {
     return {
-      user: user,
+      auth: auth,
       form: {
         username: "",
         password: "",
@@ -88,7 +87,7 @@ export default {
   methods: {
     handleLoginClicked(e) {
       e.preventDefault();
-      this.user.login(this.form.username, this.form.password);
+      this.auth.login(this.form.username, this.form.password);
     },
     handleRequestAccountClicked() {
       console.log("Request Account Clicked");

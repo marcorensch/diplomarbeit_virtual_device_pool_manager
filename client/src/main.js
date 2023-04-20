@@ -1,4 +1,4 @@
-import { createApp } from "vue";
+import { createApp, markRaw } from "vue";
 import App from "./App.vue";
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
@@ -17,12 +17,22 @@ import {
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { faCircle } from "@fortawesome/free-regular-svg-icons";
 
 library.add(faUser, faUserShield, faUserPlus, faUserEdit);
-library.add(faTrash, faXmark);
+library.add(faTrash, faXmark, faCircle);
 
 const pinia = createPinia();
-const toastOptions = {};
+pinia.use(({ store }) => {
+  store.router = markRaw(router);
+});
+const toastOptions = {
+  position: "top-right",
+  timeout: 3000,
+  closeOnClick: true,
+  pauseOnHover: false,
+  draggablePercent: 0.6,
+};
 
 createApp(App)
   .component("font-awesome-icon", FontAwesomeIcon)

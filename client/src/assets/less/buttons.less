@@ -1,6 +1,6 @@
 @import "variables";
 
-.uk-button{
+.uk-button {
   border-radius: @nxd-border-radius;
   padding: 0 23px;
   font-size: 16px;
@@ -9,10 +9,11 @@
   min-width: 160px;
   transition: background .1s ease-in-out, border .1s ease-in-out, color .1s ease-in-out;
 
-  &:hover{
+  &:hover {
     transition: background .1s ease-in-out, border .1s ease-in-out, color .1s ease-in-out;
   }
-  &.uk-disabled{
+
+  &.uk-disabled {
     > * {
       opacity: .2;
     }
@@ -72,5 +73,24 @@
     background-color: @color-danger-hover;
     border-color: @color-danger-hover;
     color: @color-white;
+  }
+}
+
+.uk-button-group {
+  .uk-button {
+    border-radius: 0;
+    border-right: 1px solid rgba(@color-grey-light, .2);
+    min-width: 0;
+
+    &:first-of-type {
+      border-top-left-radius: @nxd-border-radius;
+      border-bottom-left-radius: @nxd-border-radius;
+    }
+
+    &:last-of-type {
+      border-top-right-radius: @nxd-border-radius;
+      border-bottom-right-radius: @nxd-border-radius;
+        border-right: 0;
+    }
   }
 }

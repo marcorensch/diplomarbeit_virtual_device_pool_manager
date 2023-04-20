@@ -1,5 +1,7 @@
 
 export const permissions = {
+    // Admin
+    ACCESS_ADMIN: 'canAccessAdmin',
     // Account Management
     ACCESS_ACCOUNT_LIST: 'canAccessAccountList',
     ACCESS_ROLES_LIST: 'canAccessRolesList',
@@ -79,6 +81,7 @@ export class PermissionHandler {
     }
 
     getPermissions(userRoles) {
+        if (!userRoles) return new Map();
         userRoles = Array.isArray(userRoles) ? userRoles : [userRoles]
         let allPermissions = new Map();
 
