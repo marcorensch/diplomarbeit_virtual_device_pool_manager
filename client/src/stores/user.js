@@ -2,7 +2,10 @@ import { defineStore } from "pinia";
 import axios from "axios";
 
 export const useUserStore = defineStore("user", {
-  state: () => ({}),
+  state: () => ({
+    user: null,
+    userPermissions: [],
+  }),
   getters: {},
   actions: {
     async login(username, password) {
@@ -15,6 +18,13 @@ export const useUserStore = defineStore("user", {
       } catch (e) {
         console.log(e.response);
       }
+    },
+    logout() {
+      this.userPermissions = [];
+      this.user = null;
+    },
+    setUserPermissions(permissions) {
+      this.userPermissions = permissions;
     },
   },
 });

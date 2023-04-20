@@ -17,9 +17,11 @@
                 @keyup="filterAccountList"
               />
               <div
-                class="uk-position-center-right"
+                v-if="search_account.length > 0"
+                class="uk-position-center-right clear-search-icon"
                 style="margin-right: 15px"
                 @click="handleClearSearchAccClicked"
+                uk-tooltip="Clear search filter"
               >
                 <font-awesome-icon :icon="['fas', 'xmark']" />
               </div>
@@ -57,16 +59,22 @@
               <td>{{ user.firstname }}</td>
               <td>{{ user.lastname }}</td>
               <td :data-user-type="user.role">
-                <div v-if="user.role === 'admin'">
+                <div v-if="user.role === 'ADMIN'">
                   <font-awesome-icon :icon="['fas', 'user-shield']" /><span
                     class="uk-margin-small-left"
                     >Administrator
                   </span>
                 </div>
-                <div v-else>
+                <div v-else-if="user.role === 'USER'">
                   <font-awesome-icon :icon="['fas', 'user']" /><span
                     class="uk-margin-small-left"
                     >User
+                  </span>
+                </div>
+                <div v-else>
+                  <font-awesome-icon :icon="['fas', 'user']" /><span
+                    class="uk-margin-small-left"
+                    >{{ user.role }}
                   </span>
                 </div>
               </td>
@@ -214,17 +222,5 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.uk-button-group {
-  .uk-button {
-    min-width: unset;
-    &:not(:first-of-type) {
-      border-top-left-radius: 0;
-      border-bottom-left-radius: 0;
-    }
-    &:not(:last-of-type) {
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
-    }
-  }
-}
+@import "@/assets/less/admin.less";
 </style>

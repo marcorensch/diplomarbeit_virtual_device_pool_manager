@@ -7,6 +7,7 @@ export default class Role {
 }
 
 const Roles = {
-    admin : "Administator",
-    user : "User"
+    ADMIN : "Administator",
+    USER : "User",
+    GUEST : "Guest"
 }

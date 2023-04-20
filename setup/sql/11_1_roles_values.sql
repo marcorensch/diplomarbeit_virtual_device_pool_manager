@@ -1,1 +1,1 @@
-INSERT INTO `roles` (name, hidden) VALUES ('admin',''), ('user', '');
+INSERT INTO `roles` (name, hidden) VALUES ('ADMIN',''), ('USER', ''), ('GUEST', '');

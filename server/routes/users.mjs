@@ -5,7 +5,7 @@ import User from "../models/User.mjs";
 
 const router = express.Router();
 
-router.get('/', UserValidator.validateTokens, UserValidator.checkIsAdmin, UserValidator.setCookies, async (req, res) => {
+router.get('/', UserValidator.validateTokens, UserValidator.hasPermission('canAccessAccountList'), UserValidator.setCookies, async (req, res) => {
     const users = await UserFactory.getAllUsers();
     return res.status(200).json({users});
 });
