@@ -8,11 +8,11 @@ CREATE TABLE IF NOT EXISTS `users`
     lastname    varchar(255) NOT NULL DEFAULT '',
     notes       text         NOT NULL,
     hidden      text         NOT NULL,
-    role_id     int(11)      NOT NULL,
-    created_at  datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    modified_at datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    role_id     int(11)      NULL,
+    created_at  datetime     NOT NULL DEFAULT NOW(),
+    modified_at datetime     NOT NULL DEFAULT NOW() ON UPDATE NOW(),
     PRIMARY KEY (`id`),
-    CONSTRAINT `user_role_ibfk_1` FOREIGN KEY (role_id) REFERENCES `roles` (id)
+    CONSTRAINT `user_role_ibfk_1` FOREIGN KEY (role_id) REFERENCES `roles` (id) ON DELETE SET NULL ON UPDATE CASCADE
 )
     ENGINE = InnoDB
     DEFAULT CHARACTER SET = utf8
