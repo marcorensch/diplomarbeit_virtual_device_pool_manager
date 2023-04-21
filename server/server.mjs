@@ -45,7 +45,7 @@ app.use('/api/users', usersRouter);
 app.use('/api/roles', rolesRouter);
 
 app.get('/', (req, res) => {
-    res.send('Hello there! This isn\'t the page you\'re looking for. ⭐🧔⚔️');
+    res.send('Hello there! The Backend is reachable');
 })
 
 if(process.env.USE_SSL === true) {

@@ -30,8 +30,6 @@ export default class User {
         return await bcrypt.hash(plainPassword, 10);
     }
     async checkPassword(password) {
-        console.log("password: " + password)
-        console.log("this.password: " + this.password)
         return await bcrypt.compare(password, this.password);
     }
 

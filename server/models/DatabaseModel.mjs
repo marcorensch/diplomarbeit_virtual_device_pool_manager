@@ -1,6 +1,15 @@
 import * as dotenv from 'dotenv';
-dotenv.config();
 import mariadb from 'mariadb';
+import path from "path";
+
+const getDotEnvPath = (env) => {
+    if (env === 'TEST') {
+        return '.env.test'
+    }
+    return '.env'
+}
+
+dotenv.config({path: path.resolve(process.cwd(), getDotEnvPath(process.env.NODE_ENV?.toUpperCase()))});
 export default class DatabaseModel{
     configuration;
     constructor() {

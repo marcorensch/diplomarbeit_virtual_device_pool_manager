@@ -7,18 +7,23 @@ export default class UserValidator {
     static async validateLogin(req, res, next) {
         let {username, password} = req.body;
         if (!username || !password) return res.status(400).send("Username or password missing");
-
+        let user;
         try {
-            let user = await UserFactory.getUserByUsername(username);
-            if (!await user.checkPassword(password)) return res.status(401).send("Invalid password");
-            await user.generateTokens();
-            req.user = user;
-            req.setCookies = true;
-            next();
+            user = await UserFactory.getUserByUsername(username);
         } catch (e) {
-            console.log(e)
-            return res.status(500).send("Error while logging in");
+            return res.status(401).send("Invalid Credentials");
         }
+
+        if (!await user.checkPassword(password)) return res.status(401).send("Invalid Credentials");
+        try {
+            await user.generateTokens();
+        } catch (e) {
+            return res.status(500).send("Error while generating tokens");
+        }
+
+        req.user = user;
+        req.setCookies = true;
+        next();
     }
 
     static async validateTokens(req, res, next) {
@@ -89,9 +94,6 @@ export default class UserValidator {
             if (!req.user?.role) return res.status(403).send("Unauthorized");
             const permissionHandler = new PermissionHandler();
             const permissionsMap = permissionHandler.getPermissions(req.user.role);
-            console.log(action);
-            console.log(permissionsMap);
-            console.log(permissionsMap.has(action));
             if (!permissionsMap.has(action)) return res.status(403).send("Unauthorized");
 
             next();
