@@ -86,6 +86,7 @@ export class PermissionHandler {
         let allPermissions = new Map();
 
         userRoles.forEach(role => {
+            role = role.toUpperCase();
             if (this.rolePermissions[role]) {
                 this.rolePermissions[role].forEach(permission => {
                     allPermissions.set(permission, true)
