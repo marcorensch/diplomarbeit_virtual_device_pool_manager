@@ -11,6 +11,7 @@ export default class UserValidator {
         try {
             user = await UserFactory.getUserByUsername(username);
         } catch (e) {
+            console.log(e)
             return res.status(401).send("Invalid Credentials");
         }
 
@@ -18,6 +19,7 @@ export default class UserValidator {
         try {
             await user.generateTokens();
         } catch (e) {
+            console.log(e)
             return res.status(500).send("Error while generating tokens");
         }
 
