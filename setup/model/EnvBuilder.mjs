@@ -21,7 +21,7 @@ const schemas = {
         "API_HOST": "API_HOST",
         "API_PORT": "API_PORT",
         "USE_SSL": "USE_SSL",
-        "DATABASE_HOST": "DATABASE_PORT",
+        "DATABASE_HOST": "DATABASE_HOST",
         "DATABASE_PORT": "DATABASE_PORT",
         "DATABASE_USER": "DATABASE_USER",
         "DATABASE_PASSWORD": "DATABASE_PASSWORD",

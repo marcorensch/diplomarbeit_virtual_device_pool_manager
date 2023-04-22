@@ -30,6 +30,7 @@ export default class User {
         return await bcrypt.hash(plainPassword, 10);
     }
     async checkPassword(password) {
+        if(this.password === null) throw "Password is null";
         return await bcrypt.compare(password, this.password);
     }
 

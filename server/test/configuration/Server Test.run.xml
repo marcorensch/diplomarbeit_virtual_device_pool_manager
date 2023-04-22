@@ -1,0 +1,30 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Server Test" type="mocha-javascript-test-runner">
+    <node-interpreter>project</node-interpreter>
+    <node-options />
+    <mocha-package>$PROJECT_DIR$/server/node_modules/mocha</mocha-package>
+    <working-directory>$PROJECT_DIR$/server/test</working-directory>
+    <pass-parent-env>true</pass-parent-env>
+    <envs>
+      <env name="API_HOST" value="localhost" />
+      <env name="API_PORT" value="3000" />
+      <env name="DATABASE_HOST" value="127.0.0.1" />
+      <env name="DATABASE_NAME" value="virtual_device_pool_manager_test" />
+      <env name="DATABASE_PASSWORD" value="root" />
+      <env name="DATABASE_PORT" value="3306" />
+      <env name="DATABASE_USER" value="root" />
+      <env name="JWT_EXPIRATION" value="1h" />
+      <env name="JWT_REFRESH_EXPIRATION" value="7d" />
+      <env name="JWT_REFRESH_SECRET" value="195f06e8571476d6eba8dd2d383b716ce1856c582297ca725117e88eba4830acb81fd8b69dffb2518bede64fa23a6448fc16f5f13bccad83e696ee385fb72169" />
+      <env name="JWT_SECRET" value="a82a650e0565c3638709899e11891f116810c8eed88fc02d9c22c3e29e73adea4fa4da0723d7d9a0c92d5d4cdfce26957358f942d11de2a98428a7794783f6e0" />
+      <env name="NODE_ENV" value="test" />
+      <env name="USE_SSL" value="true" />
+    </envs>
+    <ui>bdd</ui>
+    <extra-mocha-options />
+    <test-kind>DIRECTORY</test-kind>
+    <test-directory>$PROJECT_DIR$/server/test</test-directory>
+    <recursive>false</recursive>
+    <method v="2" />
+  </configuration>
+</component>

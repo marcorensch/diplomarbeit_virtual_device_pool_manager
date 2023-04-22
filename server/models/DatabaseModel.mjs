@@ -30,9 +30,9 @@ export default class DatabaseModel{
         try {
             return mariadb.createConnection(this.configuration);
         } catch (err) {
-            console.log("Could not establish database connection")
-            console.log(this)
-            console.log(err)
+            console.error("Could not establish database connection")
+            console.error(this)
+            console.error(err)
         }
     }
 
