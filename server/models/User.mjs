@@ -50,7 +50,6 @@ export default class User {
     async save() {
         const database = new DatabaseModel();
         try {
-            console.log("role id: " + this.role_id);
             const roleData = await database.query("SELECT * FROM roles WHERE id = ? LIMIT 1", [this.role_id]);
             if (roleData.length === 0) throw "Role not found";
         } catch (e) {

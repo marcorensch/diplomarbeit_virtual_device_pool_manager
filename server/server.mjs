@@ -19,7 +19,7 @@ import cookieParser from "cookie-parser";
 import chalk from "chalk";
 
 import authRouter from "./routes/auth.mjs";
-import usersRouter from "./routes/users.mjs";
+import adminRouter from "./routes/admin.mjs";
 import rolesRouter from "./routes/roles.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -41,7 +41,7 @@ app.use(express.urlencoded({extended: true}));
 app.use(cookieParser());
 
 app.use('/api/auth', authRouter);
-app.use('/api/users', usersRouter);
+app.use('/api/admin', adminRouter);
 app.use('/api/roles', rolesRouter);
 
 app.get('/', (req, res) => {
