@@ -42,6 +42,6 @@ export default class UserFactory {
 
     static async getAllUsers() {
         const database = new DatabaseModel();
-        return await database.query("SELECT u.id, u.username, u.firstname, u.lastname, u.email, u.created_at, r.name AS role FROM users AS u JOIN roles AS r ON u.role_id = r.id ORDER BY u.username");
+        return await database.query("SELECT u.id, u.username, u.firstname, u.lastname, u.email, u.created_at, u.role_id, u.hidden, u.notes, r.name AS role FROM users AS u JOIN roles AS r ON u.role_id = r.id ORDER BY u.username");
     }
 }

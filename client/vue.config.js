@@ -13,7 +13,7 @@ module.exports = defineConfig({
 function defineServerConfiguration() {
   const certFile = path.join(__dirname, "..", "certs", "cert.pem");
   const keyFile = path.join(__dirname, "..", "certs", "key.pem");
-  if (process.env.VUE_APP_USE_SSL === true) {
+  if (process.env.VUE_APP_USE_SSL === "true") {
     if (fs.existsSync(certFile) && fs.existsSync(keyFile)) {
       return {
         type: "https",

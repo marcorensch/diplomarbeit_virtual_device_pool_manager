@@ -71,7 +71,10 @@
           </td>
           <td>
             <div class="uk-button-group">
-              <button class="uk-button uk-button-default">
+              <button
+                class="uk-button uk-button-default"
+                @click="handleEditAccClicked(user)"
+              >
                 <font-awesome-icon
                   class="uk-preserve-width"
                   :icon="['fas', 'user-edit']"
@@ -91,7 +94,13 @@
         </tr>
       </tbody>
     </table>
-    <AddAccountModal ref="modal" @accountCreated="getUsers" />
+    <AccountDetailsModal
+      :account="selectedAccount"
+      ref="modal"
+      @accountCreated="getUsers"
+      @accountUpdated="getUsers"
+      @modalClosed="selectedAccount = null"
+    />
   </div>
 </template>
 
@@ -99,7 +108,7 @@
 // @ is an alias to /src
 
 import axios from "axios";
-import AddAccountModal from "@/components/AddAccountModal.vue";
+import AccountDetailsModal from "@/components/AccountDetailsModal.vue";
 import { useToast } from "vue-toastification";
 import UIkit from "uikit";
 
@@ -117,7 +126,7 @@ function debounce(func, timeout = 400) {
 
 export default {
   name: "UsersView",
-  components: { AddAccountModal },
+  components: { AccountDetailsModal },
   setup() {
     return {
       toast,
@@ -127,6 +136,7 @@ export default {
     return {
       search_account: "",
       users: [],
+      selectedAccount: null,
     };
   },
   mounted() {
@@ -153,21 +163,19 @@ export default {
         });
       })();
     },
-    async handleAddAccClicked() {
+    handleAddAccClicked() {
+      this.$refs.modal.showModal();
+    },
+    handleEditAccClicked(user) {
+      this.selectedAccount = user;
       this.$refs.modal.showModal();
     },
     async getUsers() {
       try {
         const response = await axios.get("/api/admin/accounts");
         this.users = response.data.users.map((user) => {
-          return {
-            id: user.id,
-            username: user.username,
-            firstname: user.firstname,
-            lastname: user.lastname,
-            role: user.role,
-            isVisible: true,
-          };
+          user.isVisible = true;
+          return user;
         });
       } catch (error) {
         if (error.response.status === 401) {

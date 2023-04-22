@@ -48,7 +48,7 @@ app.get('/', (req, res) => {
     res.send('Hello there! The Backend is reachable');
 })
 
-if(process.env.USE_SSL === true) {
+if(process.env.USE_SSL === "true") {
     const keyPath = path.join(__dirname, '..', 'certs', 'key.pem');
     const certPath = path.join(__dirname, '..', 'certs', 'cert.pem');
     if (!fs.existsSync(keyPath) || !fs.existsSync(certPath)) {
@@ -60,7 +60,7 @@ if(process.env.USE_SSL === true) {
         key: fs.readFileSync(keyPath),
         cert: fs.readFileSync(certPath)
     }, app).listen(port, () => {
-        console.log(chalk.bgGreen.rgb(255, 255, 255).visible(` Server listening on port ${port} with SSL`));
+        console.log(chalk.bgGreen.rgb(255, 255, 255).visible(` Server listening on port ${port} with SSL `));
         if (process.env.NODE_ENV === 'test') {
             console.log(chalk.bgYellow.whiteBright(" Starting Server in Test Mode "));
         }

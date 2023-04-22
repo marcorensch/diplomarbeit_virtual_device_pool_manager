@@ -1,14 +1,19 @@
 <template>
-  <div id="addUserModal" class="uk-flex-top" uk-modal>
+  <div id="accountModal" class="uk-flex-top" uk-modal>
     <div class="uk-modal-dialog uk-margin-auto-vertical">
       <div class="uk-modal-header">
-        <h2 class="uk-modal-title">
+        <h3 class="uk-modal-title" v-if="!account">
           <font-awesome-icon :icon="['fas', 'user-plus']" />
           Add Account
-        </h2>
+        </h3>
+        <h3 class="uk-modal-title" v-else>
+          <font-awesome-icon :icon="['fas', 'user-edit']" />
+          Edit {{ account.username }}'s Account
+        </h3>
       </div>
       <div class="uk-modal-body">
         <form id="add-account-form" class="uk-form" autocomplete="off">
+          <input v-if="account" type="text" name="id" v-model="form.id" />
           <div class="uk-grid uk-child-width-expand uk-grid-small">
             <div>
               <div class="uk-margin">
@@ -133,27 +138,35 @@
           </div>
           <div class="notes-section">
             <a href="#" @click="showNotes = !showNotes">
-              <span v-if="!showNotes">Add Notes</span>
-              <span v-else>Hide Notes</span>
+              <span v-if="!showNotes"
+                ><font-awesome-icon :icon="['fas', 'chevron-down']" /> Show
+                Notes</span
+              >
+              <span v-else
+                ><font-awesome-icon :icon="['fas', 'chevron-up']" /> Hide
+                Notes</span
+              >
             </a>
           </div>
-          <div class="uk-margin" :class="{ 'uk-hidden': !showNotes }">
-            <textarea
-              tabindex="8"
-              class="uk-textarea"
-              rows="3"
-              placeholder="Notes"
-              v-model="form.notes"
-            ></textarea>
-          </div>
-          <div class="uk-margin" :class="{ 'uk-hidden': !showNotes }">
-            <textarea
-              tabindex="9"
-              class="uk-textarea"
-              rows="3"
-              placeholder="Hidden Notes"
-              v-model="form.hidden"
-            ></textarea>
+          <div class="uk-animation-fade" :class="{ 'uk-hidden': !showNotes }">
+            <div class="uk-margin">
+              <textarea
+                tabindex="8"
+                class="uk-textarea"
+                rows="3"
+                placeholder="Notes"
+                v-model="form.notes"
+              ></textarea>
+            </div>
+            <div class="uk-margin" :class="{ 'uk-hidden': !showNotes }">
+              <textarea
+                tabindex="9"
+                class="uk-textarea"
+                rows="3"
+                placeholder="Hidden Notes"
+                v-model="form.hidden"
+              ></textarea>
+            </div>
           </div>
         </form>
       </div>
@@ -165,8 +178,19 @@
             </button>
           </div>
           <div>
-            <button class="uk-button uk-button-primary" @click="addAccount">
+            <button
+              v-if="!account"
+              class="uk-button uk-button-primary"
+              @click="addAccount"
+            >
               Create Account
+            </button>
+            <button
+              v-else
+              class="uk-button uk-button-success"
+              @click="updateAccount"
+            >
+              Update Account
             </button>
           </div>
         </div>
@@ -188,19 +212,28 @@ import { useToast } from "vue-toastification";
 const toast = useToast();
 
 export default {
-  name: "AddAccountModal",
+  name: "AccountDetailsModal",
   setup() {
     return {
       v$: useVuelidate(),
       toast,
     };
   },
-  emits: ["account-created"],
+  props: {
+    account: {
+      type: Object,
+      default: () => {
+        return null;
+      },
+    },
+  },
+  emits: ["account-created", "modal-closed"],
   components: { FontAwesomeIcon },
   data() {
     return {
       showNotes: false,
       form: {
+        id: null,
         firstname: "",
         lastname: "",
         email: "",
@@ -237,10 +270,22 @@ export default {
   },
   async mounted() {
     await this.getUserRoles();
+    const modal = document.getElementById("accountModal");
+    modal.addEventListener("hide", () => {
+      this.$emit("modal-closed");
+      this.v$.$reset();
+    });
   },
   methods: {
     showModal() {
-      UIkit.modal("#addUserModal").show();
+      document.getElementById("add-account-form").reset();
+      this.$nextTick(() => {
+        if (this.account) {
+          console.log(this.account);
+          this.form = this.account;
+        }
+        UIkit.modal("#accountModal").show();
+      });
     },
     async getUserRoles() {
       try {
@@ -251,6 +296,10 @@ export default {
       } catch (error) {
         console.log(error);
       }
+    },
+    async updateAccount() {
+      const isFormCorrect = await this.v$.$validate();
+      if (!isFormCorrect) return;
     },
     async addAccount() {
       const isFormCorrect = await this.v$.$validate();
