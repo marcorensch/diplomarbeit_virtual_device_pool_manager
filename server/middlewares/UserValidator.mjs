@@ -11,7 +11,6 @@ export default class UserValidator {
         try {
             user = await UserFactory.getUserByUsername(username);
         } catch (e) {
-            console.log(e)
             return res.status(401).send("Invalid Credentials");
         }
 
