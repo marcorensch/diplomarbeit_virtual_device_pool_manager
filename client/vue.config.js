@@ -11,12 +11,10 @@ module.exports = defineConfig({
 });
 
 function defineServerConfiguration() {
-  console.log("Configuring dev server");
   const certFile = path.join(__dirname, "..", "certs", "cert.pem");
   const keyFile = path.join(__dirname, "..", "certs", "key.pem");
-  if (process.env.VUE_APP_USE_SSL) {
+  if (process.env.VUE_APP_USE_SSL === true) {
     if (fs.existsSync(certFile) && fs.existsSync(keyFile)) {
-      console.log("Using https");
       return {
         type: "https",
         options: {

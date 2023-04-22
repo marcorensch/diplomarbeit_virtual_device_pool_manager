@@ -3,7 +3,6 @@ import DatabaseModel from "../models/DatabaseModel.mjs";
 
 export default class UserFactory {
     static async getUser(data) {
-        console.log(data)
         const user = new User();
         user.setData(data);
         return user;

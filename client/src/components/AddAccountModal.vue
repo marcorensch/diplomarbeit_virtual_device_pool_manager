@@ -256,7 +256,7 @@ export default {
       const isFormCorrect = await this.v$.$validate();
       if (!isFormCorrect) return;
       try {
-        const response = await axios.post("/api/users", this.form);
+        const response = await axios.post("/api/admin/accounts", this.form);
         console.log(response);
         document.getElementById("add-account-form").reset();
         UIkit.modal("#addUserModal").hide();

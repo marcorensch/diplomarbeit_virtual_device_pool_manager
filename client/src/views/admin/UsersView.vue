@@ -158,7 +158,7 @@ export default {
     },
     async getUsers() {
       try {
-        const response = await axios.get("/api/users");
+        const response = await axios.get("/api/admin/accounts");
         this.users = response.data.users.map((user) => {
           return {
             id: user.id,
@@ -197,7 +197,7 @@ export default {
         );
       if (!confirmation) return;
       try {
-        await axios.delete(`/api/users/${user.id}`);
+        await axios.delete(`/api/admin/accounts/${user.id}`);
         toast.success("Account deleted");
         await this.getUsers();
       } catch (error) {

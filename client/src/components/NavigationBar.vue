@@ -115,7 +115,9 @@
                   'uk-active active': isActive || isExactActive,
                 }"
               >
-                <a :href="href" @click="navigate"><span>Login</span></a>
+                <a :href="href" @click="navigate">
+                  <span>Login</span>
+                </a>
               </li>
             </router-link>
           </ul>
@@ -139,9 +141,7 @@ export default {
       auth: useAuthStore(),
     };
   },
-  mounted() {
-    console.log(this.auth);
-  },
+  mounted() {},
   methods: {
     logout() {
       this.auth.logout();

@@ -2,17 +2,14 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 process.env.NODE_ENV = 'setup';
-import * as fs from "fs";
+
 import * as path from "path";
+import inquirer from 'inquirer';
 import {fileURLToPath} from 'url';
-import * as readline from "readline";
-import {stdin as input, stdout as output} from "node:process";
 import chalk from "chalk";
 import crypto from "crypto";
-import bcrypt from "bcrypt";
-
-import DatabaseConnector from "./model/DatabaseConnector.mjs";
-
+import EnvBuilder from "./model/EnvBuilder.mjs";
+import {createSSL, installDatabase, createAdministrator} from "./helpers/utilities.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -20,171 +17,245 @@ const __dirname = path.dirname(__filename);
 const pathToServer = path.join(__dirname, '..', 'server');
 const pathToClient = path.join(__dirname, '..', 'client');
 
-const yesOptions = ['y', 'yes', 'j', 'ja', 'true', '1', 1, true];
 
-async function main() {
-    await setupEnvironment();
-    await installDatabase();
-    await createAdminUser();
+const questions = [
+    {
+        type: 'input',
+        name: 'API_HOST',
+        message: 'Server API host?',
+        default() {
+            return 'localhost'
+        },
+    },
+    {
+        type: 'input',
+        name: 'API_PORT',
+        message: 'Server API port?',
+        default() {
+            return 3000;
+        },
+        filter: Number,
+    },
+    {
+        type: 'confirm',
+        name: 'USE_SSL',
+        message: 'Use SSL?',
+        default() {
+            return true
+        },
+    },
+    {
+        type: 'confirm',
+        name: 'createCertificates',
+        message: 'Create (Self Signed) SSL certificates?',
+        default() {
+            return true
+        },
+        when: (answers) => answers.USE_SSL
+    },
+    {
+        type: 'input',
+        name: 'DATABASE_HOST',
+        message: 'Database host?',
+        default() {
+            return '127.0.0.1'
+        }
+    },
+    {
+        type: 'input',
+        name: 'DATABASE_PORT',
+        message: 'Database port?',
+        default() {
+            return 3306;
+        },
+        filter: Number,
+    },
+    {
+        type: 'input',
+        name: 'DATABASE_USER',
+        message: 'Database user?',
+        default() {
+            return 'root'
+        }
+    },
+    {
+        type: 'input',
+        name: 'DATABASE_PASSWORD',
+        message: 'Database password?',
+        default() {
+            return 'root'
+        }
+    },
+    {
+        type: 'confirm',
+        name: 'createTestDatabase',
+        message: 'Create test database?',
+        default() {
+            return true
+        }
+    },
+    {
+        type: 'input',
+        name: 'DATABASE_HOST_TEST',
+        message: 'Test database host?',
+        default() {
+            return '127.0.0.1'
+        },
+        when: (answers) => answers.createTestDatabase
+    },
+    {
+        type: 'input',
+        name: 'DATABASE_PORT_TEST',
+        message: 'Test database port?',
+        default() {
+            return 3306;
+        },
+        filter: Number,
+        when: (answers) => answers.createTestDatabase
+    },
+    {
+        type: 'input',
+        name: 'DATABASE_USER_TEST',
+        message: 'Test database user?',
+        default() {
+            return 'root'
+        },
+        when: (answers) => answers.createTestDatabase
+    },
+    {
+        type: 'input',
+        name: 'DATABASE_PASSWORD_TEST',
+        message: 'Test database password?',
+        default() {
+            return 'root'
+        },
+        when: (answers) => answers.createTestDatabase
+    },
+    {
+        type: 'input',
+        name: 'JWT_EXPIRATION',
+        message: 'JWT expiration time?',
+        default() {
+            return '1h'
+        },
+        validate(value) {
+            const pass = value.match(
+                /^\d+[smhdwy]$/i
+            );
+            if (pass) {
+                return true;
+            }
+            return 'Please enter a valid duration (e.g. 1h, 30m, 1d, 1w, 1y)';
+        },
+    },
+    {
+        type: 'input',
+        name: 'JWT_REFRESH_EXPIRATION',
+        message: 'JWT refresh expiration time?',
+        default() {
+            return '7d'
+        },
+        validate(value) {
+            const pass = value.match(
+                /^\d+[smhdwy]$/i
+            );
+            if (pass) {
+                return true;
+            }
 
+            return 'Please enter a valid duration (e.g. 1h, 30m, 1d, 1w, 1y)';
+        },
+    },
+    {
+        type: 'input',
+        name: 'adminPassword',
+        message: 'Admin password?',
+        default() {
+            return false
+        }
+    }
 
-    console.log('\n-----------------------------------------------------------------------------');
-    console.log(chalk.green.bold('The configuration files have been stored!'));
-    console.log("The Server Configuration file can be found at: " + chalk.bold.blue(pathToServer + "/.env"));
-    console.log("The Client Configuration file can be found at: " + chalk.bold.blue(pathToClient + "/.env"));
-    console.log(chalk.bold('Note:') + '\nYou can change the configuration at any time by editing the .env file.');
-    console.log(chalk.bold.yellow('\nNEW TOKEN SECRETS WHERE CREATED - SECRETS SHOULD NOT BE SHARED WITH ANYONE!'));
-    console.log("\nPlease make sure your Database is running and the credentials are correct.");
-    console.log("You can now using " + chalk.bold("npm run devStart") + " to start your server locally.");
-    console.log('-----------------------------------------------------------------------------\n');
+]
+let answers = await inquirer.prompt(questions).then((answers) => {
+    return answers;
+});
 
+// add generated values
+answers.DATABASE_NAME = "virtual_device_pool_manager";
+answers.DATABASE_NAME_TEST = "virtual_device_pool_manager_test";
+answers.API_URI = `http${answers.USE_SSL ? 's' : ''}://${answers.API_HOST}:${answers.API_PORT}`;
+answers.JWT_SECRET = crypto.randomBytes(64).toString('hex');
+answers.JWT_REFRESH_SECRET = crypto.randomBytes(64).toString('hex');
+
+const envConfigurations = [
+    {
+        schema: 'server',
+        path: path.join(pathToServer, '.env'),
+    },
+    {
+        schema: 'server-test',
+        path: path.join(pathToServer, '.env.test'),
+    },
+    {
+        schema: 'client',
+        path: path.join(pathToClient, '.env'),
+    },
+    {
+        schema: 'client-test',
+        path: path.join(pathToClient, '.env.test'),
+    }
+];
+
+try {
+    for (const envConfig of envConfigurations) {
+        EnvBuilder.buildEnv(envConfig.path, answers, envConfig.schema);
+    }
+} catch (e) {
+    console.error(e);
+    process.exit(1);
 }
 
-async function setupEnvironment() {
-    const rl = readline.createInterface({
-        input,
-        output,
-    });
+if (answers.createCertificates) {
+    await createSSL(answers.API_HOST);
+}
 
-    const question = (question) => new Promise((resolve) => rl.question(question, resolve));
-
-    console.log(chalk.bold.blue("\nServer configuration"));
-
-    console.log("This Script guides you through the setup of the server and the client. You can press enter to use the default value. (default:" + chalk.bold.cyan("value") + ")\n");
-
-    const apiHostname = await question("Server host (default: localhost): ") || "localhost";
-    const serverPort = await question("Server port (default: 3000): ") || 3000;
-    const useSSL = yesOptions.includes(await question("Use SSL (default: false): ") || false);
-
-    const backendUri = useSSL ? `https://${apiHostname}:${serverPort}` : `http://${apiHostname}:${serverPort}`;
-
-    const createCerts = useSSL ? yesOptions.includes(await question("Create SSL certificates (default: false): ") || false) : false;
-
-    const jwtSecret = crypto.randomBytes(64).toString('hex');
-    const jwtRefreshSecret = crypto.randomBytes(64).toString('hex');
-    const jwtExpiration = await question("JWT expiration time (default: 1h): ") || "1h";
-    const jwtRefreshExpiration = await question("JWT refresh expiration time (default: 7d): ") || "7d";
-
-    console.log(chalk.bold.blue("\nDatabase configuration"));
-    const databaseHost = await question("Database host (default: 127.0.0.1): ") || "127.0.0.1";
-    const databasePort = await question("Database port (default: 3306): ") || 3306;
-    const databaseUser = await question("Database user (default: root): ") || "root";
-    const databasePassword = await question("Database password (default root): ") || "root";
-
-    rl.close();
-
-    const serverEnv = `API_URL=${backendUri}\nSERVER_PORT=${serverPort}\nUSE_SSL=${useSSL}\nDATABASE_HOST=${databaseHost}\nDATABASE_PORT=${databasePort}\nDATABASE_NAME=virtual_device_pool_manager\nDATABASE_USER=${databaseUser}\nDATABASE_PASSWORD=${databasePassword}\nJWT_SECRET=${jwtSecret}\nJWT_REFRESH_SECRET=${jwtRefreshSecret}\nJWT_EXPIRATION=${jwtExpiration}\nJWT_REFRESH_EXPIRATION=${jwtRefreshExpiration}`;
-    const clientEnv = ` VUE_APP_SERVER_PORT=${serverPort}\nVUE_APP_USE_SSL=${useSSL}\nVUE_APP_API_URI=${backendUri}`;
-
+if (answers.createTestDatabase) {
     try {
-        await fs.promises.writeFile(path.join(pathToServer, '.env'), serverEnv), {encoding: 'utf8', flag: 'w'};
-        await fs.promises.writeFile('.env', serverEnv, {encoding: 'utf8', flag: 'w'});
-        dotenv.config();
-    } catch (e) {
+        const connectionData = {
+            host: answers.DATABASE_HOST_TEST,
+            port: answers.DATABASE_PORT_TEST,
+            user: answers.DATABASE_USER_TEST,
+            password: answers.DATABASE_PASSWORD_TEST,
+            useDatabase: false,
+            database: answers.DATABASE_NAME_TEST,
+        }
+        await installDatabase(answers.DATABASE_NAME_TEST, connectionData);
+        connectionData.useDatabase = true;
+        await createAdministrator(answers.DATABASE_NAME_TEST, "test", connectionData);
+    }catch (e) {
         console.error(e);
         process.exit(1);
     }
-
-    try {
-        await fs.promises.writeFile(path.join(pathToClient, '.env'), clientEnv);
-    } catch (e) {
-        console.error(e);
-        process.exit(1);
-    }
-
-    console.log(chalk.bold.green("Parameters set!"));
-
-    if (createCerts) {
-        await createSSL(apiHostname);
-    }
 }
 
-async function createSSL(apiHostname) {
-    const {exec} = await import('child_process');
-
-    const sslPath = path.join(__dirname, '..', 'certs');
-
-    try {
-        if (!fs.existsSync(sslPath)) await fs.promises.mkdir(sslPath);
-    } catch (e) {
-        console.error(e);
-        process.exit(1);
+try {
+    const connectionData = {
+        host: answers.DATABASE_HOST,
+        port: answers.DATABASE_PORT,
+        user: answers.DATABASE_USER,
+        password: answers.DATABASE_PASSWORD,
+        useDatabase: false,
+        database: answers.DATABASE_NAME,
     }
-
-    console.log(chalk.bold.yellow("Creating SSL certificates..."));
-
-    try {
-        await exec(`openssl req -x509 -newkey rsa:4096 -keyout ${path.join(sslPath, 'key.pem')} -out ${path.join(sslPath, 'cert.pem')} -days 365 -nodes -subj "/CN=${apiHostname}"`);
-        console.log(chalk.bold.green("SSL certificates created!"));
-    } catch (e) {
-        console.log(chalk.bold.red("Failed to create SSL certificates!"));
-        console.error(e);
-    }
+    await installDatabase(answers.DATABASE_NAME, connectionData);
+    connectionData.useDatabase = true;
+    await createAdministrator(answers.DATABASE_NAME_TEST, answers.adminPassword, connectionData);
+}catch (e) {
+    console.error(e);
+    process.exit(1);
 }
 
-async function createAdminUser() {
-    const username = 'administrator';
-    const password = crypto.randomBytes(12).toString('hex');
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const adminUserRoleData = await DatabaseConnector.execute('SELECT id FROM roles WHERE name = ?', ['admin']);
-    const status = await DatabaseConnector.execute('INSERT INTO users (username, password, notes, hidden, role_id) VALUES (?, ?, ?, ?, ?)', [username, hashedPassword, '', '', adminUserRoleData[0].id]);
 
-    if (status.affectedRows === 1) {
-        console.log(chalk.bold.green("\n********************* Admin user created! *********************\n"));
-        console.log(chalk.bold.yellow("Username: " + username));
-        console.log(chalk.bold.yellow("Password: " + password));
-        console.log(chalk.bold("Please change the password after the first login!"));
-        console.log(chalk.bold.green("\n***************************************************************"));
-    } else {
-        console.log(chalk.bold.red("Failed to create admin user!"));
-        console.log(status);
-    }
-};
-
-async function installDatabase() {
-    const rl = readline.createInterface({
-        input,
-        output,
-    });
-
-    const question = (question) => new Promise((resolve) => rl.question(question, resolve));
-
-    console.log(chalk.bold.blue("\nDatabase setup"));
-
-    let removeDatabase = await question("Do you want to remove the existing database? (default: yes): ") || true;
-    let createTestDatabase = await question("Do you want to create a test database? (default: no): ") || true;
-
-    removeDatabase = yesOptions.includes(removeDatabase);
-    createTestDatabase = yesOptions.includes(createTestDatabase);
-
-    rl.close();
-
-    if (removeDatabase) {
-        console.log(chalk.bold.yellow("Removing database..."));
-        await DatabaseConnector.dropDatabase();
-    }
-
-    console.log(chalk.bold.yellow("Creating database..."));
-    await DatabaseConnector.createDatabase(process.env.DATABASE_NAME);
-
-    console.log(chalk.bold.yellow("Installing tables..."));
-    const sqlScripts = await getFiles(path.join(__dirname, 'sql'));
-    for (const sqlScript of sqlScripts) {
-        if (sqlScript === '01_create_database.sql') continue;
-        console.log(chalk("Executing " + sqlScript))
-        const sql = await fs.promises.readFile(path.join(__dirname, 'sql', sqlScript), 'utf8');
-        await DatabaseConnector.execute(sql);
-        console.log(chalk.green("Done!"))
-    }
-}
-
-async function getFiles(dir) {
-    const dirents = await fs.promises.readdir(dir, {withFileTypes: true});
-    return dirents
-        .filter(dirent => dirent.isFile())
-        .map(dirent => dirent.name);
-}
-
-await main();
-
-process.exit(0);
+console.log('\n-----------------------------------------------------------------------------');
+console.log("You can now using " + chalk.bold("npm run devStart") + " to start your server locally.");
+console.log('-----------------------------------------------------------------------------\n');

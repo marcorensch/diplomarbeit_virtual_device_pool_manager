@@ -4,7 +4,7 @@ import {PermissionHandler} from "../helpers/PermissionHandler.mjs";
 
 const router = express.Router();
 
-router.post('/login', UserValidator.validateLogin, UserValidator.setCookies, (req, res) => {
+router.post('/login', UserValidator.validateLogin, UserValidator.setCookies,(req, res) => {
 
     const permissionHandler = new PermissionHandler();
     const permissions = permissionHandler.getPermissions(req.user.role);
@@ -18,6 +18,6 @@ router.post('/login', UserValidator.validateLogin, UserValidator.setCookies, (re
 router.post('/logout', (req, res) => {
     res.clearCookie('nxd-token');
     res.clearCookie('nxd-refresh-token');
-    res.status(200).json({message: 'Logout successful'});
+    res.status(200).send('Logout successful');
 });
 export default router;
