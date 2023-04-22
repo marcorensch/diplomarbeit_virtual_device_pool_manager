@@ -37,7 +37,6 @@ describe("Test API Availability", () => {
         const data = {firstname: "test", lastname: "test", username: "test", password: "test", role_id: 2};
         await agent.post("/api/auth/login").send(adminCredentials);
         const response = await agent.put("/api/admin/accounts/99999999999999999").send(data);
-        console.log(response.text)
         expect(response.status).to.equal(404);
     });
 });
