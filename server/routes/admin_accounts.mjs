@@ -34,6 +34,30 @@ router.post('/', UserValidator.hasPermission('canCreateAccount'), UserValidator.
     }
 });
 
+router.put('/:id', UserValidator.hasPermission("canUpdateAccount"), UserValidator.setCookies, async (req, res) => {
+    const {id} = req.params;
+    const {username, firstname, lastname, password, email, role_id, notes, hidden} = req.body;
+    if (!username || !role_id) return res.status(400).send("Missing data");
+
+    let user;
+    try {
+        user = await UserFactory.getUserById(id);
+    } catch (e) {
+        return res.status(404).send("Error while identifying user");
+    }
+
+    user.setData({username, firstname, lastname, email, role_id, notes, hidden})
+    if (password) user.password = await user.encryptPassword(password);
+
+    try {
+        await user.save();
+        return res.status(200).json({message: "User updated", id: user.id});
+    } catch (e) {
+        console.log(e)
+        return res.status(500).send("Error while updating user");
+    }
+});
+
 router.delete('/:id', UserValidator.hasPermission("canDeleteAccount"), UserValidator.setCookies, async (req, res) => {
     const {id} = req.params;
     let user;

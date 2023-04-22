@@ -27,11 +27,19 @@ describe("Test API Availability", () => {
         const response = await agent.delete("/api/admin/accounts/100");
         expect(response.status).to.equal(401);
     });
-    // it("should return 401 for put on /api/users", async () => {
-    //     const data = {firstname: "test", lastname: "test", username: "test", password: "test", role_id: 1};
-    //     const response = await supertest(app).put("/api/users/100", data);
-    //     expect(response.status).to.equal(401);
-    // });
+    it("should return 401 for put on /api/admin/accounts if no admin account used", async () => {
+        const data = {firstname: "test", lastname: "test", username: "test", password: "test", role_id: 2};
+        await agent.get("/api/auth/logout");
+        const response = await agent.put("/api/admin/accounts/99999999999999999").send(data);
+        expect(response.status).to.equal(401);
+    });
+    it("should return 404 for put on /api/admin/accounts if user does not exist", async () => {
+        const data = {firstname: "test", lastname: "test", username: "test", password: "test", role_id: 2};
+        await agent.post("/api/auth/login").send(adminCredentials);
+        const response = await agent.put("/api/admin/accounts/99999999999999999").send(data);
+        console.log(response.text)
+        expect(response.status).to.equal(404);
+    });
 });
 
 describe("Test Authentication Routes", () => {
