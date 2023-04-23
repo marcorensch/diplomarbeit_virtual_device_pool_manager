@@ -19,6 +19,7 @@
       <env name="JWT_SECRET" value="a82a650e0565c3638709899e11891f116810c8eed88fc02d9c22c3e29e73adea4fa4da0723d7d9a0c92d5d4cdfce26957358f942d11de2a98428a7794783f6e0" />
       <env name="NODE_ENV" value="test" />
       <env name="USE_SSL" value="true" />
+      <env name="NODE_TLS_REJECT_UNAUTHORIZED" value="0" />
     </envs>
     <ui>bdd</ui>
     <extra-mocha-options />

@@ -15,7 +15,7 @@ router.post('/login', UserValidator.validateLogin, UserValidator.setCookies,(req
 
 })
 
-router.post('/logout', (req, res) => {
+router.get('/logout', (req, res) => {
     res.clearCookie('nxd-token');
     res.clearCookie('nxd-refresh-token');
     res.status(200).send('Logout successful');
