@@ -21,6 +21,7 @@ import chalk from "chalk";
 import authRouter from "./routes/auth.mjs";
 import adminRouter from "./routes/admin.mjs";
 import rolesRouter from "./routes/roles.mjs";
+import accountsRouter from "./routes/accounts.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -43,6 +44,7 @@ app.use(cookieParser());
 app.use('/api/auth', authRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/roles', rolesRouter);
+app.use('/api/accounts', accountsRouter);
 
 app.get('/', (req, res) => {
     res.send('Hello there! The Backend is reachable');

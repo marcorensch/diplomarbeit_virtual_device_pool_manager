@@ -1,6 +1,6 @@
 <template>
   <NavigationBar />
-  <div class="uk-section">
+  <div class="uk-section uk-section-small">
     <div class="uk-container">
       <router-view v-slot="{ Component, route }">
         <transition :name="route.meta.transition || 'fade'" mode="out-in">

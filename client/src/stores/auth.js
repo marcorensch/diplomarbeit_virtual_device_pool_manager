@@ -46,6 +46,19 @@ export const useAuthStore = defineStore("auth", {
         toast.error("Error while logging in, please try again");
       }
     },
+    async updateProfile(data) {
+      try {
+        const response = await axios.put(`/api/accounts/${this.user.id}`, data);
+        this.user = response.data.user;
+        localStorage.setItem("user", JSON.stringify(this.user));
+        toast.success("Successfully updated profile");
+        return true;
+      } catch (e) {
+        console.log(e.response);
+        toast.error("Error while updating profile, please try again");
+        return false;
+      }
+    },
     async logout() {
       this.userPermissions = [];
       this.user = null;
