@@ -34,6 +34,13 @@ describe("Test Authentication Routes", () => {
         expect(response.body).to.have.property("user");
     });
 
+    it("should return user data in body without password on login /api/auth/login", async () => {
+        const response = await agent.post("/api/auth/login").send(adminCredentials);
+        expect(response.status).to.eql(200);
+        expect(response.body).to.have.property("user");
+        expect(response.body.user).to.not.have.property("password");
+    });
+
     it("should return permission data in body for /api/auth/login with correct credentials", async () => {
         const response = await agent.post("/api/auth/login").send(adminCredentials);
         expect(response.status).to.eql(200);
@@ -87,10 +94,11 @@ describe("Test Administrative Account Routes", () => {
         const response = await agent.post("/api/admin/accounts").send(newUsrAcc);
         expect(response.status).to.eql(201);
     });
-    it("should return 409 for post on /api/users when creating new account with existing username", async () => {
+    it("should return 409 with message 'Username already in use' for post on /api/admin/accounts with existing username", async () => {
         await agent.post("/api/auth/login").send(adminCredentials);
         const response = await agent.post("/api/admin/accounts").send(newUsrAcc);
         expect(response.status).to.eql(409);
+        expect(response.text).to.eql("Username already in use");
     });
 
     it("should return 200 when deleting existing user", async () => {
@@ -115,8 +123,8 @@ describe("Test Administrative Account Routes", () => {
     });
     it("should return 400 on /api/admin/accounts when logged in and trying to delete own account", async () => {
         await agent.get("/api/auth/logout");
-        await agent.post("/api/auth/login").send(adminCredentials);
-        const response = await agent.delete("/api/admin/accounts/1");
+        const auth = await agent.post("/api/auth/login").send(adminCredentials);
+        const response = await agent.delete(`/api/admin/accounts/${auth.body.user.id}`);
         expect(response.status).to.eql(403);
         expect(response.text).to.eql("You cannot delete your own account here");
     });
