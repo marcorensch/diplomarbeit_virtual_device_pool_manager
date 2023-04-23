@@ -5,11 +5,14 @@
         <div class="uk-card uk-card-default login">
           <div class="uk-card-header">
             <h3 class="uk-card-title">
-              <div class="uk-flex uk-grid-small">
-                <div class="uk-flex uk-flex-middle">
-                  <font-awesome-icon :icon="['fas', 'user']" />
+              <div class="uk-flex-middle uk-grid-small" uk-grid>
+                <div class="uk-width-auto">
+                  <font-awesome-icon
+                    :icon="['fas', 'user']"
+                    class="uk-preserve-width uk-heading-large"
+                  />
                 </div>
-                <div>
+                <div class="uk-width-expand">
                   <div class="uk-h3 uk-text-bold uk-margin-remove">
                     Virtual Device Pool Manager
                   </div>
@@ -42,25 +45,28 @@
                 </div>
               </div>
             </div>
-            <div
-              class="uk-card-footer uk-flex uk-flex-right uk-grid-small uk-child-width-expand"
-            >
-              <div>
-                <button
-                  class="uk-button uk-button-secondary uk-width-1-1"
-                  @click="handleRequestAccountClicked"
-                  type="button"
-                >
-                  Request Account
-                </button>
-              </div>
-              <div>
-                <button
-                  class="uk-button uk-button-primary uk-width-1-1"
-                  type="submit"
-                >
-                  Login
-                </button>
+            <div class="uk-card-footer">
+              <div
+                class="uk-flex-right@m uk-grid-small uk-child-width-1-1 uk-child-width-expand@m"
+                uk-grid
+              >
+                <div>
+                  <button
+                    class="uk-button uk-button-secondary uk-width-1-1"
+                    @click="handleRequestAccountClicked"
+                    type="button"
+                  >
+                    Request Account
+                  </button>
+                </div>
+                <div>
+                  <button
+                    class="uk-button uk-button-primary uk-width-1-1"
+                    type="submit"
+                  >
+                    Login
+                  </button>
+                </div>
               </div>
             </div>
           </form>

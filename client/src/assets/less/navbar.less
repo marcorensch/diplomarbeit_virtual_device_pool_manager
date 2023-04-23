@@ -139,3 +139,25 @@ li#user-icon-link {
     }
   }
 }
+
+ul.uk-nav-primary {
+  li:not(:last-of-type) {
+    border-bottom: 1px solid @color-grey-light;
+  }
+  li {
+    a {
+      span {
+        font-size: 1.5rem;
+        color: @color-grey-dark;
+      }
+    }
+  }
+  li.uk-active {
+    a {
+      span {
+        font-size: 1.5rem;
+        color: @color-primary
+      }
+    }
+  }
+}

@@ -52,7 +52,7 @@ export const useAuthStore = defineStore("auth", {
       localStorage.removeItem("user");
       localStorage.removeItem("permissions");
       try {
-        const response = await axios.post("/api/auth/logout");
+        const response = await axios.get("/api/auth/logout");
         if (response.status === 200) {
           toast.info("Successfully logged out");
           this.router.push("/");
