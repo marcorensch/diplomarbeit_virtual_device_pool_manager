@@ -62,7 +62,11 @@
             </div>
             <div v-else-if="user.role === 'USER'">
               <font-awesome-icon :icon="['fas', 'user']" />
-              <span class="uk-margin-small-left">User </span>
+              <span class="uk-margin-small-left">Registered User </span>
+            </div>
+            <div v-else-if="user.role === 'GUEST'">
+              <font-awesome-icon :icon="['fas', 'user']" />
+              <span class="uk-margin-small-left">Registered Guest </span>
             </div>
             <div v-else>
               <font-awesome-icon :icon="['fas', 'user']" />

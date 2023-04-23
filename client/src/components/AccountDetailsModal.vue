@@ -300,6 +300,7 @@ export default {
     await this.getUserRoles();
     const modal = document.getElementById("accountModal");
     modal.addEventListener("hide", () => {
+      this.v$.$reset();
       this.$emit("modal-closed");
     });
   },
@@ -331,8 +332,18 @@ export default {
       }
     },
     async updateAccount() {
-      if (!(await this.v$.$validate())) return;
+      const formIsValid = await this.v$.$validate();
+      if (!formIsValid) return;
       console.log(this.form);
+      try {
+        await axios.put(`/api/admin/accounts/${this.form.id}`, this.form);
+        this.hideModal();
+        this.toast.success("Account Updated Successfully");
+        this.$emit("account-updated");
+      } catch (error) {
+        console.log(error);
+        this.toast.error("Error Updating Account - Please Try Again");
+      }
     },
     async addAccount() {
       if (!(await this.v$.$validate())) return;
