@@ -12,8 +12,8 @@
         </h3>
       </div>
       <div class="uk-modal-body">
-        <form id="add-account-form" class="uk-form" autocomplete="off">
-          <input v-if="account" type="text" name="id" v-model="form.id" />
+        <form id="account-form" class="uk-form" autocomplete="off">
+          <input v-if="account" type="hidden" name="id" v-model="form.id" />
           <div class="uk-grid uk-child-width-expand uk-grid-small">
             <div>
               <div class="uk-margin">
@@ -83,6 +83,9 @@
                   v-model="form.password"
                 />
               </div>
+              <div class="uk-text-meta uk-text-small" v-if="account">
+                Leave blank to keep current password.
+              </div>
               <div
                 class="uk-alert uk-alert-danger uk-text-small"
                 v-for="error of v$.form.password.$errors"
@@ -119,7 +122,6 @@
               v-model="form.role_id"
               :class="{ 'form-invalid': v$.form.role_id.$errors }"
             >
-              <option value="0" disabled>Select Role</option>
               <option
                 v-for="role in roleOptions"
                 :value="role.id"
@@ -240,7 +242,7 @@ export default {
         username: "",
         password: "",
         confirmPassword: "",
-        role_id: "0",
+        role_id: "",
         notes: "",
         hidden: "",
       },
@@ -248,41 +250,70 @@ export default {
     };
   },
   validations() {
-    return {
-      form: {
-        username: {
-          required,
-          minLength: minLength(7),
+    if (this.account) {
+      return {
+        form: {
+          username: {
+            required,
+            minLength: minLength(7),
+          },
+          password: {
+            required: this.hasEnteredPassword(),
+            minLength: minLength(8),
+          },
+          confirmPassword: {
+            required: this.hasEnteredPassword(),
+            sameAsPassword: this.hasEnteredPassword()
+              ? sameAs(this.form.password)
+              : {},
+          },
+          role_id: {
+            required,
+            minValueValue: minValue(1),
+          },
         },
-        password: {
-          required,
-          minLength: minLength(8),
+      };
+    } else {
+      return {
+        form: {
+          username: {
+            required,
+            minLength: minLength(7),
+          },
+          password: {
+            required,
+            minLength: minLength(8),
+          },
+          confirmPassword: {
+            required,
+            sameAsPassword: sameAs(this.form.password),
+          },
+          role_id: {
+            required,
+            minValueValue: minValue(1),
+          },
         },
-        confirmPassword: {
-          sameAsPassword: sameAs(this.form.password),
-        },
-        role_id: {
-          required,
-          minValueValue: minValue(1),
-        },
-      },
-    };
+      };
+    }
   },
   async mounted() {
     await this.getUserRoles();
     const modal = document.getElementById("accountModal");
     modal.addEventListener("hide", () => {
       this.$emit("modal-closed");
-      this.v$.$reset();
     });
   },
   methods: {
+    hasEnteredPassword() {
+      return this.form.password.length > 0;
+    },
     showModal() {
-      document.getElementById("add-account-form").reset();
+      document.getElementById("account-form").reset();
+      this.v$.$reset();
       this.$nextTick(() => {
         if (this.account) {
-          console.log(this.account);
-          this.form = this.account;
+          const form = { ...this.form, ...this.account };
+          this.form = form;
         }
         UIkit.modal("#accountModal").show();
       });
@@ -293,28 +324,32 @@ export default {
         response.data.roles.map((role) => {
           this.roleOptions.push(new Role(role.id, role.name));
         });
+        this.roleOptions.unshift({ id: 0, label: "Select Role" });
+        console.log(this.roleOptions);
       } catch (error) {
         console.log(error);
       }
     },
     async updateAccount() {
-      const isFormCorrect = await this.v$.$validate();
-      if (!isFormCorrect) return;
+      if (!(await this.v$.$validate())) return;
+      console.log(this.form);
     },
     async addAccount() {
-      const isFormCorrect = await this.v$.$validate();
-      if (!isFormCorrect) return;
+      if (!(await this.v$.$validate())) return;
       try {
         const response = await axios.post("/api/admin/accounts", this.form);
         console.log(response);
-        document.getElementById("add-account-form").reset();
-        UIkit.modal("#addUserModal").hide();
         this.toast.success("Account Created Successfully");
         this.$emit("account-created");
+        this.hideModal();
       } catch (error) {
         console.log(error);
         this.toast.error("Error Creating Account - Please Try Again");
       }
+    },
+
+    hideModal() {
+      UIkit.modal("#accountModal").hide();
     },
   },
 };
