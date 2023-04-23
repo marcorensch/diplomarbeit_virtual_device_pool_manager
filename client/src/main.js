@@ -11,6 +11,10 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import {
   faChevronDown,
   faChevronUp,
+  faSlash,
+  faSort,
+  faSortDown,
+  faSortUp,
   faTrash,
   faUser,
   faUserEdit,
@@ -23,6 +27,7 @@ import { faCircle } from "@fortawesome/free-regular-svg-icons";
 
 library.add(faUser, faUserShield, faUserPlus, faUserEdit);
 library.add(faTrash, faXmark, faCircle, faChevronDown, faChevronUp);
+library.add(faSort, faSortUp, faSortDown, faSlash);
 
 const pinia = createPinia();
 pinia.use(({ store }) => {

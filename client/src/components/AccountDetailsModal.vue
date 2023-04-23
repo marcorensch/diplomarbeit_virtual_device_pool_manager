@@ -8,7 +8,7 @@
         </h3>
         <h3 class="uk-modal-title" v-else>
           <font-awesome-icon :icon="['fas', 'user-edit']" />
-          Edit {{ account.username }}'s Account
+          Edit <span class="uk-visible@m">{{ account.username }}'</span> Account
         </h3>
       </div>
       <div class="uk-modal-body">
@@ -173,23 +173,28 @@
         </form>
       </div>
       <div class="uk-card-footer">
-        <div class="uk-flex uk-flex-right uk-grid-small">
+        <div
+          class="uk-flex-right@m uk-grid-small uk-child-width-1-1 uk-child-width-auto@m"
+          uk-grid
+        >
           <div>
-            <button class="uk-button uk-button-secondary uk-modal-close">
+            <button
+              class="uk-button uk-button-secondary uk-modal-close uk-width-1-1 uk-width-auto@m"
+            >
               Cancel
             </button>
           </div>
           <div>
             <button
               v-if="!account"
-              class="uk-button uk-button-primary"
+              class="uk-button uk-button-primary uk-width-1-1 uk-width-auto@m"
               @click="addAccount"
             >
               Create Account
             </button>
             <button
               v-else
-              class="uk-button uk-button-success"
+              class="uk-button uk-button-success uk-width-1-1 uk-width-auto@m"
               @click="updateAccount"
             >
               Update Account
