@@ -39,8 +39,6 @@
 
 <script>
 import { useAuthStore } from "@/stores/auth";
-import { useToast } from "vue-toastification";
-const toast = useToast();
 export default {
   name: "DeleteAccountWidget",
   data() {
