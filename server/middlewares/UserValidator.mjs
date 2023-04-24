@@ -15,7 +15,7 @@ export default class UserValidator {
         }
 
         try{
-            if (!await user.checkPassword(password)) return res.status(401).send("Invalid Credentials");
+            if (!await user.comparePasswords(password)) return res.status(401).send("Invalid Credentials");
         }catch (e) {
             console.log(e)
             return res.status(500).send("Error while validating credentials");

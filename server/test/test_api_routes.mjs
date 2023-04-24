@@ -10,11 +10,6 @@ const adminCredentials = {
     password: "test"
 }
 
-const userCredentials = {
-    username: "test",
-    password: "test"
-}
-
 describe("Test API Availability", () => {
     it("should return 200 for get on  /", async () => {
         const response = await agent.get("/");
@@ -127,5 +122,171 @@ describe("Test Administrative Account Routes", () => {
         const response = await agent.delete(`/api/admin/accounts/${auth.body.user.id}`);
         expect(response.status).to.eql(403);
         expect(response.text).to.eql("You cannot delete your own account here");
+    });
+});
+
+describe("Test User available Account Routes", () => {
+    const newUsrAcc = {firstname: "", lastname: "", username: "accountTestsUser", password: "accountTestsUser", email:"", notes:"", hidden:"", role_id: 2};
+    const secondUsrAcc = {firstname: "", lastname: "", username: "existingUserName", password: "accountTestsUser", email:"", notes:"", hidden:"", role_id: 2};
+    const accountTestsUserAcc = {
+        username: "accountTestsUser",
+        password: "accountTestsUser",
+    }
+    const secondUsrAccCredentials = {
+        username: "existingUserName",
+        password: "accountTestsUser",
+    }
+    before(async () => {
+        await agent.get("/api/auth/logout");
+        await agent.post("/api/auth/login").send(adminCredentials);
+        await agent.post("/api/admin/accounts").send(newUsrAcc);
+        await agent.post("/api/admin/accounts").send(secondUsrAcc);
+        await agent.get("/api/auth/logout");
+    });
+    after(async () => {
+        await agent.get("/api/auth/logout");
+        await agent.post("/api/auth/login").send(adminCredentials);
+        const data = await agent.get("/api/admin/accounts");
+        const testUsr = data.body.users.find((usr) => usr.username === "accountTestsUser");
+        const testUsr2 = data.body.users.find((usr) => usr.username === "existingUserName");
+        await agent.delete("/api/admin/accounts/" + testUsr.id);
+        await agent.delete("/api/admin/accounts/" + testUsr2.id);
+        await agent.get("/api/auth/logout");
+    });
+
+    describe("updating own account",  () => {
+        beforeEach(async () => {
+            await agent.get("/api/auth/logout");
+        });
+        it("should return 200 when updating firstname", async () => {
+            const login = await agent.post("/api/auth/login").send(accountTestsUserAcc);
+            const response = await agent.put(`/api/accounts/${login.body.user.id}`).send({firstname: "test"});
+            expect(response.status).to.eql(200, response.text);
+        });
+        it("should return 200 when updating lastname", async () => {
+            const login = await agent.post("/api/auth/login").send(accountTestsUserAcc);
+            const response = await agent.put(`/api/accounts/${login.body.user.id}`).send({lastname: "test"});
+            expect(response.status).to.eql(200, response.text);
+        });
+        it("should return 200 when updating email", async () => {
+            const login = await agent.post("/api/auth/login").send(accountTestsUserAcc);
+            const response = await agent.put(`/api/accounts/${login.body.user.id}`).send({email: "my@address.tld"});
+            expect(response.status).to.eql(200, response.text);
+        });
+        it("should return 200 when updating email, firstname, lastname", async () => {
+            const login = await agent.post("/api/auth/login").send(accountTestsUserAcc);
+            const response = await agent.put(`/api/accounts/${login.body.user.id}`).send({lastname: "newLastname", firstname: "newFirstname", email: "my@address.tld"});
+            expect(response.status).to.eql(200, response.text);
+        });
+        it("should return 200 when updating username (that is not already in use)", async () => {
+            const login = await agent.post("/api/auth/login").send(accountTestsUserAcc);
+            const response = await agent.put(`/api/accounts/${login.body.user.id}`).send({username: "newTestUsername"});
+            const switchBack = await agent.put(`/api/accounts/${login.body.user.id}`).send({username: "accountTestsUser"});
+            expect(response.status).to.eql(200, response.text);
+            expect(switchBack.status).to.eql(200, switchBack.text);
+        });
+        it("should return 200 when updating password", async () => {
+            const login = await agent.post("/api/auth/login").send(accountTestsUserAcc);
+            const response = await agent.put(`/api/accounts/${login.body.user.id}`).send({password: "myNewPassword"});
+            const switchBack = await agent.put(`/api/accounts/${login.body.user.id}`).send({password: "accountTestsUser"});
+            expect(response.status).to.eql(200, response.text);
+            expect(switchBack.status).to.eql(200, switchBack.text);
+        });
+        it("should return 400 when trying to delete last admin account", async () => {
+            const login = await agent.post("/api/auth/login").send(adminCredentials);
+            const response = await agent.delete(`/api/accounts/${login.body.user.id}`);
+            expect(response.status).to.eql(409, response.text);
+            expect(response.text).to.eql("You can not delete last Administrator account");
+        });
+    });
+
+    describe("user account changes got stored in database",  () => {
+        beforeEach(async () => {
+            await agent.get("/api/auth/logout");
+        });
+        it('should have new firstname stored in database after change', async () => {
+            const login = await agent.post("/api/auth/login").send(accountTestsUserAcc);
+            await agent.put(`/api/accounts/${login.body.user.id}`).send({firstname: "test"});
+            await agent.get("/api/auth/logout");
+            const login2 = await agent.post("/api/auth/login").send(accountTestsUserAcc);
+            expect(login2.body.user.firstname).to.eql("test", login2.body.user.firstname);
+        });
+        it('should have new firstname, lastname, email stored in database after change', async () => {
+            const login = await agent.post("/api/auth/login").send(accountTestsUserAcc);
+            await agent.put(`/api/accounts/${login.body.user.id}`).send({firstname: "testAgain", lastname: "testAgain", email: "foo@bar.tld"});
+            await agent.get("/api/auth/logout");
+            const login2 = await agent.post("/api/auth/login").send(accountTestsUserAcc);
+            expect(login2.body.user.firstname).to.eql("testAgain", login2.body.user.firstname);
+            expect(login2.body.user.lastname).to.eql("testAgain", login2.body.user.lastname);
+            expect(login2.body.user.email).to.eql("foo@bar.tld", login2.body.user.email);
+        });
+    });
+    describe("block changes for other accounts",  () => {
+        it("should return 403 when trying to updating firstname of other account with message", async () => {
+            const firstUserLogin = await agent.post("/api/auth/login").send(accountTestsUserAcc);
+            await agent.get("/api/auth/logout");
+            const secondUserLogin = await agent.post("/api/auth/login").send(secondUsrAccCredentials);
+            const response = await agent.put(`/api/accounts/${firstUserLogin.body.user.id}`).send({firstname: "test"});
+            expect(response.status).to.eql(403, response.text);
+            expect(response.text).to.eql("You are not allowed to update this account");
+        });
+        it("should return 403 when trying to updating firstname of other account as administrator with message", async () => {
+            const firstUserLogin = await agent.post("/api/auth/login").send(accountTestsUserAcc);
+            await agent.get("/api/auth/logout");
+            const secondUserLogin = await agent.post("/api/auth/login").send(adminCredentials);
+            const response = await agent.put(`/api/accounts/${firstUserLogin.body.user.id}`).send({firstname: "test"});
+            expect(response.status).to.eql(403, response.text);
+            expect(response.text).to.eql("You are not allowed to update this account");
+        });
+        it("should return 403 when trying to updating firstname of non existing account with message", async () => {
+            await agent.post("/api/auth/login").send(accountTestsUserAcc);
+            const response = await agent.put(`/api/accounts/999999999`).send({firstname: "test"});
+            expect(response.status).to.eql(403, response.text);
+            expect(response.text).to.eql("You are not allowed to update this account");
+        });
+    });
+    describe("updating own account with invalid data",  () => {
+        it("should return 400 when updating username with empty string", async () => {
+            const login = await agent.post("/api/auth/login").send(accountTestsUserAcc);
+            const response = await agent.put(`/api/accounts/${login.body.user.id}`).send({username: ""});
+            expect(response.status).to.eql(400, response.text);
+            expect(response.text).to.eql("Username does not meet the requirements");
+        });
+        it("should return 400 when updating username with spaces only", async () => {
+            const login = await agent.post("/api/auth/login").send(accountTestsUserAcc);
+            const response = await agent.put(`/api/accounts/${login.body.user.id}`).send({username: "                "});
+            expect(response.status).to.eql(400, response.text);
+            expect(response.text).to.eql("Username does not meet the requirements");
+        });
+        it("should return 400 when updating username containing spaces", async () => {
+            const login = await agent.post("/api/auth/login").send(accountTestsUserAcc);
+            const response = await agent.put(`/api/accounts/${login.body.user.id}`).send({username: "      newTestUsername      "});
+            expect(response.status).to.eql(400, response.text);
+            expect(response.text).to.eql("Username does not meet the requirements");
+        });
+        it("should return 400 when updating username with less than 7 characters", async () => {
+            const login = await agent.post("/api/auth/login").send(accountTestsUserAcc);
+            const response = await agent.put(`/api/accounts/${login.body.user.id}`).send({username: "foo"});
+            expect(response.status).to.eql(400, response.text);
+            expect(response.text).to.eql("Username does not meet the requirements");
+        });
+        it("should return 400 when updating password with spaces only", async () => {
+            const login = await agent.post("/api/auth/login").send(accountTestsUserAcc);
+            const response = await agent.put(`/api/accounts/${login.body.user.id}`).send({password: "                "});
+            expect(response.status).to.eql(400, response.text);
+            expect(response.text).to.eql("Password does not meet the requirements");
+        });
+        it("should return 400 when updating password containing spaces", async () => {
+            const login = await agent.post("/api/auth/login").send(accountTestsUserAcc);
+            const response = await agent.put(`/api/accounts/${login.body.user.id}`).send({password: "      newTestUsersPWD      "});
+            expect(response.status).to.eql(400, response.text);
+            expect(response.text).to.eql("Password does not meet the requirements");
+        });
+        it("should return 400 when updating password with less than 8 characters", async () => {
+            const login = await agent.post("/api/auth/login").send(accountTestsUserAcc);
+            const response = await agent.put(`/api/accounts/${login.body.user.id}`).send({password: "foo"});
+            expect(response.status).to.eql(400, response.text);
+            expect(response.text).to.eql("Password does not meet the requirements");
+        });
     });
 });

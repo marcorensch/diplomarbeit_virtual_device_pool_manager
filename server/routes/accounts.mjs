@@ -18,12 +18,14 @@ router.put('/:id', UserValidator.hasPermission('canUpdateOwnAccount'), UserValid
     }
 
     if (data.hasOwnProperty('password')) {
+        if(!user.checkPasswordValidity(data.password)) return res.status(400).send("Password does not meet the requirements");
         user.password = await user.encryptPassword(data.password)
         delete data.password;
     }
-    ;
 
     user.setData(data);
+
+    if(!user.checkUsernameValidity()) return res.status(400).send("Username does not meet the requirements");
 
     try {
         await user.save();
@@ -48,7 +50,7 @@ router.delete('/:id', UserValidator.hasPermission('canDeleteOwnAccount'), UserVa
 
     try {
         user = await UserHelper.getUserById(id);
-    }catch (e) {
+    } catch (e) {
         return res.status(404).send("Error while identifying user");
     }
 

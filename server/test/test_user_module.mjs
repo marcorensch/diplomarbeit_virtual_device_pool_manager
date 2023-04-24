@@ -57,7 +57,7 @@ describe("Test User Model", () => {
             user.setData({
                 password: await user.encryptPassword("testPassword")
             });
-            const result = await user.checkPassword("testPassword");
+            const result = await user.comparePasswords("testPassword");
             expect(result).to.be.true;
         });
         it("should return false if the password is not correct", async () => {
@@ -65,7 +65,7 @@ describe("Test User Model", () => {
             user.setData({
                 password: await user.encryptPassword("testPassword")
             });
-            const result = await user.checkPassword("WrongTestPassword");
+            const result = await user.comparePasswords("WrongTestPassword");
             expect(result).to.be.false;
         });
         it("should return false if the password is null", async () => {
@@ -75,7 +75,7 @@ describe("Test User Model", () => {
                 password: null
             });
             try {
-                await user.checkPassword("testPassword");
+                await user.comparePasswords("testPassword");
             }catch (e) {
                 msg = e;
             }

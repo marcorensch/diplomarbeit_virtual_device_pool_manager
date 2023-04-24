@@ -29,7 +29,7 @@ export default class User {
     async encryptPassword(plainPassword) {
         return await bcrypt.hash(plainPassword, 10);
     }
-    async checkPassword(password) {
+    async comparePasswords(password) {
         if(this.password === null) throw "Password is null";
         return await bcrypt.compare(password, this.password);
     }
@@ -46,6 +46,14 @@ export default class User {
         this.token = await this.generateToken();
         this.refreshToken = await this.generateRefreshToken();
         return this;
+    }
+
+    checkPasswordValidity(password) {
+        return password === password.trim() && password.length >= process.env.USER_PWD_MIN_LENGTH;
+    }
+
+    checkUsernameValidity() {
+        return this.username === this.username.trim() && this.username.length >= process.env.USER_NAME_MIN_LENGTH;
     }
 
     async save() {
