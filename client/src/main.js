@@ -50,4 +50,6 @@ createApp(App)
   .use(router)
   .use(pinia)
   .use(Toast, toastOptions)
+  .provide("PWDMINLENGTH", process.env.VUE_APP_USER_PWD_MIN_LENGTH)
+  .provide("USERNAMEMINLENGTH", process.env.VUE_APP_USER_NAME_MIN_LENGTH)
   .mount("#app");

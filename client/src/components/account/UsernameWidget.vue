@@ -24,7 +24,7 @@
               v-for="error of v$.username.$errors"
               :key="error.$uid"
             >
-              This username is already taken.
+              The Username has to be at least {{ USERNAMEMINLENGTH }} characters
             </div>
           </div>
         </div>
@@ -39,6 +39,9 @@
               class="uk-button uk-button-primary"
               type="button"
               @click="updateUsername"
+              :class="{
+                'uk-disabled': usernameHasChanged,
+              }"
             >
               Update
             </button>
@@ -53,8 +56,12 @@
 import { useAuthStore } from "@/stores/auth";
 import { useVuelidate } from "@vuelidate/core";
 import { minLength } from "@vuelidate/validators";
+import { useToast } from "vue-toastification";
+const toast = useToast();
+
 export default {
-  name: "UsernameComponent",
+  name: "UsernameWidget",
+  inject: ["USERNAMEMINLENGTH"],
   setup() {
     return {
       v$: useVuelidate(),
@@ -69,9 +76,31 @@ export default {
   validations() {
     return {
       username: {
-        minLength: minLength(7),
+        minLength: minLength(this.USERNAMEMINLENGTH),
       },
     };
+  },
+  mounted() {
+    this.username = this.auth.user.username;
+  },
+  computed: {
+    usernameHasChanged() {
+      return this.username === this.auth.user.username;
+    },
+  },
+  methods: {
+    async updateUsername() {
+      const formIsValid = await this.v$.$validate();
+      if (!formIsValid) return;
+      const success = await this.auth.updateProfile({
+        username: this.username,
+      });
+      if (!success) {
+        toast.error("Error while updating profile, Username might be taken");
+        this.username = this.auth.user.username;
+      }
+      this.v$.$reset();
+    },
   },
 };
 </script>

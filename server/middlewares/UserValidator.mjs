@@ -1,4 +1,4 @@
-import UserFactory from "../factories/UserFactory.mjs";
+import UserHelper from "../helpers/UserHelper.mjs";
 import {calculateExpirationMs} from "../helpers/Utilities.mjs";
 import jwt from "jsonwebtoken";
 import {PermissionHandler} from "../helpers/PermissionHandler.mjs";
@@ -9,7 +9,7 @@ export default class UserValidator {
         if (!username || !password) return res.status(400).send("Username or password missing");
         let user;
         try {
-            user = await UserFactory.getUserByUsername(username);
+            user = await UserHelper.getUserByUsername(username);
         } catch (e) {
             return res.status(401).send("Invalid Credentials");
         }
@@ -51,7 +51,7 @@ export default class UserValidator {
         if (!userId) return res.status(401).send("Invalid token");
 
         try {
-            user = await UserFactory.getUserById(userId);
+            user = await UserHelper.getUserById(userId);
         } catch (e) {
             console.log(e)
             return res.status(500).send("Error while authorising user");

@@ -4,45 +4,22 @@
     <h2>
       {{ dayTimeGreeting() }} {{ auth.user.firstname || auth.user.username }}!
     </h2>
-    <div class="" uk-grid uk-height-match="target: .uk-card-body">
-      <div class="uk-width-1-1 uk-width-1-3@m">
-        <PersonalComponent />
+    <div
+      class="uk-child-width-1-1 uk-child-width-1-3@m"
+      uk-grid
+      uk-height-match="target: .uk-card-body"
+    >
+      <div>
+        <PersonalWidget />
       </div>
-      <div class="uk-width-1-1 uk-width-1-3@m">
-        <UsernameComponent />
+      <div>
+        <UsernameWidget />
       </div>
-      <div class="uk-width-1-1 uk-width-1-3@m">
-        <PasswordComponent />
+      <div>
+        <PasswordWidget />
       </div>
-      <div class="uk-width-1-1 uk-width-2-3@m">
-        <div>
-          <div class="uk-card uk-card-default uk-card-body">Foo</div>
-        </div>
-      </div>
-      <div class="uk-width-1-1 uk-width-1-3@m">
-        <div>
-          <div class="uk-card uk-card-default">
-            <div class="uk-card-header">
-              <h3 class="uk-card-title">
-                <font-awesome-icon :icon="['fas', 'trash']" /> Delete account
-              </h3>
-            </div>
-            <div class="uk-card-body">
-              <p class="uk-text-muted uk-text-center">
-                A deleted account cannot be restored.
-              </p>
-            </div>
-            <div class="uk-card-footer">
-              <button
-                class="uk-button uk-button-danger uk-width-1-1"
-                type="button"
-                @click="deleteAccount"
-              >
-                Delete account
-              </button>
-            </div>
-          </div>
-        </div>
+      <div>
+        <DeleteAccountWidget />
       </div>
     </div>
   </div>
@@ -50,18 +27,20 @@
 
 <script>
 import { useAuthStore } from "@/stores/auth";
-import PasswordComponent from "@/components/account/PasswordComponent.vue";
-import PersonalComponent from "@/components/account/PersonalComponent.vue";
+import PasswordWidget from "@/components/account/PasswordWidget.vue";
+import PersonalWidget from "@/components/account/PersonalWidget.vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import UsernameComponent from "@/components/account/UsernameComponent.vue";
+import UsernameWidget from "@/components/account/UsernameWidget.vue";
+import DeleteAccountWidget from "@/components/account/DeleteAccountWidget.vue";
 
 export default {
   name: "UserSettingsView",
   components: {
-    UsernameComponent,
+    DeleteAccountWidget,
+    UsernameWidget,
     FontAwesomeIcon,
-    PersonalComponent,
-    PasswordComponent,
+    PersonalWidget,
+    PasswordWidget,
   },
   data() {
     return {

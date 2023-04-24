@@ -83,7 +83,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useVuelidate } from "@vuelidate/core";
 import { email } from "@vuelidate/validators";
 export default {
-  name: "PersonalComponent",
+  name: "PersonalWidget",
   setup() {
     return {
       v$: useVuelidate(),

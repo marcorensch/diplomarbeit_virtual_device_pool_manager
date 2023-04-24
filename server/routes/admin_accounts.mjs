@@ -1,12 +1,12 @@
 import express from "express";
-import UserFactory from "../factories/UserFactory.mjs";
+import UserHelper from "../helpers/UserHelper.mjs";
 import UserValidator from "../middlewares/UserValidator.mjs";
 import User from "../models/User.mjs";
 
 const router = express.Router();
 
 router.get('/', UserValidator.hasPermission('canAccessAccountList'), UserValidator.setCookies, async (req, res) => {
-    const users = await UserFactory.getAllUsers();
+    const users = await UserHelper.getAllUsers();
     return res.status(200).json({users});
 });
 
@@ -15,7 +15,7 @@ router.post('/', UserValidator.hasPermission('canCreateAccount'), UserValidator.
     if (!username || !password || !role_id) return res.status(400).send("Missing data");
 
     try {
-        if (await UserFactory.checkUserExists(username)) return res.status(409).send("Username already in use");
+        if (await UserHelper.checkUserExists(username)) return res.status(409).send("Username already in use");
     } catch (e) {
         console.log(e)
         return res.status(500).send("Error while checking username availability");
@@ -41,7 +41,7 @@ router.put('/:id', UserValidator.hasPermission("canUpdateAccount"), UserValidato
 
     let user;
     try {
-        user = await UserFactory.getUserById(id);
+        user = await UserHelper.getUserById(id);
     } catch (e) {
         return res.status(404).send("Error while identifying user");
     }
@@ -64,7 +64,7 @@ router.delete('/:id', UserValidator.hasPermission("canDeleteAccount"), UserValid
     if(parseInt(req.user.id) === parseInt(id)) return res.status(403).send("You cannot delete your own account here");
     let user;
     try {
-        user = await UserFactory.getUserById(id);
+        user = await UserHelper.getUserById(id);
     } catch (e) {
         return res.status(404).send("Error while identifying user");
     }

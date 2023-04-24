@@ -186,6 +186,8 @@ answers.DATABASE_NAME_TEST = "virtual_device_pool_manager_test";
 answers.API_URI = `http${answers.USE_SSL ? 's' : ''}://${answers.API_HOST}:${answers.API_PORT}`;
 answers.JWT_SECRET = crypto.randomBytes(64).toString('hex');
 answers.JWT_REFRESH_SECRET = crypto.randomBytes(64).toString('hex');
+answers.USER_PWD_MIN_LENGTH = 8;
+answers.USER_NAME_MIN_LENGTH = 7;
 
 const envConfigurations = [
     {

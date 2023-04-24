@@ -54,8 +54,6 @@ export const useAuthStore = defineStore("auth", {
         toast.success("Successfully updated profile");
         return true;
       } catch (e) {
-        console.log(e.response);
-        toast.error("Error while updating profile, please try again");
         return false;
       }
     },
@@ -74,6 +72,20 @@ export const useAuthStore = defineStore("auth", {
         }
       } catch (e) {
         console.log(e);
+      }
+    },
+    async deleteAccount() {
+      try {
+        const response = await axios.delete(`/api/accounts/${this.user.id}`);
+        if (response.status === 200) {
+          toast.info("Successfully deleted account");
+          await this.logout();
+        } else {
+          toast.error("Failed to delete account, Reason:\n" + response.text);
+        }
+      } catch (e) {
+        console.log(e.response);
+        toast.error(`Failed to delete account, Reason:\n${e.response.data}`);
       }
     },
   },

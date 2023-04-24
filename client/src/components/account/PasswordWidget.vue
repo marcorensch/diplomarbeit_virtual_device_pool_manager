@@ -24,7 +24,7 @@
               v-for="error of v$.password.$errors"
               :key="error.$uid"
             >
-              Password must be at least 8 characters long.
+              Password must be at least {{ PWDMINLENGTH }} characters long.
             </div>
           </div>
           <div class="uk-margin">
@@ -75,8 +75,11 @@
 import { useAuthStore } from "@/stores/auth";
 import { useVuelidate } from "@vuelidate/core";
 import { sameAs, minLength } from "@vuelidate/validators";
+import { useToast } from "vue-toastification";
+const toast = useToast();
 export default {
-  name: "PasswordComponent",
+  name: "PasswordWidget",
+  inject: ["PWDMINLENGTH"],
   setup() {
     return {
       v$: useVuelidate(),
@@ -92,7 +95,7 @@ export default {
   validations() {
     return {
       password: {
-        minLength: this.password ? minLength(8) : {},
+        minLength: this.password ? minLength(this.PWDMINLENGTH) : {},
       },
       passwordConfirm: {
         sameAs: sameAs(this.password),
@@ -103,10 +106,16 @@ export default {
     async handleSaveClicked() {
       const formIsValid = await this.v$.$validate();
       if (!formIsValid) return;
-      if (await this.auth.updateProfile({ password: this.password })) {
-        this.password = "";
-        this.passwordConfirm = "";
+      const success = await this.auth.updateProfile({
+        password: this.password,
+      });
+      if (!success) {
+        toast.error(
+          "Error while updating profile, Please try again later. Your Password was not changed."
+        );
       }
+      this.password = "";
+      this.passwordConfirm = "";
       this.v$.$reset();
     },
   },
