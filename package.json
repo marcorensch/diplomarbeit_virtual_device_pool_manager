@@ -35,6 +35,7 @@
   "homepage": "https://github.com/marcorensch/diplomarbeit_virtual_device_pool_manager#readme",
   "dependencies": {
     "concurrently": "^8.0.1",
-    "cross-env": "^7.0.3"
+    "cross-env": "^7.0.3",
+    "rate-limiter-flexible": "^2.4.1"
   }
 }

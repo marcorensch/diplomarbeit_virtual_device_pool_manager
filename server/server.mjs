@@ -15,6 +15,7 @@ import {fileURLToPath} from 'url';
 import https from "https";
 import express from 'express';
 import cors from 'cors';
+import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import chalk from "chalk";
 
@@ -22,6 +23,7 @@ import authRouter from "./routes/auth.mjs";
 import adminRouter from "./routes/admin.mjs";
 import rolesRouter from "./routes/roles.mjs";
 import accountsRouter from "./routes/accounts.mjs";
+import rateLimiterMiddleware from "./middlewares/RateLimiter.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -36,10 +38,14 @@ const corsOptions = {
 }
 
 const app = express();
+app.use(helmet());
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cookieParser());
+if(process.env.NODE_ENV.toUpperCase() !== 'TEST') {
+    app.use(rateLimiterMiddleware)
+}
 
 app.use('/api/auth', authRouter);
 app.use('/api/admin', adminRouter);
@@ -49,6 +55,16 @@ app.use('/api/accounts', accountsRouter);
 app.get('/', (req, res) => {
     res.send('Hello there! The Backend is reachable');
 })
+
+app.use((req, res, next) => {
+    res.status(404).send("Sorry can't find that!")
+})
+
+app.use((err, req, res, next) => {
+    console.error(err.stack)
+    res.status(500).send('Something broke!')
+})
+
 
 if(process.env.USE_SSL === "true") {
     const keyPath = path.join(__dirname, '..', 'certs', 'key.pem');

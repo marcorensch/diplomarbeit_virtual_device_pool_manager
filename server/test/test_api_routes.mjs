@@ -13,60 +13,60 @@ const adminCredentials = {
 describe("Test API Availability", () => {
     it("should return 200 for get on  /", async () => {
         const response = await agent.get("/");
-        expect(response.status).to.equal(200, "Response status should be 200");
+        expect(response.status).to.equal(200, response.text);
     });
 });
 
 describe("Test Authentication Routes", () => {
     it("should return 200 for /api/auth/login with correct credentials", async () => {
         const response = await agent.post("/api/auth/login").send(adminCredentials);
-        expect(response.status).to.eql(200);
+        expect(response.status).to.eql(200, response.text);
     });
 
     it("should return user data in body for /api/auth/login with correct credentials", async () => {
         const response = await agent.post("/api/auth/login").send(adminCredentials);
-        expect(response.status).to.eql(200);
+        expect(response.status).to.eql(200, response.text);
         expect(response.body).to.have.property("user");
     });
 
     it("should return user data in body without password on login /api/auth/login", async () => {
         const response = await agent.post("/api/auth/login").send(adminCredentials);
-        expect(response.status).to.eql(200);
+        expect(response.status).to.eql(200, response.text);
         expect(response.body).to.have.property("user");
         expect(response.body.user).to.not.have.property("password");
     });
 
     it("should return permission data in body for /api/auth/login with correct credentials", async () => {
         const response = await agent.post("/api/auth/login").send(adminCredentials);
-        expect(response.status).to.eql(200);
+        expect(response.status).to.eql(200, response.text);
         expect(response.body).to.have.property("permissions");
     });
 
     it("should set cookies on /api/auth/login with correct credentials", async () => {
         const response = await agent.post("/api/auth/login").send(adminCredentials);
-        expect(response.status).to.eql(200);
-        expect('set-cookie' in response.header).to.equal(true);
+        expect(response.status).to.eql(200, response.text);
+        expect('set-cookie' in response.header).to.equal(true, "Response Header has no set-cookie property");
     });
 
     it("should return 401 for /api/auth/login with wrong password", async () => {
         const wrongCredentials = {username: "administrator", password: "wrongPassword"};
         const response = await agent.post("/api/auth/login").send(wrongCredentials);
-        expect(response.status).to.eql(401);
-        expect(response.text).to.eql("Invalid Credentials");
+        expect(response.status).to.eql(401, response.text);
+        expect(response.text).to.eql("Invalid Credentials", "Response Text is not 'Invalid Credentials'");
     });
 
     it("should return 401 for /api/auth/login with non existing user", async () => {
         const wrongCredentials = {username: "admin", password: "test"};
         const response = await agent.post("/api/auth/login").send(wrongCredentials);
-        expect(response.status).to.equal(401);
-        expect(response.text).to.equal("Invalid Credentials");
+        expect(response.status).to.equal(401, response.text);
+        expect(response.text).to.equal("Invalid Credentials", "Response Text is not 'Invalid Credentials'");
     });
 
     it("should return 200 for /api/auth/logout", async () => {
         const response = await agent.get("/api/auth/logout");
-        expect(response.status).to.equal(200);
-        expect(response.text).to.equal("Logout successful");
-        expect('set-cookie' in response.header).to.equal(true);
+        expect(response.status).to.equal(200, response.text);
+        expect(response.text).to.equal("Logout successful", "Response Text is not 'Logout successful'");
+        expect('set-cookie' in response.header).to.eql(true, "Response Header has no set-cookie property");
     });
 
 });
@@ -75,24 +75,24 @@ describe("Test Administrative Account Routes", () => {
     const newUsrAcc = {firstname: "test", lastname: "test", username: "test", password: "test", email:"", notes:"", hidden:"", role_id: 2};
     it("should return 401 and text Missing token for get on /api/admin/accounts when not logged in", async () => {
         const response = await agent.get("/api/admin/accounts");
-        expect(response.status).to.eql(401);
+        expect(response.status).to.eql(401, response.text);
         expect(response.text).to.eql("Missing token");
 
     });
     it("should return 200 for /api/admin/accounts when logged in with ADMIN role", async () => {
         await agent.post("/api/auth/login").send(adminCredentials);
         const response = await agent.get("/api/admin/accounts");
-        expect(response.status).to.eql(200);
+        expect(response.status).to.eql(200, response.text);
     });
     it("should return 201 for post on /api/admin/accounts when creating new account with ADMIN role", async () => {
         await agent.post("/api/auth/login").send(adminCredentials);
         const response = await agent.post("/api/admin/accounts").send(newUsrAcc);
-        expect(response.status).to.eql(201);
+        expect(response.status).to.eql(201, response.text);
     });
     it("should return 409 with message 'Username already in use' for post on /api/admin/accounts with existing username", async () => {
         await agent.post("/api/auth/login").send(adminCredentials);
         const response = await agent.post("/api/admin/accounts").send(newUsrAcc);
-        expect(response.status).to.eql(409);
+        expect(response.status).to.eql(409, response.text);
         expect(response.text).to.eql("Username already in use");
     });
 
@@ -101,26 +101,26 @@ describe("Test Administrative Account Routes", () => {
         const data = await agent.get("/api/admin/accounts");
         const testUsr = data.body.users.find((usr) => usr.username === "test");
         const response = await agent.delete("/api/admin/accounts/" + testUsr.id);
-        expect(response.status).to.equal(200);
+        expect(response.status).to.equal(200, response.text);
     });
 
     it("should return 404 when deleting not existing user by id", async () => {
         await agent.post("/api/auth/login").send(adminCredentials);
         const response = await agent.delete("/api/admin/accounts/999999999999999");
-        expect(response.status).to.equal(404);
+        expect(response.status).to.equal(404, response.text);
     });
     it("should return 401 on /api/admin/accounts when logged in with USER role", async () => {
         const data = {username: "test", password: "test"};
         await agent.get("/api/auth/logout");
         await agent.post("/api/auth/login").send(data);
         const response = await agent.get("/api/admin/accounts");
-        expect(response.status).to.eql(401);
+        expect(response.status).to.eql(401, response.text);
     });
     it("should return 400 on /api/admin/accounts when logged in and trying to delete own account", async () => {
         await agent.get("/api/auth/logout");
         const auth = await agent.post("/api/auth/login").send(adminCredentials);
         const response = await agent.delete(`/api/admin/accounts/${auth.body.user.id}`);
-        expect(response.status).to.eql(403);
+        expect(response.status).to.eql(403, response.text);
         expect(response.text).to.eql("You cannot delete your own account here");
     });
 });
@@ -225,7 +225,7 @@ describe("Test User available Account Routes", () => {
         it("should return 403 when trying to updating firstname of other account with message", async () => {
             const firstUserLogin = await agent.post("/api/auth/login").send(accountTestsUserAcc);
             await agent.get("/api/auth/logout");
-            const secondUserLogin = await agent.post("/api/auth/login").send(secondUsrAccCredentials);
+            await agent.post("/api/auth/login").send(secondUsrAccCredentials);
             const response = await agent.put(`/api/accounts/${firstUserLogin.body.user.id}`).send({firstname: "test"});
             expect(response.status).to.eql(403, response.text);
             expect(response.text).to.eql("You are not allowed to update this account");
@@ -233,7 +233,7 @@ describe("Test User available Account Routes", () => {
         it("should return 403 when trying to updating firstname of other account as administrator with message", async () => {
             const firstUserLogin = await agent.post("/api/auth/login").send(accountTestsUserAcc);
             await agent.get("/api/auth/logout");
-            const secondUserLogin = await agent.post("/api/auth/login").send(adminCredentials);
+            await agent.post("/api/auth/login").send(adminCredentials);
             const response = await agent.put(`/api/accounts/${firstUserLogin.body.user.id}`).send({firstname: "test"});
             expect(response.status).to.eql(403, response.text);
             expect(response.text).to.eql("You are not allowed to update this account");
