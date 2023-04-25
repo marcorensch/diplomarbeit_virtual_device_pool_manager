@@ -1,25 +1,27 @@
 <template>
-  <div>
-    <h1><font-awesome-icon :icon="['fas', 'gears']" /> Settings</h1>
-    <h2>
-      {{ dayTimeGreeting() }} {{ auth.user.firstname || auth.user.username }}!
-    </h2>
-    <div
-      class="uk-child-width-1-1 uk-child-width-1-3@m"
-      uk-grid
-      uk-height-match="target: .uk-card-body"
-    >
-      <div>
-        <PersonalWidget />
-      </div>
-      <div>
-        <UsernameWidget />
-      </div>
-      <div>
-        <PasswordWidget />
-      </div>
-      <div>
-        <DeleteAccountWidget />
+  <div class="uk-section uk-section-small">
+    <div class="uk-container">
+      <h1><font-awesome-icon :icon="['fas', 'gears']" /> Settings</h1>
+      <h2>
+        {{ dayTimeGreeting() }} {{ auth.user.firstname || auth.user.username }}!
+      </h2>
+      <div
+        class="uk-child-width-1-1 uk-child-width-1-3@m"
+        uk-grid
+        uk-height-match="target: .uk-card-body"
+      >
+        <div>
+          <PersonalWidget />
+        </div>
+        <div>
+          <UsernameWidget />
+        </div>
+        <div>
+          <PasswordWidget />
+        </div>
+        <div>
+          <DeleteAccountWidget />
+        </div>
       </div>
     </div>
   </div>

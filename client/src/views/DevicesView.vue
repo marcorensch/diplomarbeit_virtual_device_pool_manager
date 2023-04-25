@@ -1,6 +1,5 @@
 <template>
   <div class="devices-view">
-    <img alt="Vue logo" src="../assets/logo.png" />
     <router-view v-slot="{ Component, route }">
       <transition :name="route.meta.transition || 'fade'" mode="out-in">
         <component :is="Component" />

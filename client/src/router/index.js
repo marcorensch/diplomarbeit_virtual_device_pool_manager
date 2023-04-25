@@ -40,7 +40,7 @@ const routes = [
     path: "/login",
     name: "login",
     component: () => import("../views/LoginView.vue"),
-    meta: { transition: "slide-bottom" },
+    meta: { transition: "fade" },
   },
   {
     path: "/user-settings",

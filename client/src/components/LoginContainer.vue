@@ -26,6 +26,9 @@
               <div class="uk-form">
                 <div class="uk-margin">
                   <input
+                    id="login-username"
+                    ref="login-username"
+                    tabindex="1"
                     class="uk-input"
                     type="text"
                     name="username"
@@ -81,6 +84,7 @@ const auth = useAuthStore();
 
 export default {
   name: "LoginContainer",
+  refs: ["username"],
   data() {
     return {
       auth: auth,
@@ -89,6 +93,11 @@ export default {
         password: "",
       },
     };
+  },
+  mounted() {
+    this.$nextTick(() => {
+      this.$refs["login-username"].focus();
+    });
   },
   methods: {
     handleLoginClicked(e) {
