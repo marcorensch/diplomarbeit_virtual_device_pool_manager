@@ -50,12 +50,19 @@
               v-model="form.email"
             />
           </div>
+          <div
+            class="uk-alert uk-alert-danger uk-text-small"
+            v-for="error of v$.form.email.$errors"
+            :key="error.$uid"
+          >
+            {{ error.$message }}
+          </div>
           <hr />
           <div class="uk-margin">
             <input
               tabindex="4"
               class="uk-input"
-              :class="{ 'form-invalid': v$.form.username.$errors }"
+              :class="{ 'form-invalid': v$.form.username.$errors.length }"
               type="text"
               name="username"
               placeholder="Username"
@@ -68,7 +75,7 @@
             v-for="error of v$.form.username.$errors"
             :key="error.$uid"
           >
-            Username is required and must be between 7 and 30 characters.
+            {{ error.$message }}
           </div>
 
           <div class="uk-grid uk-grid-small uk-child-width-expand">
@@ -91,7 +98,7 @@
                 v-for="error of v$.form.password.$errors"
                 :key="error.$uid"
               >
-                Password is required and must be at least 8 characters.
+                {{ error.$message }}
               </div>
             </div>
             <div>
@@ -110,7 +117,7 @@
                 v-for="error of v$.form.confirmPassword.$errors"
                 :key="error.$uid"
               >
-                Given Passwords do not match.
+                {{ error.$message }}
               </div>
             </div>
           </div>
@@ -120,7 +127,7 @@
               tabindex="7"
               class="uk-select"
               v-model="form.role_id"
-              :class="{ 'form-invalid': v$.form.role_id.$errors }"
+              :class="{ 'form-invalid': v$.form.role_id.$errors.length }"
             >
               <option
                 v-for="role in roleOptions"
@@ -135,7 +142,7 @@
               v-for="error of v$.form.role_id.$errors"
               :key="error.$uid"
             >
-              Select Role for this Account
+              {{ error.$message }}
             </div>
           </div>
           <div class="notes-section">
@@ -213,13 +220,22 @@ import Role from "../models/Role";
 import UIkit from "uikit";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { useVuelidate } from "@vuelidate/core";
-import { required, sameAs, minValue, minLength } from "@vuelidate/validators";
+import {
+  required,
+  sameAs,
+  minValue,
+  minLength,
+  email,
+  alphaNum,
+  helpers,
+} from "@vuelidate/validators";
 import { useToast } from "vue-toastification";
 
 const toast = useToast();
 
 export default {
   name: "AccountDetailsModal",
+  inject: ["PWDMINLENGTH", "USERNAMEMINLENGTH"],
   setup() {
     return {
       v$: useVuelidate(),
@@ -260,11 +276,24 @@ export default {
         form: {
           username: {
             required,
-            minLength: minLength(7),
+            minLength: helpers.withMessage(
+              `Username must be at least ${this.USERNAMEMINLENGTH} characters`,
+              minLength(this.USERNAMEMINLENGTH)
+            ),
+            alphanum: helpers.withMessage(
+              "Username must be alphanumeric",
+              alphaNum
+            ),
+          },
+          email: {
+            email: helpers.withMessage("Invalid email address", email),
           },
           password: {
             required: this.hasEnteredPassword(),
-            minLength: minLength(8),
+            minLength: helpers.withMessage(
+              `Password must be at least ${this.PWDMINLENGTH} characters`,
+              minLength(this.PWDMINLENGTH)
+            ),
           },
           confirmPassword: {
             required: this.hasEnteredPassword(),
@@ -283,11 +312,24 @@ export default {
         form: {
           username: {
             required,
-            minLength: minLength(7),
+            minLength: helpers.withMessage(
+              `Username must be at least ${this.USERNAMEMINLENGTH} characters`,
+              minLength(this.USERNAMEMINLENGTH)
+            ),
+            alphanum: helpers.withMessage(
+              "Username must be alphanumeric",
+              alphaNum
+            ),
+          },
+          email: {
+            email: helpers.withMessage("Invalid email address", email),
           },
           password: {
             required,
-            minLength: minLength(8),
+            minLength: helpers.withMessage(
+              `Password must be at least ${this.PWDMINLENGTH} characters`,
+              minLength(this.PWDMINLENGTH)
+            ),
           },
           confirmPassword: {
             required,
@@ -295,7 +337,10 @@ export default {
           },
           role_id: {
             required,
-            minValueValue: minValue(1),
+            minValueValue: helpers.withMessage(
+              "Please select a role",
+              minValue(1)
+            ),
           },
         },
       };
