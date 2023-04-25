@@ -20,6 +20,17 @@ const routes = [
         path: "create",
         name: "create-device",
         component: () => import("../views/devices/ConfigView.vue"),
+        beforeEnter: () => {
+          const authStore = useAuthStore();
+          if (!authStore.isLoggedIn) {
+            return { name: "NotFound" };
+          }
+          if (authStore.hasPermission("canCreateDevices")) {
+            return true;
+          } else {
+            return { name: "NotFound" };
+          }
+        },
       },
     ],
   },
