@@ -54,9 +54,7 @@ export default {
     };
   },
   mounted() {
-    this.$nextTick(() => {
-      this.animateNav();
-    });
+    this.setNavPosition();
 
     const navElements = document.querySelectorAll("nav a");
     for (const navElement of navElements) {
@@ -67,6 +65,18 @@ export default {
     }
   },
   methods: {
+    setNavPosition() {
+      const navElements = document.querySelectorAll("nav a");
+      for (const navElement of navElements) {
+        if (navElement.classList.contains("router-link-exact-active")) {
+          const navAnimation = document.querySelector(".animation");
+          const navAnimationWidth = navElement.offsetWidth;
+          const navAnimationLeft = navElement.offsetLeft;
+          navAnimation.style.width = navAnimationWidth + "px";
+          navAnimation.style.left = navAnimationLeft + "px";
+        }
+      }
+    },
     animateNav(e) {
       const target = e.target;
       const navAnimation = document.querySelector(".animation");
