@@ -36,8 +36,9 @@ router.post('/', UserValidator.hasPermission('canCreateAccount'), UserValidator.
 
 router.put('/:id', UserValidator.hasPermission("canUpdateAccount"), UserValidator.setCookies, async (req, res) => {
     const {id} = req.params;
-    const {username, firstname, lastname, password, email, role_id, notes, hidden} = req.body;
-    if (!username || !role_id) return res.status(400).send("Missing data");
+    let data = req.body;
+    for (const key in data) if (data[key] === undefined) delete data[key];
+    if (!data.username || !data.role_id ) return res.status(400).send("Missing data");
 
     let user;
     try {
@@ -46,8 +47,12 @@ router.put('/:id', UserValidator.hasPermission("canUpdateAccount"), UserValidato
         return res.status(404).send("Error while identifying user");
     }
 
-    user.setData({username, firstname, lastname, email, role_id, notes, hidden})
-    if (password) user.password = await user.encryptPassword(password);
+    user.setData(data)
+    if(!user.checkUsernameValidity()) return res.status(400).send("Username does not meet the requirements");
+    if (data.password) {
+        if(!user.checkPasswordValidity(data.password)) return res.status(400).send("Password does not meet the requirements");
+        user.password = await user.encryptPassword(data.password)
+    }
 
     try {
         await user.save();

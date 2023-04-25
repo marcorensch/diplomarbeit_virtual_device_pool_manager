@@ -96,6 +96,35 @@ describe("Test Administrative Account Routes", () => {
         expect(response.text).to.eql("Username already in use");
     });
 
+    it("should return 400 with message 'Username does not meet the requirements' when trying to set invalid username only containing spaces", async () => {
+        await agent.get("/api/auth/logout");
+        await agent.post("/api/auth/login").send(adminCredentials);
+        const data = await agent.get("/api/admin/accounts");
+        const testUsr = data.body.users.find((usr) => usr.username === "test");
+        const response = await agent.put("/api/admin/accounts/" + testUsr.id).send({username: "      ", role_id: 2});
+        expect(response.status).to.eql(400, response.text);
+        expect(response.text).to.eql("Username does not meet the requirements");
+    });
+    it("should return 400 with message 'Username does not meet the requirements' when trying to set invalid username containing spaces", async () => {
+        await agent.get("/api/auth/logout");
+        await agent.post("/api/auth/login").send(adminCredentials);
+        const data = await agent.get("/api/admin/accounts");
+        const testUsr = data.body.users.find((usr) => usr.username === "test");
+        const response = await agent.put("/api/admin/accounts/" + testUsr.id).send({username: " fooBiba  ", role_id: 2});
+        expect(response.status).to.eql(400, response.text);
+        expect(response.text).to.eql("Username does not meet the requirements");
+    });
+
+    it("should return 400 with message 'Username does not meet the requirements' when trying to set invalid username with three characters", async () => {
+        await agent.get("/api/auth/logout");
+        await agent.post("/api/auth/login").send(adminCredentials);
+        const data = await agent.get("/api/admin/accounts");
+        const testUsr = data.body.users.find((usr) => usr.username === "test");
+        const response = await agent.put("/api/admin/accounts/" + testUsr.id).send({username: "dfu", role_id: 2});
+        expect(response.status).to.eql(400, response.text);
+        expect(response.text).to.eql("Username does not meet the requirements");
+    });
+
     it("should return 200 when deleting existing user", async () => {
         await agent.post("/api/auth/login").send(adminCredentials);
         const data = await agent.get("/api/admin/accounts");

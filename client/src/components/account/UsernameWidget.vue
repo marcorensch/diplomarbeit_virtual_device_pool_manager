@@ -16,6 +16,7 @@
                 id="username"
                 type="text"
                 v-model="username"
+                @change="usernameHasChanged()"
                 :class="{ 'form-invalid': v$.username.$errors.length }"
               />
             </div>
@@ -24,7 +25,7 @@
               v-for="error of v$.username.$errors"
               :key="error.$uid"
             >
-              The Username has to be at least {{ USERNAMEMINLENGTH }} characters
+              {{ error.$message }}
             </div>
           </div>
         </div>
@@ -40,7 +41,7 @@
               type="button"
               @click="updateUsername"
               :class="{
-                'uk-disabled': usernameHasChanged,
+                'uk-disabled': !usernameIsValid,
               }"
             >
               Update
@@ -55,7 +56,7 @@
 <script>
 import { useAuthStore } from "@/stores/auth";
 import { useVuelidate } from "@vuelidate/core";
-import { minLength } from "@vuelidate/validators";
+import { alphaNum, minLength, helpers } from "@vuelidate/validators";
 import { useToast } from "vue-toastification";
 const toast = useToast();
 
@@ -71,24 +72,35 @@ export default {
     return {
       auth: useAuthStore(),
       username: "",
+      usernameIsValid: false,
     };
   },
   validations() {
     return {
       username: {
-        minLength: minLength(this.USERNAMEMINLENGTH),
+        minLength: helpers.withMessage(
+          `The Username has to be at least ${this.USERNAMEMINLENGTH} characters`,
+          minLength(this.USERNAMEMINLENGTH)
+        ),
+        alphaNum: helpers.withMessage(
+          "Username can only contain letters and numbers",
+          alphaNum
+        ),
       },
     };
   },
   mounted() {
     this.username = this.auth.user.username;
   },
-  computed: {
-    usernameHasChanged() {
-      return this.username === this.auth.user.username;
-    },
-  },
+  computed: {},
   methods: {
+    async usernameHasChanged() {
+      const formIsValid = await this.v$.$validate();
+      const notTheSame = this.username !== this.auth.user.username;
+      console.log(notTheSame, formIsValid);
+      console.log(notTheSame && formIsValid);
+      this.usernameIsValid = notTheSame && formIsValid;
+    },
     async updateUsername() {
       const formIsValid = await this.v$.$validate();
       if (!formIsValid) return;
