@@ -9,15 +9,23 @@ import { createPinia } from "pinia";
 
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
+  faCameraRetro,
   faChevronDown,
   faChevronUp,
   faGears,
   faKey,
+  faLaptop,
+  faMicrochip,
+  faMobileRetro,
+  faMobileScreenButton,
+  faPlus,
   faSlash,
   faSort,
   faSortDown,
   faSortUp,
+  faTabletScreenButton,
   faTrash,
+  faTv,
   faUser,
   faUserEdit,
   faUserGear,
@@ -31,7 +39,16 @@ import { faCircle } from "@fortawesome/free-regular-svg-icons";
 library.add(faUser, faUserShield, faUserPlus, faUserEdit);
 library.add(faTrash, faXmark, faCircle, faChevronDown, faChevronUp);
 library.add(faSort, faSortUp, faSortDown, faSlash);
-library.add(faGears, faUserGear, faKey);
+library.add(faGears, faUserGear, faKey, faPlus);
+library.add(
+  faMobileScreenButton,
+  faMobileRetro,
+  faTabletScreenButton,
+  faLaptop,
+  faTv,
+  faCameraRetro,
+  faMicrochip
+);
 
 const pinia = createPinia();
 pinia.use(({ store }) => {

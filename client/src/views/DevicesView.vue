@@ -1,14 +1,20 @@
 <template>
-  <div class="devices">
+  <div class="devices-view">
     <img alt="Vue logo" src="../assets/logo.png" />
-    <h1>Devices</h1>
+    <router-view />
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
+import { useAuthStore } from "@/stores/auth";
 
 export default {
   name: "DevicesView",
+  setup() {
+    const authStore = useAuthStore();
+    return {
+      authStore,
+    };
+  },
 };
 </script>

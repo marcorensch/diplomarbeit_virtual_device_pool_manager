@@ -9,8 +9,19 @@ const toast = useToast();
 const routes = [
   {
     path: "/",
-    name: "devices",
     component: DevicesView,
+    children: [
+      {
+        path: "",
+        name: "devices",
+        component: () => import("../views/devices/ListView.vue"),
+      },
+      {
+        path: "create",
+        name: "create-device",
+        component: () => import("../views/devices/ConfigView.vue"),
+      },
+    ],
   },
   {
     path: "/login",
