@@ -4,7 +4,8 @@
     uk-height-viewport="offset-top:true"
   >
     <div class="uk-container nxd-padding-xlarge-bottom">
-      <h1>Configure Device</h1>
+      <h1 v-if="!deviceEditStore.device.id">Add Device</h1>
+      <h1 v-else>Edit {{ deviceEditStore.device.name }}</h1>
       <div class="uk-position-relative" uk-grid="masonry=true">
         <div class="uk-width-1-1 uk-width-1-3@m uk-flex-last@m">
           <ImageWidget />
@@ -32,7 +33,12 @@
           </button>
         </div>
         <div>
-          <button class="uk-button uk-button-primary uk-width-1-1">Save</button>
+          <button
+            class="uk-button uk-button-primary uk-width-1-1"
+            @click="handleSaveClicked"
+          >
+            Save
+          </button>
         </div>
       </div>
     </div>
@@ -56,11 +62,14 @@ export default {
     };
   },
   mounted() {
-    this.device = this.deviceEditStore.device;
+    this.device = this.deviceEditStore.getDevice;
   },
   methods: {
     handleCancelClicked() {
       this.$router.push({ name: "devices" });
+    },
+    handleSaveClicked() {
+      this.deviceEditStore.saveDevice();
     },
   },
 };

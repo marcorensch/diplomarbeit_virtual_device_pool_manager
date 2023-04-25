@@ -58,7 +58,6 @@ const routes = [
   },
   {
     path: "/admin",
-    name: "admin",
     component: () => import("../views/admin/AdminView.vue"),
     beforeEnter: () => {
       const authStore = useAuthStore();
@@ -71,25 +70,60 @@ const routes = [
         return { name: "NotFound" };
       }
     },
+    children: [
+      {
+        path: "",
+        name: "admin",
+        component: () => import("../views/admin/DashboardView.vue"),
+        beforeEnter: () => {
+          const authStore = useAuthStore();
+          if (!authStore.isLoggedIn) {
+            return { name: "NotFound" };
+          }
+          if (authStore.hasPermission("canAccessAdmin")) {
+            return true;
+          } else {
+            return { name: "NotFound" };
+          }
+        },
+      },
+      {
+        path: "msisdn-manager",
+        name: "msisdn-manager",
+        component: () => import("../views/admin/MsisdnManagerView.vue"),
+        beforeEnter: () => {
+          const authStore = useAuthStore();
+          if (!authStore.isLoggedIn) {
+            return { name: "NotFound" };
+          }
+          if (authStore.hasPermission("canAccessAdmin")) {
+            return true;
+          } else {
+            return { name: "NotFound" };
+          }
+        },
+      },
+      {
+        path: "users",
+        name: "users",
+        component: () => import("../views/admin/UsersView.vue"),
+        beforeEnter: () => {
+          const authStore = useAuthStore();
+          if (!authStore.isLoggedIn) {
+            toast.error("You must be logged in to access this page");
+            return { name: "login" };
+          }
+          if (authStore.hasPermission("canAccessAdmin")) {
+            return true;
+          } else {
+            toast.error("You do not have permission to access this page");
+            return { name: "devices" };
+          }
+        },
+      },
+    ],
   },
-  {
-    path: "/admin/users",
-    name: "users",
-    component: () => import("../views/admin/UsersView.vue"),
-    beforeEnter: () => {
-      const authStore = useAuthStore();
-      if (!authStore.isLoggedIn) {
-        toast.error("You must be logged in to access this page");
-        return { name: "login" };
-      }
-      if (authStore.hasPermission("canAccessAdmin")) {
-        return true;
-      } else {
-        toast.error("You do not have permission to access this page");
-        return { name: "devices" };
-      }
-    },
-  },
+
   {
     path: "/*",
     name: "NotFound",

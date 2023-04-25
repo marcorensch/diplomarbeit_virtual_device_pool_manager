@@ -15,6 +15,13 @@ export const useDeviceEditStore = defineStore("deviceEdit", {
       console.log("setIMEIs", imeis);
       this.device.imei = imeis;
     },
+    setDeviceType(deviceTypeId) {
+      console.log("setDeviceType", deviceTypeId);
+      this.device.device_type_id = deviceTypeId;
+    },
+    async saveDevice() {
+      console.log("saveDevice", this.device);
+    },
     // async getDevice(id) {
     //   try {
     //     const response = await axios.get(`/api/devices/${id}`);

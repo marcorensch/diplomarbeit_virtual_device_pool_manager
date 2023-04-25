@@ -20,6 +20,11 @@ export const permissions = {
     UPDATE_VIRTUAL_DEVICES: 'canUpdateVirtualDevices',
     UPDATE_OWN_DEVICES: 'canUpdateOwnDevices',
     DELETE_OWN_DEVICES: 'canDeleteOwnDevices',
+    // Numbers
+    ACCESS_NUMBER_LIST: 'canAccessNumberList',
+    CREATE_NUMBERS: 'canCreateNumbers',
+    DELETE_NUMBERS: 'canDeleteNumbers',
+    UPDATE_NUMBERS: 'canUpdateNumbers',
     // CabinetBuilder Management
     CREATE_LOCATION: 'canCreateLocation',
     DELETE_LOCATION: 'canDeleteLocation',

@@ -9,9 +9,11 @@ import { createPinia } from "pinia";
 
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
+  faBook,
   faCameraRetro,
   faChevronDown,
   faChevronUp,
+  faDatabase,
   faGears,
   faKey,
   faLaptop,
@@ -31,6 +33,7 @@ import {
   faUserGear,
   faUserPlus,
   faUserShield,
+  faWarehouse,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -39,7 +42,15 @@ import { faCircle } from "@fortawesome/free-regular-svg-icons";
 library.add(faUser, faUserShield, faUserPlus, faUserEdit);
 library.add(faTrash, faXmark, faCircle, faChevronDown, faChevronUp);
 library.add(faSort, faSortUp, faSortDown, faSlash);
-library.add(faGears, faUserGear, faKey, faPlus);
+library.add(
+  faGears,
+  faUserGear,
+  faKey,
+  faPlus,
+  faWarehouse,
+  faDatabase,
+  faBook
+);
 library.add(
   faMobileScreenButton,
   faMobileRetro,

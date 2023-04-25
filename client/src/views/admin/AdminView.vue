@@ -1,8 +1,10 @@
 <template>
-  <div class="uk-section uk-section-small">
-    <div class="uk-container">
-      <h1>Admin View</h1>
-    </div>
+  <div class="admin-view">
+    <router-view v-slot="{ Component, route }">
+      <transition :name="route.meta.transition || 'fade'" mode="out-in">
+        <component :is="Component" />
+      </transition>
+    </router-view>
   </div>
 </template>
 
