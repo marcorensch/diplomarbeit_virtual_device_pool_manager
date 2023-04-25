@@ -90,7 +90,7 @@ const routes = [
       {
         path: "msisdn-manager",
         name: "msisdn-manager",
-        component: () => import("../views/admin/MsisdnManagerView.vue"),
+        component: () => import("../views/admin/msisdn/MsisdnManagerView.vue"),
         beforeEnter: () => {
           const authStore = useAuthStore();
           if (!authStore.isLoggedIn) {
@@ -104,8 +104,41 @@ const routes = [
         },
       },
       {
-        path: "users",
-        name: "users",
+        path: "msisdn-edit/:id",
+        name: "msisdn-edit",
+        component: () => import("../views/admin/msisdn/MsisdnEditorView.vue"),
+        beforeEnter: () => {
+          const authStore = useAuthStore();
+          if (!authStore.isLoggedIn) {
+            return { name: "NotFound" };
+          }
+          if (authStore.hasPermission("canUpdateNumbers")) {
+            return true;
+          } else {
+            return { name: "NotFound" };
+          }
+        },
+        props: true,
+      },
+      {
+        path: "msisdn-add",
+        name: "msisdn-add",
+        component: () => import("../views/admin/msisdn/MsisdnEditorView.vue"),
+        beforeEnter: () => {
+          const authStore = useAuthStore();
+          if (!authStore.isLoggedIn) {
+            return { name: "NotFound" };
+          }
+          if (authStore.hasPermission("canCreateNumbers")) {
+            return true;
+          } else {
+            return { name: "NotFound" };
+          }
+        },
+      },
+      {
+        path: "accounts",
+        name: "accounts",
         component: () => import("../views/admin/UsersView.vue"),
         beforeEnter: () => {
           const authStore = useAuthStore();

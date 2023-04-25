@@ -22,7 +22,7 @@ export default class User {
 
     setData(props) {
         for (const prop in props) {
-            this[prop] = props[prop];
+            if(this.hasOwnProperty(prop)) this[prop] = props[prop];
         }
     }
 

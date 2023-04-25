@@ -29,24 +29,6 @@
         <a :href="href" @click="navigate"><span>Administration</span></a>
       </li>
     </router-link>
-    <router-link
-      v-if="
-        auth.hasPermission('canAccessAdmin') &&
-        auth.hasPermission('canAccessAccountList')
-      "
-      :to="{ name: 'users' }"
-      custom
-      v-slot="{ href, navigate, isActive, isExactActive }"
-    >
-      <li
-        id="admin-users-link"
-        :class="{
-          'uk-active active': isActive || isExactActive,
-        }"
-      >
-        <a :href="href" @click="navigate"><span>Users</span></a>
-      </li>
-    </router-link>
   </ul>
 </template>
 

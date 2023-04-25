@@ -83,7 +83,6 @@
           </div>
         </div>
       </div>
-
       <table
         class="uk-table uk-table-striped uk-table-hover uk-table-small uk-table-middle"
       >

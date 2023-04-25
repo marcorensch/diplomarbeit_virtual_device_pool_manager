@@ -19,29 +19,10 @@
         </div>
       </div>
     </div>
-    <div class="uk-position-fixed uk-position-bottom uk-position-z-index">
-      <div
-        class="nxd-background-horizon uk-padding uk-grid-small uk-child-width-1-1 uk-child-width-auto@m uk-flex-right uk-animation-slide-bottom"
-        uk-grid
-      >
-        <div>
-          <button
-            class="uk-button uk-button-secondary uk-width-1-1"
-            @click="handleCancelClicked"
-          >
-            Cancel
-          </button>
-        </div>
-        <div>
-          <button
-            class="uk-button uk-button-primary uk-width-1-1"
-            @click="handleSaveClicked"
-          >
-            Save
-          </button>
-        </div>
-      </div>
-    </div>
+    <ControlsFooterWidget
+      :cancel="handleCancelClicked"
+      :save="handleSaveClicked"
+    />
   </div>
 </template>
 
@@ -51,10 +32,11 @@ import BasicsWidget from "@/components/devices/configform/BasicsWidget.vue";
 import Device from "@/models/Device.mjs";
 import ImageWidget from "@/components/devices/configform/ImageWidget.vue";
 import NotesWidget from "@/components/devices/configform/NotesWidget.vue";
+import ControlsFooterWidget from "@/components/ControlsFooterWidget.vue";
 
 export default {
   name: "DeviceConfigView",
-  components: { NotesWidget, ImageWidget, BasicsWidget },
+  components: { NotesWidget, ImageWidget, BasicsWidget, ControlsFooterWidget },
   data() {
     return {
       deviceEditStore: useDeviceEditStore(),

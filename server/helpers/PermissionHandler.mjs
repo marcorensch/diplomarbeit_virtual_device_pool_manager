@@ -25,7 +25,9 @@ export const permissions = {
     CREATE_NUMBERS: 'canCreateNumbers',
     DELETE_NUMBERS: 'canDeleteNumbers',
     UPDATE_NUMBERS: 'canUpdateNumbers',
-    // CabinetBuilder Management
+    ACCESS_SIM_TYPES: 'canAccessSimTypes',
+    // PoolBuilder Management
+    ACCESS_POOL_BUILDER: 'canAccessPoolBuilder',
     CREATE_LOCATION: 'canCreateLocation',
     DELETE_LOCATION: 'canDeleteLocation',
     UPDATE_LOCATION: 'canUpdateLocation',
@@ -50,6 +52,7 @@ export const permissions = {
     DELETE_LINKS: 'canDeleteLinks',
     UPDATE_LINKS: 'canUpdateLinks',
     // GuideMe
+    MANAGE_GUIDES: 'canManageGuides',
     ACCESS_GUIDES: 'canAccessGuides',
     CREATE_GUIDES: 'canCreateGuides',
     DELETE_GUIDES: 'canDeleteGuides',

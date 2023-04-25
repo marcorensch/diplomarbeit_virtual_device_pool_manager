@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS `numbers`
     modified_at timestamp    NOT NULL DEFAULT NOW() ON UPDATE NOW(),
     PRIMARY KEY (id),
     CONSTRAINT `numbers_multidevice_link` FOREIGN KEY (parent_id) REFERENCES `numbers` (id) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT `numbers_sim_type_link` FOREIGN KEY (sim_type) REFERENCES `sim_types` (id) ON DELETE SET NULL ON UPDATE CASCADE
+    CONSTRAINT `numbers_sim_type_link` FOREIGN KEY (sim_type) REFERENCES `sim_types` (id) ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT `numbers_parent_id_link` FOREIGN KEY (parent_id) REFERENCES `numbers` (id) ON DELETE CASCADE ON UPDATE CASCADE
 )
     ENGINE = InnoDB
     DEFAULT CHARACTER SET = utf8

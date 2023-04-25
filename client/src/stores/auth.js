@@ -15,6 +15,11 @@ export const useAuthStore = defineStore("auth", {
     hasPermission: (state) => (permission) => {
       return state.userPermissions.includes(permission);
     },
+    hasPermissions: (state) => (permissions) => {
+      return permissions.every((permission) =>
+        state.userPermissions.includes(permission)
+      );
+    },
   },
   actions: {
     checkAuth() {

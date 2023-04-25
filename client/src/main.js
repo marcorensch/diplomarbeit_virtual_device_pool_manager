@@ -20,6 +20,7 @@ import {
   faMicrochip,
   faMobileRetro,
   faMobileScreenButton,
+  faPencil,
   faPlus,
   faSlash,
   faSort,
@@ -32,6 +33,7 @@ import {
   faUserEdit,
   faUserGear,
   faUserPlus,
+  faUsers,
   faUserShield,
   faWarehouse,
   faXmark,
@@ -39,7 +41,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { faCircle } from "@fortawesome/free-regular-svg-icons";
 
-library.add(faUser, faUserShield, faUserPlus, faUserEdit);
+library.add(faUser, faUserShield, faUserPlus, faUserEdit, faUsers, faPencil);
 library.add(faTrash, faXmark, faCircle, faChevronDown, faChevronUp);
 library.add(faSort, faSortUp, faSortDown, faSlash);
 library.add(
