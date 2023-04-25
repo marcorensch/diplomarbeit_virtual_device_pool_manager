@@ -15,11 +15,13 @@ const routes = [
         path: "",
         name: "devices",
         component: () => import("../views/devices/ListView.vue"),
+        meta: { transition: "fade" },
       },
       {
         path: "create",
         name: "create-device",
         component: () => import("../views/devices/ConfigView.vue"),
+        meta: { transition: "fade" },
         beforeEnter: () => {
           const authStore = useAuthStore();
           if (!authStore.isLoggedIn) {

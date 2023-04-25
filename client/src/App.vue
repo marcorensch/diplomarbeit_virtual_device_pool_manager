@@ -29,24 +29,4 @@ export default {
 <style lang="less">
 @import "../node_modules/uikit/src/less/uikit.less";
 @import "@/assets/less/main.less";
-
-.fade-enter-active,
-.fade-leave-active {
-  opacity: 1;
-  transition: opacity 0.3s;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
-.slide-bottom-enter-active,
-.slide-bottom-leave-active {
-  transition: opacity 0.3s, transform 0.3s;
-}
-.slide-bottom-enter-from,
-.slide-bottom-leave-to {
-  opacity: 0;
-  transform: translateY(30%);
-}
 </style>
