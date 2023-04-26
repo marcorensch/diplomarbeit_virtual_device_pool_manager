@@ -17,7 +17,19 @@
                 id="abo"
                 class="uk-input"
                 v-model="item.abonnement"
+                :class="{ 'form-invalid': v$.item.abonnement.$errors.length }"
               />
+              <div
+                v-if="v$.item.abonnement.$errors.length"
+                class="uk-text-danger uk-text-small"
+              >
+                <div
+                  v-for="error in v$.item.abonnement.$errors"
+                  :key="error.id"
+                >
+                  {{ error.$message }}
+                </div>
+              </div>
             </div>
             <div
               :class="{
@@ -25,7 +37,21 @@
               }"
             >
               <label for="msisdn">SCN</label>
-              <input type="text" id="scn" class="uk-input" v-model="item.scn" />
+              <input
+                type="text"
+                id="scn"
+                class="uk-input"
+                v-model="item.scn"
+                :class="{ 'form-invalid': v$.item.scn.$errors.length }"
+              />
+              <div
+                v-if="v$.item.scn.$errors.length"
+                class="uk-text-danger uk-text-small"
+              >
+                <div v-for="error in v$.item.scn.$errors" :key="error.id">
+                  {{ error.$message }}
+                </div>
+              </div>
             </div>
             <div>
               <label for="msisdn">{{ techString }}MSISDN</label>
@@ -35,12 +61,21 @@
                 class="uk-input"
                 placeholder="4179..."
                 v-model="item.msisdn"
+                :class="{ 'form-invalid': v$.item.msisdn.$errors.length }"
               />
+              <div
+                v-if="v$.item.msisdn.$errors.length"
+                class="uk-text-danger uk-text-small"
+              >
+                <div v-for="error in v$.item.msisdn.$errors" :key="error.id">
+                  {{ error.$message }}
+                </div>
+              </div>
             </div>
             <div>
-              <label for="parent_id">Multi Device Parent MSISDN</label>
+              <label for="parent_id">Multi Device</label>
               <select id="parent_id" class="uk-select" v-model="item.parent_id">
-                <option value="null">Select to set as Multi Device SIM</option>
+                <option value="null">Main MSISDN</option>
                 <option
                   v-for="parent of parent_msisdns"
                   :value="parent.id"
@@ -58,11 +93,27 @@
                 class="uk-input"
                 placeholder="984101..."
                 v-model="item.sim_number"
+                :class="{ 'form-invalid': v$.item.sim_number.$errors.length }"
               />
+              <div
+                v-if="v$.item.sim_number.$errors.length"
+                class="uk-text-danger uk-text-small"
+              >
+                <div
+                  v-for="error in v$.item.sim_number.$errors"
+                  :key="error.id"
+                >
+                  {{ error.$message }}
+                </div>
+              </div>
             </div>
             <div>
               <label for="sim_type">SIM Type</label>
-              <select id="sim_type" class="uk-select" v-model="item.sim_type">
+              <select
+                id="sim_type"
+                class="uk-select"
+                v-model="item.sim_type_id"
+              >
                 <option value="null">Select</option>
                 <option
                   v-for="type in sim_types"
@@ -72,6 +123,17 @@
                   {{ type.name }}
                 </option>
               </select>
+              <div
+                v-if="v$.item.sim_type_id.$errors.length"
+                class="uk-text-danger uk-text-small"
+              >
+                <div
+                  v-for="error in v$.item.sim_type_id.$errors"
+                  :key="error.id"
+                >
+                  {{ error.$message }}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -109,12 +171,73 @@
 </template>
 
 <script>
+import { useToast } from "vue-toastification";
 import ControlsFooterWidget from "@/components/ControlsFooterWidget.vue";
 import axios from "axios";
+import { useVuelidate } from "@vuelidate/core";
+import { helpers, requiredIf, numeric } from "@vuelidate/validators";
+
+const exactLength = (length, fieldname = "") =>
+  helpers.withMessage(
+    `${fieldname} must be ${length} digits`,
+    (value) => value.length === length
+  );
+
+const startsWith = (prefix, fieldname = "") =>
+  helpers.withMessage(`${fieldname} must start with ${prefix}`, (value) =>
+    value.startsWith(prefix)
+  );
+
+const validSelection = (fieldname = "") => {
+  return helpers.withMessage(`Please select a ${fieldname}`, (value) => {
+    return (
+      value !== "null" &&
+      value !== null &&
+      value !== undefined &&
+      value !== "" &&
+      value !== 0
+    );
+  });
+};
 
 export default {
   name: "MsisdnEditorView",
+  setup() {
+    const toast = useToast();
+    const v$ = useVuelidate();
+    return { toast, v$ };
+  },
   components: { ControlsFooterWidget },
+  validations() {
+    return {
+      item: {
+        msisdn: {
+          exactLength: exactLength(11, "MSISDN"),
+          startsWith: startsWith("41", "MSISDN"),
+          numeric,
+        },
+        sim_number: {
+          exactLength: exactLength(20),
+          startsWith: startsWith("894101", "ICCID"),
+          numeric,
+        },
+        abonnement: {
+          requiredIfMain: helpers.withMessage(
+            "Abonnement Description is required for Main MSISDN",
+            requiredIf(function () {
+              return !/\d+/.exec(this.item.parent_id);
+            })
+          ),
+        },
+        sim_type_id: {
+          validSelection: validSelection("SIM Type"),
+        },
+        scn: {
+          numeric,
+        },
+      },
+    };
+  },
   props: {
     id: {
       type: String,
@@ -135,7 +258,7 @@ export default {
         abonnement: "",
         parent_id: null,
         sim_number: "",
-        sim_type: null,
+        sim_type_id: null,
         notes: "",
         hidden: "",
       },
@@ -192,13 +315,18 @@ export default {
       console.log("cancel clicked");
       this.$router.push({ name: "msisdn-manager" });
     },
-    handleSaveClicked() {
+    async handleSaveClicked() {
+      const formIsValid = await this.v$.$validate();
+      console.log(this.v$.$errors);
+      if (!formIsValid) return;
+
       if (/\d+/.exec(this.item.parent_id)) {
         this.item.abonnement = "";
         this.item.scn = "";
       } else {
         this.item.parent_id = null;
       }
+
       if (this.id) {
         this.updateMsisdn();
       } else {
@@ -208,11 +336,11 @@ export default {
     saveNewMsisdn() {
       axios
         .post("/api/admin/numbers", this.item)
-        .then(() => {
-          this.$router.push({ name: "msisdn-manager" });
+        .then((res) => {
+          this.handleResponse(res);
         })
         .catch((error) => {
-          console.log(error);
+          this.handleResponse(error.response);
         });
     },
     updateMsisdn() {
@@ -222,8 +350,19 @@ export default {
           this.$router.push({ name: "msisdn-manager" });
         })
         .catch((error) => {
-          console.log(error);
+          this.handleResponse(error.response);
         });
+    },
+    handleResponse(response) {
+      if (response.status === 200 || response.status === 201) {
+        this.$router.push({ name: "msisdn-manager" });
+        this.toast.success("MSISDN saved successfully");
+      } else {
+        this.toast.error("Error saving MSISDN");
+        console.error(
+          `${response.status} - ${response.statusText}: ${response.data}`
+        );
+      }
     },
   },
 };

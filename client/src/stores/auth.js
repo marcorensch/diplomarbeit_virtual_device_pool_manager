@@ -22,6 +22,29 @@ export const useAuthStore = defineStore("auth", {
     },
   },
   actions: {
+    setLocalStorageConfig(key, value) {
+      const localStorageConfig = localStorage.getItem("config");
+      if (localStorageConfig) {
+        const config = JSON.parse(localStorageConfig);
+        config[key] = value;
+        localStorage.setItem("config", JSON.stringify(config));
+      } else {
+        const config = {
+          [key]: value,
+        };
+        localStorage.setItem("config", JSON.stringify(config));
+      }
+    },
+    getLocalStorageConfig(key, defaultValue) {
+      const localStorageConfig = localStorage.getItem("config");
+      if (localStorageConfig) {
+        const config = JSON.parse(localStorageConfig);
+        if (config[key]) {
+          return config[key];
+        }
+      }
+      return defaultValue;
+    },
     checkAuth() {
       const user = localStorage.getItem("user");
       const permissions = localStorage.getItem("permissions");

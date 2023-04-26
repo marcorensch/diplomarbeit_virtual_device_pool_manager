@@ -1,6 +1,8 @@
 import express from "express";
 import UserValidator from "../middlewares/UserValidator.mjs";
 import MsisdnHelper from "../helpers/MsisdnHelper.mjs";
+import Msisdn from "../models/Msisdn.mjs";
+import msisdnValidator from "../middlewares/msisdnValidator.mjs";
 
 const router = express.Router();
 
@@ -25,19 +27,20 @@ router.get('/:id', UserValidator.hasPermission('canUpdateNumbers'), UserValidato
     }
 });
 
-router.post('/', UserValidator.hasPermission('canCreateNumbers'), UserValidator.setCookies, async (req, res) => {
+router.post('/', UserValidator.hasPermission('canCreateNumbers'), msisdnValidator, UserValidator.setCookies, async (req, res) => {
     const data = req.body;
+
     const msisdn = MsisdnHelper.createMsisdn(data);
     try{
-        await msisdn.store();
+        await MsisdnHelper.store(msisdn);
     } catch (e) {
         console.log(e)
         return res.status(500).json({error: "Could not create MSISDN"});
     }
-    return res.status(201).json({msisdn});
+    return res.status(201).send("MSISDN created successfully");
 });
 
-router.put('/:id', UserValidator.hasPermission('canUpdateNumbers'), UserValidator.setCookies, async (req, res) => {
+router.put('/:id', UserValidator.hasPermission('canUpdateNumbers'), msisdnValidator, UserValidator.setCookies, async (req, res) => {
     const data = req.body;
     try {
         await MsisdnHelper.updateMsisdn(req.params.id, data);

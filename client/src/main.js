@@ -12,10 +12,14 @@ import {
   faBook,
   faCameraRetro,
   faChevronDown,
+  faChevronLeft,
   faChevronRight,
   faChevronUp,
+  faCubes,
   faDatabase,
   faGears,
+  faGrip,
+  faGripLines,
   faKey,
   faLaptop,
   faMicrochip,
@@ -27,6 +31,7 @@ import {
   faSort,
   faSortDown,
   faSortUp,
+  faTableList,
   faTabletScreenButton,
   faTrash,
   faTv,
@@ -42,14 +47,26 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { faCircle } from "@fortawesome/free-regular-svg-icons";
 
-library.add(faUser, faUserShield, faUserPlus, faUserEdit, faUsers, faPencil);
+library.add(
+  faUser,
+  faUserShield,
+  faUserPlus,
+  faUserEdit,
+  faUsers,
+  faPencil,
+  faTableList,
+  faGripLines,
+  faGrip
+);
 library.add(
   faTrash,
   faXmark,
   faCircle,
   faChevronDown,
   faChevronUp,
-  faChevronRight
+  faChevronRight,
+  faChevronLeft,
+  faCubes
 );
 library.add(faSort, faSortUp, faSortDown, faSlash);
 library.add(

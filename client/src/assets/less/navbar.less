@@ -4,31 +4,35 @@
   ul.main-menu > li:first-of-type a {
     margin-left: 0;
     padding-left: 0;
-    span{
-        padding-left: 0;
+
+    span {
+      padding-left: 0;
     }
   }
+
   ul.main-menu > li > a {
     font-family: @font-family-sans-serif;
     font-size: 1.2rem;
     color: @color-navy;
 
-    span{
+    span {
       padding-left: 5px;
       padding-right: 5px;
       border-top: 1px solid transparent;
       border-bottom: 1px solid transparent;
     }
   }
+
   ul.main-nav > li.uk-active > a {
     font-family: @font-family-sans-serif;
     font-size: 1.2rem;
     color: @color-primary;
 
-    span{
-      border-bottom-color:  @color-primary;
+    span {
+      border-bottom-color: @color-primary;
     }
   }
+
   &:not(.uk-navbar-transparent) {
     border-bottom: 1px solid @color-grey-light;
     background: @color-white;
@@ -64,7 +68,7 @@ li#user-icon-link {
   }
 }
 
-.navbar-submenu{
+.navbar-submenu {
   width: 260px;
   background: @color-white;
   box-shadow: rgba(0, 0, 0, .2) 0 0 4px 0;
@@ -144,6 +148,7 @@ ul.uk-nav-primary {
   li:not(:last-of-type) {
     border-bottom: 1px solid @color-grey-light;
   }
+
   li {
     a {
       span {
@@ -152,6 +157,7 @@ ul.uk-nav-primary {
       }
     }
   }
+
   li.uk-active {
     a {
       span {
@@ -160,4 +166,76 @@ ul.uk-nav-primary {
       }
     }
   }
+}
+
+.horizontal-submenu-container {
+  padding: 4px;
+  position: relative;
+  a {
+    text-decoration: none;
+  }
+  .slider-left {
+    padding-left: 0;
+    left: -15px;
+    &:before {
+      content: "";
+      position: absolute;
+      top: -10px;
+      bottom: -10px;
+      left: -10px;
+      right: -20px;
+      background: linear-gradient(to right, rgba(255, 255, 255, 1) 60%, rgba(255, 255, 255, 0) 100%);
+      z-index: -1;
+    }
+  }
+
+  .slider-right {
+    padding-right: 0;
+    right: -15px;
+    &:after {
+      content: "";
+      position: absolute;
+      top: -10px;
+      bottom: -10px;
+      left: -20px;
+      right: -10px;
+      background: linear-gradient(to left, rgba(255, 255, 255, 1) 60%, rgba(255, 255, 255, 0) 100%);
+      z-index: -1;
+    }
+  }
+}
+
+ul a {
+  line-height: 40px;
+  height: 100%;
+  font-size: 16px;
+  display: inline-block;
+  position: relative;
+  z-index: 1;
+  text-decoration: none;
+  text-align: center;
+  color: @color-grey-dark;
+  cursor: pointer;
+  margin: 0 4px;
+}
+
+ul .animation {
+  position: absolute;
+  height: 100%;
+  top: 0;
+  z-index: 0;
+  width: 0px;
+  transition: all 0.2s ease-in-out 0s;
+  background: @color-white;
+  border-radius: @nxd-border-radius;
+}
+
+a {
+  width: auto;
+  padding: 0 16px;
+}
+
+a.router-link-exact-active {
+  background: transparent;
+  color: @color-navy;
 }

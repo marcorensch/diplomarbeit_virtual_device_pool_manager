@@ -5,12 +5,36 @@
         <div
           class="nxd-background-horizon uk-border-rounded horizontal-submenu-container"
         >
-          <nav>
-            <template v-for="link of adminRouterLinks" :key="link.path">
-              <router-link :to="link.path">{{ link.label }} </router-link>
-            </template>
-            <div class="animation start-home"></div>
-          </nav>
+          <div uk-slider="finite:true">
+            <div class="uk-position-relative">
+              <div class="uk-slider-container">
+                <ul id="horizontal-submenu" class="uk-slider-items">
+                  <template v-for="link of adminRouterLinks" :key="link.path">
+                    <li>
+                      <router-link class="uk-text-nowrap" :to="link.path">
+                        <font-awesome-icon :icon="'fas fa-' + link.icon" />
+                        {{ link.label }}
+                      </router-link>
+                    </li>
+                  </template>
+
+                  <div class="animation"></div>
+                </ul>
+              </div>
+              <a
+                class="uk-position-center-left slider-left uk-hidden@m"
+                uk-slidenav-previous
+                uk-slider-item="previous"
+              >
+              </a>
+              <a
+                class="uk-position-center-right slider-right uk-hidden@m"
+                uk-slidenav-next
+                uk-slider-item="next"
+              >
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -24,8 +48,12 @@
 
 <script>
 import { useAuthStore } from "@/stores/auth";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import UIkit from "uikit";
+
 export default {
   name: "AdminView",
+  components: { FontAwesomeIcon },
   data() {
     return {
       auth: useAuthStore(),
@@ -33,32 +61,36 @@ export default {
         {
           label: "Dashboard",
           path: "/admin",
+          icon: "grip",
         },
         {
           label: "MSISDN Manager",
           path: "/admin/msisdn-manager",
+          icon: "mobile-screen-button",
         },
         {
           label: "Account Manager",
           path: "/admin/accounts",
+          icon: "users",
         },
         {
           label: "Pool Builder",
           path: "/admin/pool-builder",
+          icon: "cubes",
         },
         {
           label: "GuideMe Manager",
           path: "/admin/guideme-manager",
+          icon: "book",
         },
       ],
     };
   },
   mounted() {
     this.setNavPosition();
-
-    const navElements = document.querySelectorAll("nav a");
-    for (const navElement of navElements) {
-      navElement.addEventListener("click", (e) => {
+    const navLinks = document.querySelectorAll("#horizontal-submenu a");
+    for (const navLink of navLinks) {
+      navLink.addEventListener("click", (e) => {
         e.preventDefault();
         this.animateNav(e);
       });
@@ -66,9 +98,10 @@ export default {
   },
   methods: {
     setNavPosition() {
-      const navElements = document.querySelectorAll("nav a");
-      for (const navElement of navElements) {
-        if (navElement.classList.contains("router-link-exact-active")) {
+      const navLinks = document.querySelectorAll("#horizontal-submenu a");
+      for (const navLink of navLinks) {
+        if (navLink.classList.contains("router-link-exact-active")) {
+          const navElement = navLink.closest("li");
           const navAnimation = document.querySelector(".animation");
           const navAnimationWidth = navElement.offsetWidth;
           const navAnimationLeft = navElement.offsetLeft;
@@ -79,57 +112,15 @@ export default {
     },
     animateNav(e) {
       const target = e.target;
+      const parentListItem = target.closest("li");
       const navAnimation = document.querySelector(".animation");
-      const navAnimationWidth = target.offsetWidth;
-      const navAnimationLeft = target.offsetLeft;
+      const navAnimationWidth = parentListItem.offsetWidth;
+      const navAnimationLeft = parentListItem.offsetLeft;
       navAnimation.style.width = navAnimationWidth + "px";
       navAnimation.style.left = navAnimationLeft + "px";
+
+      console.log(navAnimation.style.width);
     },
   },
 };
 </script>
-
-<style lang="less">
-@import "@/assets/less/variables.less";
-.horizontal-submenu-container {
-  padding: 4px;
-  nav {
-    margin: 0;
-    position: relative;
-    height: 40px;
-    border-radius: @nxd-border-radius;
-    font-size: 0;
-  }
-  nav a {
-    line-height: 40px;
-    height: 100%;
-    font-size: 16px;
-    display: inline-block;
-    position: relative;
-    z-index: 1;
-    text-decoration: none;
-    text-align: center;
-    color: @color-grey-dark;
-    cursor: pointer;
-    margin: 0 4px;
-  }
-  nav .animation {
-    position: absolute;
-    height: 100%;
-    top: 0;
-    z-index: 0;
-    width: 0px;
-    transition: all 0.5s ease 0s;
-    background: @color-white;
-    border-radius: @nxd-border-radius;
-  }
-  a {
-    width: auto;
-    padding: 0 16px;
-  }
-  a.router-link-exact-active {
-    background: transparent;
-    color: @color-navy;
-  }
-}
-</style>

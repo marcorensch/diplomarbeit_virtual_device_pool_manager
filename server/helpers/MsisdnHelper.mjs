@@ -18,7 +18,7 @@ export default class MsisdnHelper {
 
     static async getMsisdnsByParentId(parentId) {
         const database = new DatabaseModel();
-        const numbersData = await database.query("SELECT a.*, b.name AS simTypeName FROM numbers as a JOIN sim_types AS b ON a.sim_type = b.id WHERE a.parent_id = ? ORDER BY a.abonnement ASC, a.msisdn ASC", [parentId]);
+        const numbersData = await database.query("SELECT a.*, b.name AS simTypeName FROM numbers as a LEFT JOIN sim_types AS b ON a.sim_type_id = b.id WHERE a.parent_id = ? ORDER BY a.abonnement ASC, a.msisdn ASC", [parentId]);
         if (numbersData.length === 0) return [];
         const numbers = [];
         for (const numberData of numbersData) {
@@ -29,7 +29,7 @@ export default class MsisdnHelper {
 
     static async getAllMsisdns(parentOnly = false) {
         const database = new DatabaseModel();
-        const numbersData = await database.query("SELECT a.*, b.name AS simTypeName FROM numbers as a JOIN sim_types AS b ON a.sim_type = b.id WHERE a.parent_id IS NULL ORDER BY a.abonnement ASC, a.msisdn ASC");
+        const numbersData = await database.query("SELECT a.*, b.name AS simTypeName FROM numbers as a LEFT JOIN sim_types AS b ON a.sim_type_id = b.id WHERE a.parent_id IS NULL ORDER BY a.abonnement ASC, a.msisdn ASC");
         if (numbersData.length === 0) return [];
         const numbers = [];
         for (const numberData of numbersData) {
@@ -50,9 +50,16 @@ export default class MsisdnHelper {
         if (!msisdn) return null;
         msisdn.setData(data);
         const database = new DatabaseModel();
-        const result = await database.query("UPDATE numbers SET msisdn = ?, scn = ?, abonnement = ?, sim_number = ?, parent_id = ?, sim_type = ?, notes = ?, hidden = ? WHERE id = ?", [msisdn.msisdn, msisdn.scn, msisdn.abonnement, msisdn.sim_number, msisdn.parent_id, msisdn.sim_type, msisdn.notes, msisdn.hidden, id]);
+        const result = await database.query("UPDATE numbers SET msisdn = ?, scn = ?, abonnement = ?, sim_number = ?, parent_id = ?, sim_type_id = ?, notes = ?, hidden = ? WHERE id = ?", [msisdn.msisdn, msisdn.scn, msisdn.abonnement, msisdn.sim_number, msisdn.parent_id, msisdn.sim_type_id, msisdn.notes, msisdn.hidden, id]);
         if (result.affectedRows === 0) return null;
         return msisdn;
+    }
+
+    static async store(msisdn) {
+        const database = new DatabaseModel();
+        const result = await database.query("INSERT INTO numbers (msisdn, scn, abonnement, sim_number, parent_id, sim_type_id, notes, hidden) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", [msisdn.msisdn, msisdn.scn, msisdn.abonnement, msisdn.sim_number, msisdn.parent_id, msisdn.sim_type_id, msisdn.notes, msisdn.hidden]);
+        this.id = result.insertId;
+        return this;
     }
 
     static createMsisdn(data) {

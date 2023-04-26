@@ -1,7 +1,7 @@
 <template>
   <div class="uk-section uk-section-small user-list-view">
     <div class="uk-container">
-      <h1>Userlist</h1>
+      <h1>Account Manager</h1>
       <div
         class="actions uk-background-muted uk-border-rounded uk-padding-small"
       >

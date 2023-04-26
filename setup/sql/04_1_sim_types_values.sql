@@ -1,1 +1,1 @@
-INSERT INTO `sim_types` (name) VALUES ('eSIM'), ('pSIM');
+INSERT INTO `sim_types` (name) VALUES ('eSIM'), ('pSIM'), ('iSIM');

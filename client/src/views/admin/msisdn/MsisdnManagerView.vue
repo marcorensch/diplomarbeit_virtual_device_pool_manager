@@ -3,9 +3,9 @@
     <div class="uk-container">
       <h1>MSISDN Manager</h1>
       <div
-        class="actions uk-background-muted uk-border-rounded uk-padding-small"
+        class="actions uk-background-muted uk-border-rounded uk-padding-small uk-margin-bottom"
       >
-        <div class="uk-flex">
+        <div class="uk-flex uk-grid-small">
           <div class="uk-width-auto">
             <button
               class="uk-button uk-button-primary"
@@ -16,8 +16,32 @@
               <span class="uk-visible@m uk-margin-small-left">Add MSISDN</span>
             </button>
           </div>
-          <div class="uk-width-expand">
+          <div class="uk-width-expand uk-flex-middle">
             <div class="uk-flex uk-flex-right uk-flex-middle uk-grid-small">
+              <div>
+                <div class="uk-button-group">
+                  <button
+                    class="uk-button uk-button-default"
+                    :class="{ 'uk-button-primary': layout === 'cards' }"
+                    @click="handleLayoutChanged('cards')"
+                  >
+                    <font-awesome-icon
+                      class="uk-preserve-width"
+                      :icon="['fas', 'grip-lines']"
+                    />
+                  </button>
+                  <button
+                    class="uk-button uk-button-default"
+                    :class="{ 'uk-button-primary': layout === 'table' }"
+                    @click="handleLayoutChanged('table')"
+                  >
+                    <font-awesome-icon
+                      class="uk-preserve-width"
+                      :icon="['fas', 'table-list']"
+                    />
+                  </button>
+                </div>
+              </div>
               <div>
                 <div
                   class="uk-width-auto uk-width-medium@m uk-position-relative"
@@ -45,83 +69,27 @@
           </div>
         </div>
       </div>
-      <div
-        v-for="number of numbers"
-        :key="number.id"
-        class="uk-margin uk-card uk-card-default uk-card-small"
-      >
-        <div class="uk-position-relative" uk-grid>
-          <div class="uk-width-expand">
-            <div class="uk-card-header">
-              <h3>{{ number.abonnement }}</h3>
-              <span>SCN: {{ number.scn }}</span>
-            </div>
-            <div class="uk-card-body uk-position-relative">
-              <div
-                class="uk-child-width-1-1 uk-child-width-1-3@m uk-grid-small"
-                uk-grid
-              >
-                <div>
-                  <b>MSISDN:</b><br />
-                  {{ number.msisdn }}
-                </div>
-                <div>
-                  <div>
-                    <b>SIM Card:</b>
-                  </div>
-                  <div>{{ number.sim_number }} ({{ number.simTypeName }})</div>
-                </div>
-                <div
-                  class="uk-width-1-1 uk-margin"
-                  v-if="number.multi_device.length"
-                >
-                  <div class="uk-text-bold">Multi Device:</div>
-                  <ul
-                    :class="'md_list_' + number.id"
-                    class="uk-list uk-list-divider uk-text-small uk-margin-remove-top"
-                  >
-                    <li
-                      v-for="md of number.multi_device"
-                      class="multidevice-item"
-                      :key="md.id"
-                    >
-                      <div
-                        class="uk-flex uk-flex-middle uk-grid-small uk-position-relative"
-                      >
-                        <div class="uk-width-expand">
-                          {{ md.sim_number }} ({{ md.simTypeName }})
-                        </div>
-                        <div>
-                          <font-awesome-icon
-                            class=""
-                            :icon="['fas', 'chevron-right']"
-                          />
-                        </div>
-                        <router-link
-                          class="uk-position-cover uk-position-z-index"
-                          :to="{ name: 'msisdn-edit', params: { id: md.id } }"
-                        />
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="uk-width-auto uk-flex uk-flex-middle">
-            <div class="uk-padding-small">
-              <font-awesome-icon
-                class="uk-margin-small-right"
-                :icon="['fas', 'chevron-right']"
-                size="2x"
-              />
-            </div>
-          </div>
-          <router-link
-            class="uk-position-cover"
-            :to="{ name: 'msisdn-edit', params: { id: number.id } }"
-          />
+      <div v-if="layout === 'cards'">
+        <div v-for="number of numbers" :key="number.id">
+          <MsisdnMgrCard :number="number" />
         </div>
+      </div>
+      <div class="uk-overflow-auto" v-else-if="layout === 'table'">
+        <table class="uk-table uk-table-divider">
+          <thead>
+            <th>MSISDN</th>
+            <th>ICCID</th>
+            <th>Abo</th>
+            <th class="uk-text-nowrap">Multi Device</th>
+          </thead>
+          <tbody>
+            <MsisdnMgrRow
+              v-for="number of numbers"
+              :number="number"
+              :key="number.id"
+            />
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -130,25 +98,37 @@
 <script>
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import MsisdnMgrCard from "@/views/admin/msisdn/MsisdnMgrCard.vue";
+import MsisdnMgrRow from "@/views/admin/msisdn/MsisdnMgrRow.vue";
+import { useAuthStore } from "@/stores/auth";
 
 export default {
   name: "MsisdnManagerView",
-  components: { FontAwesomeIcon },
+  components: { MsisdnMgrRow, MsisdnMgrCard, FontAwesomeIcon },
   data() {
     return {
+      auth: useAuthStore(),
+      layout: null,
       search_msisdn: "",
       numbers: [],
     };
   },
   mounted() {
     this.getMsisdnList();
+    this.layout = this.auth.getLocalStorageConfig("msisdn_layout", "cards");
   },
   methods: {
+    handleLayoutChanged(layout) {
+      this.layout = layout;
+      this.auth.setLocalStorageConfig("msisdn_layout", layout);
+    },
     getMsisdnList() {
       axios
         .get("/api/admin/numbers")
         .then((response) => {
-          console.log(response.data);
+          response.data.map((number) => {
+            number.visible = true;
+          });
           this.numbers = response.data;
         })
         .catch((error) => {
@@ -159,10 +139,32 @@ export default {
       this.$router.push({ name: "msisdn-add" });
     },
     filterMsisdnList() {
-      console.log("filtering msisdn list");
+      this.numbers.map((number) => {
+        number.visible =
+          this.filterMultiDevice(number) || this.filterChecks(number);
+      });
+    },
+    filterChecks(number) {
+      return (
+        number.msisdn.includes(this.search_msisdn) ||
+        number.abonnement
+          .toLowerCase()
+          .includes(this.search_msisdn.toLowerCase()) ||
+        number.sim_number.includes(this.search_msisdn) ||
+        number.scn.includes(this.search_msisdn)
+      );
+    },
+    filterMultiDevice(number) {
+      if (number.multi_device.length) {
+        return number.multi_device.some((md) => {
+          return this.filterChecks(md);
+        });
+      }
+      return false;
     },
     handleClearSearchMsisdnClicked() {
       this.search_msisdn = "";
+      this.filterMsisdnList();
     },
     handleEditMsisdnClicked(id) {
       this.$router.push({ name: "msisdn-edit", params: { id } });
