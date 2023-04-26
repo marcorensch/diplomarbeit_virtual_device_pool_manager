@@ -45,62 +45,82 @@
           </div>
         </div>
       </div>
-      <div class="uk-margin uk-card uk-card-default uk-card-small">
-        <div class="uk-card-body uk-position-relative">
-          <div class="uk-overflow-auto">
-            <table class="uk-table uk-table-striped">
-              <thead>
-                <th>MSISDN</th>
-                <th>
-                  <span class="uk-hidden@m">Abo</span>
-                  <span class="uk-visible@m">Abonnement</span>
-                </th>
-                <th class="uk-text-nowrap">
-                  SIM <span class="uk-visible@m">Type</span>
-                </th>
-                <th class="uk-text-nowrap">In Use</th>
-                <th class="uk-visible@m">Device</th>
-                <th class="">Actions</th>
-              </thead>
-              <tbody v-if="numbers.length">
-                <tr v-for="number of numbers" :key="number.id">
-                  <td>{{ number.msisdn }}</td>
-                  <td class="uk-text-nowrap">{{ number.abonnement }}</td>
-                  <td>{{ number.simTypeName }}</td>
-                  <td>
-                    <span :uk-tooltip="number.deviceName">{{
-                      number.in_use
-                    }}</span>
-                  </td>
-                  <td class="uk-visible@m">{{ number.deviceName }}</td>
-                  <td>
-                    <div class="uk-button-group">
-                      <button
-                        class="uk-button uk-button-default uk-button-small"
-                        style="min-width: 0"
-                        @click="handleEditMsisdnClicked(number.id)"
+      <div
+        v-for="number of numbers"
+        :key="number.id"
+        class="uk-margin uk-card uk-card-default uk-card-small"
+      >
+        <div class="uk-position-relative" uk-grid>
+          <div class="uk-width-expand">
+            <div class="uk-card-header">
+              <h3>{{ number.abonnement }}</h3>
+              <span>SCN: {{ number.scn }}</span>
+            </div>
+            <div class="uk-card-body uk-position-relative">
+              <div
+                class="uk-child-width-1-1 uk-child-width-1-3@m uk-grid-small"
+                uk-grid
+              >
+                <div>
+                  <b>MSISDN:</b><br />
+                  {{ number.msisdn }}
+                </div>
+                <div>
+                  <div>
+                    <b>SIM Card:</b>
+                  </div>
+                  <div>{{ number.sim_number }} ({{ number.simTypeName }})</div>
+                </div>
+                <div
+                  class="uk-width-1-1 uk-margin"
+                  v-if="number.multi_device.length"
+                >
+                  <div class="uk-text-bold">Multi Device:</div>
+                  <ul
+                    :class="'md_list_' + number.id"
+                    class="uk-list uk-list-divider uk-text-small uk-margin-remove-top"
+                  >
+                    <li
+                      v-for="md of number.multi_device"
+                      class="multidevice-item"
+                      :key="md.id"
+                    >
+                      <div
+                        class="uk-flex uk-flex-middle uk-grid-small uk-position-relative"
                       >
-                        <font-awesome-icon
-                          class="uk-preserve-width"
-                          :icon="['fas', 'pencil']"
+                        <div class="uk-width-expand">
+                          {{ md.sim_number }} ({{ md.simTypeName }})
+                        </div>
+                        <div>
+                          <font-awesome-icon
+                            class=""
+                            :icon="['fas', 'chevron-right']"
+                          />
+                        </div>
+                        <router-link
+                          class="uk-position-cover uk-position-z-index"
+                          :to="{ name: 'msisdn-edit', params: { id: md.id } }"
                         />
-                      </button>
-                      <button
-                        class="uk-button uk-button-default uk-button-small"
-                        style="min-width: 0"
-                        @click="handleDeleteMsisdnClicked(number.id)"
-                      >
-                        <font-awesome-icon
-                          class="uk-preserve-width"
-                          :icon="['fas', 'trash']"
-                        />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
+          <div class="uk-width-auto uk-flex uk-flex-middle">
+            <div class="uk-padding-small">
+              <font-awesome-icon
+                class="uk-margin-small-right"
+                :icon="['fas', 'chevron-right']"
+                size="2x"
+              />
+            </div>
+          </div>
+          <router-link
+            class="uk-position-cover"
+            :to="{ name: 'msisdn-edit', params: { id: number.id } }"
+          />
         </div>
       </div>
     </div>
@@ -109,9 +129,11 @@
 
 <script>
 import axios from "axios";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 export default {
   name: "MsisdnManagerView",
+  components: { FontAwesomeIcon },
   data() {
     return {
       search_msisdn: "",

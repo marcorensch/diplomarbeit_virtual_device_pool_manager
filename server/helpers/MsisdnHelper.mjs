@@ -18,7 +18,7 @@ export default class MsisdnHelper {
 
     static async getMsisdnsByParentId(parentId) {
         const database = new DatabaseModel();
-        const numbersData = await database.query("SELECT * FROM numbers WHERE parent_id = ?", [parentId]);
+        const numbersData = await database.query("SELECT a.*, b.name AS simTypeName FROM numbers as a JOIN sim_types AS b ON a.sim_type = b.id WHERE a.parent_id = ? ORDER BY a.abonnement ASC, a.msisdn ASC", [parentId]);
         if (numbersData.length === 0) return [];
         const numbers = [];
         for (const numberData of numbersData) {
@@ -27,13 +27,20 @@ export default class MsisdnHelper {
         return numbers;
     }
 
-    static async getAllMsisdns() {
+    static async getAllMsisdns(parentOnly = false) {
         const database = new DatabaseModel();
-        const numbersData = await database.query("SELECT a.*, b.name AS simTypeName FROM numbers as a JOIN sim_types AS b ON a.sim_type = b.id");
+        const numbersData = await database.query("SELECT a.*, b.name AS simTypeName FROM numbers as a JOIN sim_types AS b ON a.sim_type = b.id WHERE a.parent_id IS NULL ORDER BY a.abonnement ASC, a.msisdn ASC");
         if (numbersData.length === 0) return [];
         const numbers = [];
         for (const numberData of numbersData) {
             numbers.push(this.createMsisdn(numberData));
+        }
+
+        if (parentOnly) return numbers;
+
+        for (const number of numbers) {
+            const multiDevice = await this.getMsisdnsByParentId(number.id);
+            number.multi_device = multiDevice;
         }
         return numbers;
     }

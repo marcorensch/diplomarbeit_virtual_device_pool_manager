@@ -6,8 +6,29 @@
       <div class="uk-card uk-card-default">
         <div class="uk-card-body">
           <div class="uk-child-width-1-1 uk-child-width-1-2@m" uk-grid>
+            <div
+              :class="{
+                'uk-disabled nxd-disabled-section': /\d+/.exec(item.parent_id),
+              }"
+            >
+              <label for="abo">Abonnement</label>
+              <input
+                type="text"
+                id="abo"
+                class="uk-input"
+                v-model="item.abonnement"
+              />
+            </div>
+            <div
+              :class="{
+                'uk-disabled nxd-disabled-section': /\d+/.exec(item.parent_id),
+              }"
+            >
+              <label for="msisdn">SCN</label>
+              <input type="text" id="scn" class="uk-input" v-model="item.scn" />
+            </div>
             <div>
-              <label for="msisdn">MSISDN</label>
+              <label for="msisdn">{{ techString }}MSISDN</label>
               <input
                 type="text"
                 id="msisdn"
@@ -17,25 +38,17 @@
               />
             </div>
             <div>
-              <label for="msisdn">SCN</label>
-              <input type="text" id="scn" class="uk-input" v-model="item.scn" />
-            </div>
-            <div>
-              <label for="abo">Abonnement</label>
-              <input
-                type="text"
-                id="abo"
-                class="uk-input"
-                v-model="item.abonnement"
-              />
-            </div>
-            <div>
               <label for="parent_id">Multi Device Parent MSISDN</label>
-              <select
-                id="parent_id"
-                class="uk-select"
-                v-model="item.parent_id"
-              ></select>
+              <select id="parent_id" class="uk-select" v-model="item.parent_id">
+                <option value="null">Select to set as Multi Device SIM</option>
+                <option
+                  v-for="parent of parent_msisdns"
+                  :value="parent.id"
+                  :key="parent.id"
+                >
+                  {{ parent.msisdn }} ({{ parent.abonnement || "No Abo" }})
+                </option>
+              </select>
             </div>
             <div>
               <label for="sim_number">SIM Number</label>
@@ -50,6 +63,7 @@
             <div>
               <label for="sim_type">SIM Type</label>
               <select id="sim_type" class="uk-select" v-model="item.sim_type">
+                <option value="null">Select</option>
                 <option
                   v-for="type in sim_types"
                   :key="type.id"
@@ -106,16 +120,22 @@ export default {
       type: String,
     },
   },
+  computed: {
+    techString() {
+      return /\d+/.exec(this.item.parent_id) ? "Tech " : "";
+    },
+  },
   data() {
     return {
       sim_types: [],
+      parent_msisdns: [],
       item: {
         msisdn: "",
         scn: "",
         abonnement: "",
-        parent_id: 0,
+        parent_id: null,
         sim_number: "",
-        sim_type: 0,
+        sim_type: null,
         notes: "",
         hidden: "",
       },
@@ -123,6 +143,7 @@ export default {
   },
   mounted() {
     this.getSimTypes();
+    this.getParentMsisdns();
     if (this.id) {
       this.getMsisdnData();
     }
@@ -134,6 +155,23 @@ export default {
         .then((response) => {
           console.log(response.data);
           this.item = response.data;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    getParentMsisdns() {
+      axios
+        .get("/api/admin/numbers", {
+          params: {
+            parentOnly: true,
+          },
+        })
+        .then((response) => {
+          console.log(response.data);
+          this.parent_msisdns = response.data.filter((item) => {
+            if (parseInt(item.id) !== parseInt(this.id)) return true;
+          });
         })
         .catch((error) => {
           console.log(error);
@@ -155,7 +193,12 @@ export default {
       this.$router.push({ name: "msisdn-manager" });
     },
     handleSaveClicked() {
-      if (this.item.parent_id == 0) this.item.parent_id = null;
+      if (/\d+/.exec(this.item.parent_id)) {
+        this.item.abonnement = "";
+        this.item.scn = "";
+      } else {
+        this.item.parent_id = null;
+      }
       if (this.id) {
         this.updateMsisdn();
       } else {

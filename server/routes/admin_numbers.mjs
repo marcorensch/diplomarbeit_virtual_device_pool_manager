@@ -5,8 +5,9 @@ import MsisdnHelper from "../helpers/MsisdnHelper.mjs";
 const router = express.Router();
 
 router.get('/', UserValidator.hasPermission('canAccessNumberList'), UserValidator.setCookies, async (req, res) => {
+    const parentOnly = req.query.parentOnly || false;
     try {
-        const numbers = await MsisdnHelper.getAllMsisdns();
+        const numbers = await MsisdnHelper.getAllMsisdns(parentOnly);
         return res.status(200).json(numbers);
     }catch (e) {
         console.log(e)

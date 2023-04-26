@@ -12,6 +12,7 @@ import {
   faBook,
   faCameraRetro,
   faChevronDown,
+  faChevronRight,
   faChevronUp,
   faDatabase,
   faGears,
@@ -42,7 +43,14 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { faCircle } from "@fortawesome/free-regular-svg-icons";
 
 library.add(faUser, faUserShield, faUserPlus, faUserEdit, faUsers, faPencil);
-library.add(faTrash, faXmark, faCircle, faChevronDown, faChevronUp);
+library.add(
+  faTrash,
+  faXmark,
+  faCircle,
+  faChevronDown,
+  faChevronUp,
+  faChevronRight
+);
 library.add(faSort, faSortUp, faSortDown, faSlash);
 library.add(
   faGears,

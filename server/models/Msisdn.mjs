@@ -14,12 +14,18 @@ export default class Msisdn {
         this.hidden = "";
         this.created_at = null;
         this.modified_at = null;
+        this.multi_device = [];
     }
 
     setData(props) {
         for (const prop in props) {
-            if(this.hasOwnProperty(prop)) this[prop] = props[prop];
+            if(this.hasOwnProperty(prop)) this[prop] = props[prop] === 'null' ? null : props[prop];
         }
+    }
+
+    linkMultiDevice(multiDevice) {
+        const md = new Msisdn().setData(multiDevice);
+        this.multi_device.push(md);
     }
 
     async store() {
