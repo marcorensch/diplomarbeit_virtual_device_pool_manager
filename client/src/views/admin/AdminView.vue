@@ -49,7 +49,6 @@
 <script>
 import { useAuthStore } from "@/stores/auth";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import UIkit from "uikit";
 
 export default {
   name: "AdminView",
