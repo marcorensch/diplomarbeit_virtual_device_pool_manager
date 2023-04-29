@@ -17,8 +17,20 @@ router.post('/login', UserValidator.validateLogin, UserValidator.setCookies,(req
 })
 
 router.get('/logout', await UserValidator.validateTokens, async (req, res) => {
-    const deleted = await TokenHelper.deleteOldTokens(req.user.id);
-    console.log(deleted);
+
+    try{
+        await TokenHelper.deleteToken(req.user, req.originalRefreshToken);
+    }catch (error) {
+        console.error("Error while deleting token:", error);
+    }
+
+    try{
+        await TokenHelper.deleteOldTokens(req.user.id);
+    }catch (error) {
+        console.error("Error while deleting old tokens:", error);
+    }
+
+
     res.clearCookie('nxd-token');
     res.clearCookie('nxd-refresh-token');
     res.status(200).send('Logout successful');

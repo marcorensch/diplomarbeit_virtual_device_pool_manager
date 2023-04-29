@@ -113,6 +113,7 @@ export default class UserValidator {
             }
         }
 
+        req.originalRefreshToken = currentRefreshToken;
         req.user = user;
         next();
     }

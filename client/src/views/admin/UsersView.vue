@@ -214,7 +214,6 @@ import { useAuthStore } from "@/stores/auth";
 import UIkit from "uikit";
 import TableSortByHeader from "@/components/TableSortByHeader.vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { Roles } from "@/models/Role.mjs";
 
 const toast = useToast();
 

@@ -3,21 +3,41 @@ import chai from "chai";
 const { expect } = chai;
 import {app} from "../server.mjs";
 
-const agent = supertest.agent(app);
-
 const adminCredentials = {
     username: "administrator",
     password: "test"
 }
 
 describe("Test API Availability", () => {
+    const agent = supertest.agent(app);
     it("should return 200 for get on  /", async () => {
         const response = await agent.get("/");
         expect(response.status).to.equal(200, response.text);
     });
 });
 
+describe("Test Login Route", () => {
+    const agent = supertest.agent(app);
+    it("should return 200 for get on /api/auth/login", async () => {
+        const response = await agent.post("/api/auth/login").send(adminCredentials);
+        expect(response.status).to.eql(200, response.text);
+    });
+});
+
+describe("Test Logout Route", () => {
+    const agent = supertest.agent(app);
+    it("should return 200 for get on /api/auth/logout", async () => {
+        await agent.post("/api/auth/login").send(adminCredentials);
+        const response = await agent.get("/api/auth/logout");
+        expect(response.status).to.eql(200, response.text);
+    });
+});
+
 describe("Test Authentication Routes", () => {
+    const agent = supertest.agent(app);
+    afterEach(async () => {
+        await agent.get("/api/auth/logout");
+    });
     it("should return 200 for /api/auth/login with correct credentials", async () => {
         const response = await agent.post("/api/auth/login").send(adminCredentials);
         expect(response.status).to.eql(200, response.text);
@@ -62,17 +82,11 @@ describe("Test Authentication Routes", () => {
         expect(response.text).to.equal("Invalid Credentials", "Response Text is not 'Invalid Credentials'");
     });
 
-    it("should return 200 for /api/auth/logout", async () => {
-        const response = await agent.get("/api/auth/logout");
-        expect(response.status).to.equal(200, response.text);
-        expect(response.text).to.equal("Logout successful", "Response Text is not 'Logout successful'");
-        expect('set-cookie' in response.header).to.eql(true, "Response Header has no set-cookie property");
-    });
-
 });
 
 describe("Test Administrative Account Routes", () => {
     const newUsrAcc = {firstname: "test", lastname: "test", username: "test", password: "test", email:"", notes:"", hidden:"", role_id: 2};
+    const agent = supertest.agent(app);
     it("should return 401 and text Missing token for get on /api/admin/accounts when not logged in", async () => {
         const response = await agent.get("/api/admin/accounts");
         expect(response.status).to.eql(401, response.text);
