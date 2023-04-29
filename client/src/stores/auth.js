@@ -74,33 +74,55 @@ export const useAuthStore = defineStore("auth", {
         toast.error("Error while logging in, please try again");
       }
     },
-    async updateProfile(data) {
+    async updatePassword(data) {
       try {
-        const response = await axios.put(`/api/accounts/${this.user.id}`, data);
+        const response = await axios.put(
+          `/api/accounts/${this.user.id}/password`,
+          data
+        );
         this.user = response.data.user;
-        localStorage.setItem("user", JSON.stringify(this.user));
+        if (this.user) localStorage.setItem("user", JSON.stringify(this.user));
         toast.success("Successfully updated profile");
         return true;
       } catch (e) {
         return false;
       }
     },
-    async logout() {
-      this.userPermissions = [];
+    async updateProfile(data) {
+      try {
+        const response = await axios.put(`/api/accounts/${this.user.id}`, data);
+        this.user = response.data.user;
+        if (this.user) localStorage.setItem("user", JSON.stringify(this.user));
+        toast.success("Successfully updated profile");
+      } catch (e) {
+        toast.error("Error while updating profile");
+        if (e.response.status === 401) {
+          await this.logout(false);
+        }
+      }
+    },
+    resetUser() {
       this.user = null;
+      this.userPermissions = [];
       localStorage.removeItem("user");
       localStorage.removeItem("permissions");
+    },
+    async logout(withMsg = true) {
+      this.resetUser();
       try {
         const response = await axios.get("/api/auth/logout");
         if (response.status === 200) {
-          toast.info("Successfully logged out");
-          this.router.push("/");
+          if (withMsg) toast.info("Successfully logged out");
+          this.router.push({ name: "login" });
         } else {
           toast.error("Error while logging out");
         }
       } catch (e) {
         console.log(e);
       }
+    },
+    async logoutEveryhere() {
+      console.log("logoutAll");
     },
     async deleteAccount() {
       try {

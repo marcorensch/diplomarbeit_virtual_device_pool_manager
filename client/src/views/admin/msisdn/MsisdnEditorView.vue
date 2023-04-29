@@ -91,7 +91,7 @@
                 type="text"
                 id="sim_number"
                 class="uk-input"
-                placeholder="984101..."
+                placeholder="894101..."
                 v-model="item.sim_number"
                 :class="{ 'form-invalid': v$.item.sim_number.$errors.length }"
               />
@@ -280,7 +280,8 @@ export default {
           this.item = response.data;
         })
         .catch((error) => {
-          console.log(error);
+          console.log(error.response);
+          this.$router.push("/");
         });
     },
     getParentMsisdns() {

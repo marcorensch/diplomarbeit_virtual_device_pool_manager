@@ -9,7 +9,6 @@ CREATE TABLE IF NOT EXISTS `accounts`
     notes           text         NOT NULL,
     hidden          text         NOT NULL,
     role_id         int(11)      NULL,
-    last_pwd_change datetime     NOT NULL DEFAULT NOW(),
     created_at      datetime     NOT NULL DEFAULT NOW(),
     modified_at     datetime     NOT NULL DEFAULT NOW() ON UPDATE NOW(),
     PRIMARY KEY (`id`),

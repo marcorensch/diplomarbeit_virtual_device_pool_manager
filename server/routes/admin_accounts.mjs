@@ -26,7 +26,7 @@ router.post('/', UserValidator.hasPermission('canCreateAccount'), UserValidator.
     user.password = await user.encryptPassword(password);
 
     try {
-        await user.save();
+        await UserHelper.saveUser(user);
         return res.status(201).json({message: "User created", id: user.id});
     } catch (e) {
         console.log(e)
@@ -43,6 +43,7 @@ router.put('/:id', UserValidator.hasPermission("canUpdateAccount"), UserValidato
     let user;
     try {
         user = await UserHelper.getUserById(id);
+        if(!user) return res.status(404).send("User not found");
     } catch (e) {
         return res.status(404).send("Error while identifying user");
     }
@@ -55,7 +56,8 @@ router.put('/:id', UserValidator.hasPermission("canUpdateAccount"), UserValidato
     }
 
     try {
-        await user.save();
+        const result = await UserHelper.saveUser(user);
+        if(result.affectedRows === 0) return res.status(404).send("User data could not be updated");
         return res.status(200).json({message: "User updated", id: user.id});
     } catch (e) {
         console.log(e)
@@ -67,14 +69,14 @@ router.delete('/:id', UserValidator.hasPermission("canDeleteAccount"), UserValid
     const {id} = req.params;
     if(!id) return res.status(400).send("Missing data");
     if(parseInt(req.user.id) === parseInt(id)) return res.status(403).send("You cannot delete your own account here");
-    let user;
     try {
-        user = await UserHelper.getUserById(id);
+        await UserHelper.getUserById(id);
     } catch (e) {
         return res.status(404).send("Error while identifying user");
     }
     try {
-        await user.delete();
+        const result = await UserHelper.deleteUser(id);
+        if(result.affectedRows === 0) return res.status(404).send("User not found");
         return res.status(200).send("User deleted");
     } catch (e) {
         console.log(e)

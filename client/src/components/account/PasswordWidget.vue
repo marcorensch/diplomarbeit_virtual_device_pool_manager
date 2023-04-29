@@ -9,6 +9,20 @@
       <div class="uk-card-body">
         <div class="uk-form">
           <div class="uk-margin">
+            <label class="uk-form-label" for="current_password"
+              >Current Password</label
+            >
+            <div class="uk-form-controls">
+              <input
+                class="uk-input"
+                id="current_password"
+                type="password"
+                v-model="current_password"
+                :class="{ 'form-invalid': v$.current_password.$errors.length }"
+              />
+            </div>
+          </div>
+          <div class="uk-margin">
             <label class="uk-form-label" for="password">Password</label>
             <div class="uk-form-controls">
               <input
@@ -74,7 +88,7 @@
 <script>
 import { useAuthStore } from "@/stores/auth";
 import { useVuelidate } from "@vuelidate/core";
-import { sameAs, minLength } from "@vuelidate/validators";
+import { sameAs, minLength, required } from "@vuelidate/validators";
 import { useToast } from "vue-toastification";
 const toast = useToast();
 export default {
@@ -88,12 +102,16 @@ export default {
   data() {
     return {
       auth: useAuthStore(),
+      current_password: "",
       password: "",
       passwordConfirm: "",
     };
   },
   validations() {
     return {
+      current_password: {
+        required,
+      },
       password: {
         minLength: this.password ? minLength(this.PWDMINLENGTH) : {},
       },
@@ -106,14 +124,16 @@ export default {
     async handleSaveClicked() {
       const formIsValid = await this.v$.$validate();
       if (!formIsValid) return;
-      const success = await this.auth.updateProfile({
-        password: this.password,
+      const success = await this.auth.updatePassword({
+        password: this.current_password,
+        newPassword: this.password,
       });
       if (!success) {
         toast.error(
           "Error while updating profile, Please try again later. Your Password was not changed."
         );
       }
+      this.current_password = "";
       this.password = "";
       this.passwordConfirm = "";
       this.v$.$reset();
