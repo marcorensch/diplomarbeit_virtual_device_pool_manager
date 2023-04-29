@@ -88,22 +88,26 @@ describe("Test Administrative Account Routes", () => {
     const newUsrAcc = {firstname: "test", lastname: "test", username: "test", password: "test", email:"", notes:"", hidden:"", role_id: 2};
     const agent = supertest.agent(app);
     it("should return 401 and text Missing token for get on /api/admin/accounts when not logged in", async () => {
+        await agent.get("/api/auth/logout");
         const response = await agent.get("/api/admin/accounts");
         expect(response.status).to.eql(401, response.text);
-        expect(response.text).to.eql("Missing token");
+        expect(response.text).to.eql("Missing tokens");
 
     });
     it("should return 200 for /api/admin/accounts when logged in with ADMIN role", async () => {
+        await agent.get("/api/auth/logout");
         await agent.post("/api/auth/login").send(adminCredentials);
         const response = await agent.get("/api/admin/accounts");
         expect(response.status).to.eql(200, response.text);
     });
     it("should return 201 for post on /api/admin/accounts when creating new account with ADMIN role", async () => {
+        await agent.get("/api/auth/logout");
         await agent.post("/api/auth/login").send(adminCredentials);
         const response = await agent.post("/api/admin/accounts").send(newUsrAcc);
         expect(response.status).to.eql(201, response.text);
     });
     it("should return 409 with message 'Username already in use' for post on /api/admin/accounts with existing username", async () => {
+        await agent.get("/api/auth/logout");
         await agent.post("/api/auth/login").send(adminCredentials);
         const response = await agent.post("/api/admin/accounts").send(newUsrAcc);
         expect(response.status).to.eql(409, response.text);
@@ -134,43 +138,48 @@ describe("Test Administrative Account Routes", () => {
         await agent.post("/api/auth/login").send(adminCredentials);
         const data = await agent.get("/api/admin/accounts");
         const testUsr = data.body.users.find((usr) => usr.username === "test");
-        const response = await agent.put("/api/admin/accounts/" + testUsr.id).send({username: "dfu", role_id: 2});
+        const response = await agent.put("/api/admin/accounts/" + testUsr.id).send({username: "dfu", role_id: 3});
         expect(response.status).to.eql(400, response.text);
         expect(response.text).to.eql("Username does not meet the requirements");
     });
 
+    it("should return 403 when get on /api/admin/accounts when logged in with USER role", async () => {
+        await agent.get("/api/auth/logout");
+        const data = {username: "test", password: "test"};
+        await agent.post("/api/auth/login").send(data);
+        const response = await agent.get("/api/admin/accounts");
+        expect(response.status).to.eql(403, response.text);
+    })
+
     it("should return 200 when deleting existing user", async () => {
+        await agent.get("/api/auth/logout");
         await agent.post("/api/auth/login").send(adminCredentials);
         const data = await agent.get("/api/admin/accounts");
         const testUsr = data.body.users.find((usr) => usr.username === "test");
         const response = await agent.delete("/api/admin/accounts/" + testUsr.id);
-        expect(response.status).to.equal(200, response.text);
+        expect(response.status).to.eql(200, response.text);
     });
 
     it("should return 404 when deleting not existing user by id", async () => {
+        await agent.get("/api/auth/logout");
         await agent.post("/api/auth/login").send(adminCredentials);
         const response = await agent.delete("/api/admin/accounts/999999999999999");
-        expect(response.status).to.equal(404, response.text);
+        expect(response.status).to.eql(404, response.text);
     });
-    it("should return 401 on /api/admin/accounts when logged in with USER role", async () => {
-        const data = {username: "test", password: "test"};
-        await agent.get("/api/auth/logout");
-        await agent.post("/api/auth/login").send(data);
-        const response = await agent.get("/api/admin/accounts");
-        expect(response.status).to.eql(401, response.text);
-    });
-    it("should return 400 on /api/admin/accounts when logged in and trying to delete own account", async () => {
+
+    it("should return 405 on /api/admin/accounts when logged in and trying to delete own account", async () => {
         await agent.get("/api/auth/logout");
         const auth = await agent.post("/api/auth/login").send(adminCredentials);
         const response = await agent.delete(`/api/admin/accounts/${auth.body.user.id}`);
-        expect(response.status).to.eql(403, response.text);
+        expect(response.status).to.eql(405, response.text);
         expect(response.text).to.eql("You cannot delete your own account here");
     });
 });
 
 describe("Test User available Account Routes", () => {
-    const newUsrAcc = {firstname: "", lastname: "", username: "accountTestsUser", password: "accountTestsUser", email:"", notes:"", hidden:"", role_id: 2};
-    const secondUsrAcc = {firstname: "", lastname: "", username: "existingUserName", password: "accountTestsUser", email:"", notes:"", hidden:"", role_id: 2};
+    const agent = supertest.agent(app);
+    const newUsrAcc = {firstname: "", lastname: "", username: "accountTestsUser", password: "accountTestsUser", email:"", notes:"", hidden:"", role_id: 3};
+    const secondUsrAcc = {firstname: "", lastname: "", username: "existingUserName", password: "accountTestsUser", email:"", notes:"", hidden:"", role_id: 3};
     const accountTestsUserAcc = {
         username: "accountTestsUser",
         password: "accountTestsUser",

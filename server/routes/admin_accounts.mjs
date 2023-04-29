@@ -68,7 +68,7 @@ router.put('/:id', UserValidator.hasPermission("canUpdateAccount"), UserValidato
 router.delete('/:id', UserValidator.hasPermission("canDeleteAccount"), UserValidator.setCookies, async (req, res) => {
     const {id} = req.params;
     if(!id) return res.status(400).send("Missing data");
-    if(parseInt(req.user.id) === parseInt(id)) return res.status(403).send("You cannot delete your own account here");
+    if(parseInt(req.user.id) === parseInt(id)) return res.status(405).send("You cannot delete your own account here");
     try {
         await UserHelper.getUserById(id);
     } catch (e) {

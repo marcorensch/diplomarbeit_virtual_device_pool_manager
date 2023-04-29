@@ -61,12 +61,16 @@ export const permissions = {
 
 export const roles = {
     ADMIN: 'ADMIN',
+    MANAGER: 'MANAGER',
     USER: 'USER',
     GUEST: 'GUEST'
 }
 
 export const rolePermissions = {
     [roles.ADMIN]: Object.values(permissions),
+    [roles.MANAGER]: [
+        permissions.ACCESS_ADMIN,
+    ],
     [roles.USER]: [
         permissions.DELETE_OWN_ACCOUNT,
         permissions.UPDATE_OWN_ACCOUNT,

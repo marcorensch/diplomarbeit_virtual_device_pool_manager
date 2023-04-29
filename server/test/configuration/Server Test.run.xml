@@ -24,7 +24,7 @@
       <env name="USER_NAME_MIN_LENGTH" value="7" />
     </envs>
     <ui>bdd</ui>
-    <extra-mocha-options />
+    <extra-mocha-options>--exit</extra-mocha-options>
     <test-kind>DIRECTORY</test-kind>
     <test-directory>$PROJECT_DIR$/server/test</test-directory>
     <recursive>false</recursive>

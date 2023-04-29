@@ -1,5 +1,7 @@
 import {expect} from "chai";
 import User from "../models/User.mjs";
+import UserHelper from "../helpers/UserHelper.mjs";
+import TokenHelper from "../helpers/TokenHelper.mjs";
 
 describe("Test User Model", () => {
     describe("Test User Constructor", () => {
@@ -33,11 +35,11 @@ describe("Test User Model", () => {
             expect(user).to.have.property("lastname").to.equal("testLastname");
         });
         it("should return a user object with generated Tokens", async () => {
-            const user = new User();
+            let user = new User();
             user.setData({
                 id: 1
             });
-            await user.generateTokens();
+            user = await TokenHelper.generateTokens(user);
             expect(user).to.be.an("object");
             expect(user).to.have.property("token");
             expect(user).to.have.property("refreshToken");
@@ -86,6 +88,7 @@ describe("Test User Model", () => {
         describe("Create & Delete User Account", () => {
             let userAccountId;
             it("should store a new user account with the given data", async () => {
+                let result;
                 const user = new User();
                 user.setData({
                     username: "testUsername",
@@ -93,31 +96,29 @@ describe("Test User Model", () => {
                     email: "testEmail",
                     firstname: "testFirstname",
                     lastname: "testLastname",
-                    role_id: 2,
+                    role_id: 3,
                     hidden: '',
                     notes: '',
                 });
                 try {
-                    const fromQuery = await user.save();
-                    expect(fromQuery).to.be.an("object");
-                    expect(fromQuery).to.have.property("affectedRows").to.equal(1);
-                    expect(fromQuery).to.have.property("insertId").to.be.a("number");
-                    userAccountId = fromQuery.insertId;
+                    result = await UserHelper.saveUser(user);
                 } catch (e) {
                     console.log(e);
                 }
+                expect(result).to.be.an("object");
+                expect(result).to.have.property("affectedRows").to.equal(1);
+                expect(result).to.have.property("insertId").to.be.a("number");
+                userAccountId = result.insertId;
             });
             it("should delete the user account with the given id", async () => {
                 const user = new User();
                 user.setData({
                     id: userAccountId
                 });
-                const fromQuery = await user.delete();
-                expect(fromQuery).to.be.an("object");
-                expect(fromQuery).to.have.property("affectedRows").to.equal(1);
+                const result = await UserHelper.deleteUser(user.id);
+                expect(result).to.be.an("object");
+                expect(result).to.have.property("affectedRows").to.equal(1);
             });
         });
-
-
     });
 });
