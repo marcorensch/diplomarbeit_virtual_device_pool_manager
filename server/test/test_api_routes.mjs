@@ -342,3 +342,117 @@ describe("Test User available Account Routes", () => {
         });
     });
 });
+
+describe("Test MSISDN Manager API", () => {
+    const agent = supertest.agent(app);
+    const validData = {
+        msisdn: "41790001122",
+        sim_number:"89410112345678909876",
+        sim_type_id: 1,
+        abonnement:"Abonnement Name",
+        scn:"1234567",
+        notes:"Some notes",
+        hidden:"Hidden notes"
+    };
+    let validMainId;
+    let validSubId;
+
+    before(async () => {
+        await agent.post("/api/auth/login").send(adminCredentials);
+    });
+
+    after(async () => {
+        await agent.get("/api/auth/logout");
+    });
+
+    it("should store new MSISDN in database", async () => {
+        const response = await agent.post("/api/admin/numbers").send(validData);
+        expect(response.body).to.have.property("id");
+        expect(response.body).to.have.property("message");
+        expect(response.status).to.eql(201, response.text);
+        validMainId = response.body.id;
+    });
+
+    it("should exactly return one MSISDN after storing it", async () => {
+        const response = await agent.get("/api/admin/numbers");
+        expect(response.body).to.have.lengthOf(1);
+        expect(response.status).to.eql(200, response.text);
+    });
+
+    it("should return 201 when creating new Sub MSISDN (Multi Device SIM) for existing MSISDN", async () => {
+        const mdSim = validData;
+        mdSim.msisdn = "41750001123";
+        mdSim.parent_id = validMainId;
+        delete mdSim.abonnement;
+        delete mdSim.scn;
+        const response = await agent.post("/api/admin/numbers").send(mdSim);
+        expect(response.body).to.have.property("id");
+        expect(response.body).to.have.property("message");
+        expect(response.status).to.eql(201, response.text);
+        validSubId = response.body.id;
+    });
+
+    it("should return 400 when trying to store MSISDN with less than 11 characters", async () => {
+        const invalidData = {...validData};
+        invalidData.msisdn = "123456789";
+        const response = await agent.post("/api/admin/numbers").send(invalidData);
+        expect(response.status).to.eql(400, response.text);
+    });
+    it("should return 400 when trying to store MSISDN with more than 11 characters", async () => {
+        const invalidData = {...validData};
+        invalidData.msisdn = "12345678901234567890123456";
+        const response = await agent.post("/api/admin/numbers").send(invalidData);
+        expect(response.status).to.eql(400, response.text);
+    });
+    it("should return 400 when trying to store MSISDN with SIM number with more than 20 characters", async () => {
+        const invalidData = {...validData};
+        invalidData.sim_number = "8941010000";
+        const response = await agent.post("/api/admin/numbers").send(invalidData);
+        expect(response.status).to.eql(400, response.text);
+    });
+
+    it("should return 400 when trying to store MSISDN with SIM number with less than 20 characters", async () => {
+        const invalidData = {...validData};
+        invalidData.sim_number = "89410112345678909876543234453221";
+        const response = await agent.post("/api/admin/numbers").send(invalidData);
+        expect(response.status).to.eql(400, response.text);
+    });
+
+    it("should return 400 when trying to store MSISDN with SIM number in wrong format", async () => {
+        const invalidData = {...validData};
+        invalidData.sim_number = "8941011234567890987a";
+        const response = await agent.post("/api/admin/numbers").send(invalidData);
+        expect(response.status).to.eql(400, response.text);
+    });
+    it("should return 400 when trying to store MSISDN with SIM number that does not start with '894101", async () => {
+        const invalidData = {...validData};
+        invalidData.sim_number = "89510112345678909870";
+        const response = await agent.post("/api/admin/numbers").send(invalidData);
+        expect(response.status).to.eql(400, response.text);
+    });
+
+    it("should return 400 when updating MSISDN without complete set of data", async () => {
+        const response = await agent.put(`/api/admin/numbers/${validMainId}`).send({notes: "Updated notes"});
+        expect(response.status).to.eql(400);
+    });
+
+    it("should return 200 when updating MSISDN with complete set of data", async () => {
+        validData.notes = "Updated notes";
+        const response = await agent.put(`/api/admin/numbers/${validMainId}`).send(validData);
+        expect(response.status).to.eql(200);
+    });
+
+    it("should return 200 when updating Sub MSISDN with complete set of data", async () => {
+        validData.notes = "Updated notes in MD SIM";
+        const response = await agent.put(`/api/admin/numbers/${validSubId}`).send(validData);
+        expect(response.status).to.eql(200);
+    });
+
+    it("should return 200 when deleting Main MSISDN and Multi Device SIM should be deleted aswell", async () => {
+        const response = await agent.delete(`/api/admin/numbers/${validMainId}`);
+        expect(response.status).to.eql(200);
+        const response2 = await agent.get(`/api/admin/numbers/${validSubId}`);
+        expect(response2.body).to.eql(null);
+    });
+
+});

@@ -37,7 +37,7 @@ function isValidScn(scn){
 }
 
 function isValidIccid(iccid){
-    return iccid.length === 20 && iccid.startsWith('894101') && /\d+/.test(iccid);
+    return iccid.length === 20 && iccid.startsWith('894101') && /^\d+$/.test(iccid);
 }
 
 function isValidAbonnement(abonnement){

@@ -52,7 +52,7 @@ export default class MsisdnHelper {
         const database = new DatabaseModel();
         const result = await database.query("UPDATE numbers SET msisdn = ?, scn = ?, abonnement = ?, sim_number = ?, parent_id = ?, sim_type_id = ?, notes = ?, hidden = ? WHERE id = ?", [msisdn.msisdn, msisdn.scn, msisdn.abonnement, msisdn.sim_number, msisdn.parent_id, msisdn.sim_type_id, msisdn.notes, msisdn.hidden, id]);
         if (result.affectedRows === 0) return null;
-        return msisdn;
+        return result;
     }
 
     static async store(msisdn) {
