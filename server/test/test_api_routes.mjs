@@ -31,6 +31,35 @@ describe("Test Logout Route", () => {
         const response = await agent.get("/api/auth/logout");
         expect(response.status).to.eql(200, response.text);
     });
+
+    it("should return 200 for get on /api/auth/logout-everywhere", async () => {
+        await agent.post("/api/auth/login").send(adminCredentials);
+        const response = await agent.get("/api/auth/logout-everywhere");
+        expect(response.status).to.eql(200, response.text);
+    });
+
+    it("should return 401 on agent2 / agent3 after /api/auth/logout-everywhere is used on agent1", async () => {
+        const agent1 = supertest.agent(app);
+        const agent2 = supertest.agent(app);
+        const agent3 = supertest.agent(app);
+
+        await agent1.post("/api/auth/login").send(adminCredentials);
+        await agent2.post("/api/auth/login").send(adminCredentials);
+        await agent3.post("/api/auth/login").send(adminCredentials);
+
+        const response = await agent1.get("/api/auth/logout-everywhere");
+        expect(response.status).to.eql(200);
+
+        const response2 = await agent2.get("/api/admin/numbers");
+        expect(response2.status).to.eql(401);
+
+        const response3 = await agent3.get("/api/admin/numbers");
+        expect(response3.status).to.eql(401);
+
+        const response4 = await agent1.get("/api/admin/numbers");
+        expect(response4.status).to.eql(401);
+
+    });
 });
 
 describe("Test Authentication Routes", () => {

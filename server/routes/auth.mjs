@@ -35,4 +35,17 @@ router.get('/logout', await UserValidator.validateTokens, async (req, res) => {
     res.clearCookie('nxd-refresh-token');
     res.status(200).send('Logout successful');
 });
+
+router.get('/logout-everywhere', await UserValidator.validateTokens, async (req, res) => {
+
+        try{
+            await TokenHelper.deleteAllTokens(req.user);
+        }catch (error) {
+            console.error("Error while deleting token:", error);
+        }
+
+        res.clearCookie('nxd-token');
+        res.clearCookie('nxd-refresh-token');
+        res.status(200).send('Logout successful');
+});
 export default router;

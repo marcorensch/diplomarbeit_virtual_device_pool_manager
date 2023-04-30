@@ -119,7 +119,18 @@ export const useAuthStore = defineStore("auth", {
       }
     },
     async logoutEveryhere() {
-      console.log("logoutAll");
+      this.resetUser();
+      try {
+        const response = await axios.get("/api/auth/logout-everywhere");
+        if (response.status === 200) {
+          toast.info("Successfully logged out");
+          this.router.push({ name: "login" });
+        } else {
+          toast.error("Error while logging out");
+        }
+      } catch (e) {
+        console.log(e);
+      }
     },
     async deleteAccount() {
       try {
