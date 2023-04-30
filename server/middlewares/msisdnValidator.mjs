@@ -25,7 +25,7 @@ export default function msisdnValidator(req, res, next){
 }
 
 function isValidSimType(sim_type_id){
-    return /\d+/.test(sim_type_id)
+    return /^\d+$/.test(sim_type_id)
 }
 
 function isValidMsisdn(msisdn){
@@ -33,7 +33,7 @@ function isValidMsisdn(msisdn){
 }
 
 function isValidScn(scn){
-    return /\d+/.test(scn);
+    return /^\d+$/.test(scn);
 }
 
 function isValidIccid(iccid){
