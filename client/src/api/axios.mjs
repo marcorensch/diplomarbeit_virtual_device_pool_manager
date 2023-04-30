@@ -6,6 +6,10 @@ axios.interceptors.response.use(
     async (err) => {
         if (err.response.status === 401) {
             useAuthStore().resetUser();
+            this.router.push({ name: "login" });
+        }
+        if (err.response.status === 403) {
+            this.router.push({ path: "/" });
         }
         return Promise.reject(err);
     }

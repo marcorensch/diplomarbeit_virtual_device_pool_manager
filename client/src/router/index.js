@@ -25,7 +25,8 @@ const routes = [
         beforeEnter: () => {
           const authStore = useAuthStore();
           if (!authStore.isLoggedIn) {
-            return { name: "NotFound" };
+            toast.error("You must be logged in to access this page");
+            return { name: "login" };
           }
           if (authStore.hasPermission("canCreateDevices")) {
             return true;
@@ -62,12 +63,14 @@ const routes = [
     beforeEnter: () => {
       const authStore = useAuthStore();
       if (!authStore.isLoggedIn) {
-        return { name: "NotFound" };
+        toast.error("You must be logged in to access this page");
+        return { name: "login" };
       }
       if (authStore.hasPermission("canAccessAdmin")) {
         return true;
       } else {
-        return { name: "NotFound" };
+        toast.error("You are not allowed to access this page");
+        return { path: "" };
       }
     },
     children: [
@@ -78,12 +81,14 @@ const routes = [
         beforeEnter: () => {
           const authStore = useAuthStore();
           if (!authStore.isLoggedIn) {
-            return { name: "NotFound" };
+            toast.error("You must be logged in to access this page");
+            return { name: "login" };
           }
           if (authStore.hasPermission("canAccessAdmin")) {
             return true;
           } else {
-            return { name: "NotFound" };
+            toast.error("You are not allowed to access this page");
+            return { path: "" };
           }
         },
       },
@@ -94,12 +99,14 @@ const routes = [
         beforeEnter: () => {
           const authStore = useAuthStore();
           if (!authStore.isLoggedIn) {
-            return { name: "NotFound" };
+            toast.error("You must be logged in to access this page");
+            return { name: "login" };
           }
           if (authStore.hasPermission("canAccessAdmin")) {
             return true;
           } else {
-            return { name: "NotFound" };
+            toast.error("You are not allowed to access this page");
+            return { path: "" };
           }
         },
       },
@@ -110,12 +117,14 @@ const routes = [
         beforeEnter: () => {
           const authStore = useAuthStore();
           if (!authStore.isLoggedIn) {
-            return { name: "NotFound" };
+            toast.error("You must be logged in to access this page");
+            return { name: "login" };
           }
           if (authStore.hasPermission("canUpdateNumbers")) {
             return true;
           } else {
-            return { name: "NotFound" };
+            toast.error("You are not allowed to access this page");
+            return { path: "" };
           }
         },
         props: true,
@@ -127,12 +136,14 @@ const routes = [
         beforeEnter: () => {
           const authStore = useAuthStore();
           if (!authStore.isLoggedIn) {
-            return { name: "NotFound" };
+            toast.error("You must be logged in to access this page");
+            return { name: "login" };
           }
           if (authStore.hasPermission("canCreateNumbers")) {
             return true;
           } else {
-            return { name: "NotFound" };
+            toast.error("You are not allowed to access this page");
+            return { path: "" };
           }
         },
       },
@@ -149,8 +160,8 @@ const routes = [
           if (authStore.hasPermission("canAccessAdmin")) {
             return true;
           } else {
-            toast.error("You do not have permission to access this page");
-            return { name: "devices" };
+            toast.error("You are not allowed to access this page");
+            return { path: "" };
           }
         },
       },

@@ -96,9 +96,6 @@ export const useAuthStore = defineStore("auth", {
         toast.success("Successfully updated profile");
       } catch (e) {
         toast.error("Error while updating profile");
-        if (e.response.status === 401) {
-          await this.logout(false);
-        }
       }
     },
     resetUser() {
