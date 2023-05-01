@@ -101,12 +101,14 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import MsisdnMgrCard from "@/views/admin/msisdn/MsisdnMgrCard.vue";
 import MsisdnMgrRow from "@/views/admin/msisdn/MsisdnMgrRow.vue";
 import { useAuthStore } from "@/stores/auth";
+import { useToast } from "vue-toastification";
 
 export default {
   name: "MsisdnManagerView",
   components: { MsisdnMgrRow, MsisdnMgrCard, FontAwesomeIcon },
   data() {
     return {
+      toast: useToast(),
       auth: useAuthStore(),
       layout: null,
       search_msisdn: "",
@@ -132,7 +134,10 @@ export default {
           this.numbers = response.data;
         })
         .catch((error) => {
-          console.log(error);
+          console.log(error.response.status + " " + error.response.statusText);
+          this.toast.error("Error");
+          if (error.response.status === 401) this.auth.logout();
+          this.$router.push({ path: "/" });
         });
     },
     handleAddMsisdnClicked() {

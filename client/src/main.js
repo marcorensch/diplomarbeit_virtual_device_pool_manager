@@ -7,6 +7,9 @@ import router from "./router";
 
 import { createPinia } from "pinia";
 
+// add interceptor through side effects
+import "./api/axios";
+
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
   faBook,
@@ -36,6 +39,7 @@ import {
   faTrash,
   faTv,
   faUser,
+  faUserCheck,
   faUserEdit,
   faUserGear,
   faUserPlus,
@@ -49,6 +53,7 @@ import { faCircle } from "@fortawesome/free-regular-svg-icons";
 
 library.add(
   faUser,
+  faUserCheck,
   faUserShield,
   faUserPlus,
   faUserEdit,

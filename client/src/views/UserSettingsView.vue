@@ -20,6 +20,9 @@
           <PasswordWidget />
         </div>
         <div>
+          <LogoutEverywhereWidget />
+        </div>
+        <div>
           <DeleteAccountWidget />
         </div>
       </div>
@@ -34,10 +37,12 @@ import PersonalWidget from "@/components/account/PersonalWidget.vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import UsernameWidget from "@/components/account/UsernameWidget.vue";
 import DeleteAccountWidget from "@/components/account/DeleteAccountWidget.vue";
+import LogoutEverywhereWidget from "@/components/account/LogoutEverywhereWidget.vue";
 
 export default {
   name: "UserSettingsView",
   components: {
+    LogoutEverywhereWidget,
     DeleteAccountWidget,
     UsernameWidget,
     FontAwesomeIcon,

@@ -3,7 +3,7 @@ export const permissions = {
     // Admin
     ACCESS_ADMIN: 'canAccessAdmin',
     // Account Management
-    ACCESS_ACCOUNT_LIST: 'canAccessAccountList',
+    ACCESS_ACCOUNT_MANAGER: 'canAccessAccountManager',
     ACCESS_ROLES_LIST: 'canAccessRolesList',
     CREATE_ACCOUNT: 'canCreateAccount',
     DELETE_ACCOUNT: 'canDeleteAccount',
@@ -20,11 +20,11 @@ export const permissions = {
     UPDATE_VIRTUAL_DEVICES: 'canUpdateVirtualDevices',
     UPDATE_OWN_DEVICES: 'canUpdateOwnDevices',
     DELETE_OWN_DEVICES: 'canDeleteOwnDevices',
-    // Numbers
-    ACCESS_NUMBER_LIST: 'canAccessNumberList',
-    CREATE_NUMBERS: 'canCreateNumbers',
-    DELETE_NUMBERS: 'canDeleteNumbers',
-    UPDATE_NUMBERS: 'canUpdateNumbers',
+    // MSISDN Manager
+    ACCESS_MSISDN_MANAGER: 'canAccessMsisdnManager',
+    CREATE_MSISDN: 'canCreateMsisdn',
+    DELETE_MSISDN: 'canDeleteMsisdn',
+    UPDATE_MSISDN: 'canUpdateMsisdn',
     ACCESS_SIM_TYPES: 'canAccessSimTypes',
     // PoolBuilder Management
     ACCESS_POOL_BUILDER: 'canAccessPoolBuilder',
@@ -52,6 +52,7 @@ export const permissions = {
     DELETE_LINKS: 'canDeleteLinks',
     UPDATE_LINKS: 'canUpdateLinks',
     // GuideMe
+    ACCESS_GUIDE_ME_MANAGER: 'canAccessGuideMeManager',
     MANAGE_GUIDES: 'canManageGuides',
     ACCESS_GUIDES: 'canAccessGuides',
     CREATE_GUIDES: 'canCreateGuides',
@@ -61,12 +62,16 @@ export const permissions = {
 
 export const roles = {
     ADMIN: 'ADMIN',
+    MANAGER: 'MANAGER',
     USER: 'USER',
     GUEST: 'GUEST'
 }
 
 export const rolePermissions = {
     [roles.ADMIN]: Object.values(permissions),
+    [roles.MANAGER]: [
+        permissions.ACCESS_ADMIN,
+    ],
     [roles.USER]: [
         permissions.DELETE_OWN_ACCOUNT,
         permissions.UPDATE_OWN_ACCOUNT,

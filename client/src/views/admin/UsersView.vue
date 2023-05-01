@@ -147,6 +147,10 @@
                   >Administrator
                 </span>
               </div>
+              <div v-else-if="user.role === 'MANAGER'">
+                <font-awesome-icon :icon="['fas', 'user-check']" />
+                <span class="uk-margin-small-left uk-visible@m">Manager</span>
+              </div>
               <div v-else-if="user.role === 'USER'">
                 <font-awesome-icon :icon="['fas', 'user']" />
                 <span class="uk-margin-small-left uk-visible@m"
@@ -307,9 +311,7 @@ export default {
           return user;
         });
       } catch (error) {
-        if (error.response.status === 401) {
-          this.$router.push("/login");
-        }
+        this.$router.push("/");
       }
     },
     async handleDeleteAccountClicked(user) {

@@ -2,10 +2,10 @@ CREATE TABLE IF NOT EXISTS `numbers`
 (
     id          int(11)      NOT NULL AUTO_INCREMENT,
     msisdn      varchar(20)           DEFAULT NULL,
-    scn         varchar(20)  NOT NULL,
-    abonnement  varchar(255) NOT NULL DEFAULT '',
+    scn         varchar(20)           DEFAULT NULL,
+    abonnement  varchar(255)          DEFAULT NULL,
     sim_number  varchar(255) NOT NULL DEFAULT '',
-    sim_type_id    int(11)               DEFAULT NULL,
+    sim_type_id int(11)               DEFAULT NULL,
     parent_id   int(11)               DEFAULT NULL,
     notes       text         NOT NULL,
     hidden      text         NOT NULL,

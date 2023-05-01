@@ -18,6 +18,7 @@ export default class User {
         this.role = null;
         this.token = null;
         this.refreshToken = null;
+        this.permissions = [];
     }
 
     setData(props) {
@@ -34,50 +35,11 @@ export default class User {
         return await bcrypt.compare(password, this.password);
     }
 
-    async generateToken() {
-        return await jwt.sign({user_id: this.id, user_role: this.role}, process.env.JWT_SECRET, {expiresIn: process.env.JWT_EXPIRATION});
-    }
-
-    async generateRefreshToken() {
-        return await jwt.sign({user_id: this.id}, process.env.JWT_REFRESH_SECRET, {expiresIn: process.env.JWT_REFRESH_EXPIRATION});
-    }
-
-    async generateTokens() {
-        this.token = await this.generateToken();
-        this.refreshToken = await this.generateRefreshToken();
-        return this;
-    }
-
     checkPasswordValidity(password) {
         return password === password.trim() && password.length >= process.env.USER_PWD_MIN_LENGTH;
     }
 
     checkUsernameValidity() {
         return this.username === this.username.trim() && this.username.length >= process.env.USER_NAME_MIN_LENGTH;
-    }
-
-    async save() {
-        const database = new DatabaseModel();
-        try {
-            const roleData = await database.query("SELECT * FROM roles WHERE id = ? LIMIT 1", [this.role_id]);
-            if (roleData.length === 0) throw "Role not found";
-        } catch (e) {
-            throw e;
-        }
-
-        if(this.password === null) throw "Password is null";
-
-        if (this.id) {
-            return await database.query("UPDATE users SET username = ?, password = ?, firstname = ?, lastname = ?, email = ?, notes = ?, hidden = ?, role_id = ? WHERE id = ?",
-                [this.username, this.password, this.firstname, this.lastname, this.email, this.notes, this.hidden, this.role_id, this.id]);
-        } else {
-            return await database.query("INSERT INTO users (username, password, firstname, lastname, email, notes, hidden, role_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                [this.username, this.password, this.firstname, this.lastname, this.email, this.notes, this.hidden, this.role_id]);
-        }
-    }
-
-    async delete() {
-        const database = new DatabaseModel();
-        return await database.query("DELETE FROM users WHERE id = ?", [this.id]);
     }
 }

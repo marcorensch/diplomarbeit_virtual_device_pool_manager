@@ -6,18 +6,17 @@ const toast = useToast();
 export const useAuthStore = defineStore("auth", {
   state: () => ({
     user: null,
-    userPermissions: [],
   }),
   getters: {
     isLoggedIn: (state) => {
       return state.user !== null;
     },
     hasPermission: (state) => (permission) => {
-      return state.userPermissions.includes(permission);
+      return state.user?.permissions.includes(permission);
     },
     hasPermissions: (state) => (permissions) => {
       return permissions.every((permission) =>
-        state.userPermissions.includes(permission)
+        state.user?.permissions.includes(permission)
       );
     },
   },
@@ -47,10 +46,8 @@ export const useAuthStore = defineStore("auth", {
     },
     checkAuth() {
       const user = localStorage.getItem("user");
-      const permissions = localStorage.getItem("permissions");
-      if (user && permissions) {
+      if (user) {
         this.user = JSON.parse(user);
-        this.userPermissions = JSON.parse(permissions);
       }
     },
     async login(username, password) {
@@ -59,14 +56,8 @@ export const useAuthStore = defineStore("auth", {
           username,
           password,
         });
-        console.log(response);
         this.user = response.data.user;
-        this.userPermissions = response.data.permissions;
         localStorage.setItem("user", JSON.stringify(this.user));
-        localStorage.setItem(
-          "permissions",
-          JSON.stringify(this.userPermissions)
-        );
         toast.success("Successfully logged in");
         this.router.push("/");
       } catch (e) {
@@ -74,27 +65,55 @@ export const useAuthStore = defineStore("auth", {
         toast.error("Error while logging in, please try again");
       }
     },
-    async updateProfile(data) {
+    async updatePassword(data) {
       try {
-        const response = await axios.put(`/api/accounts/${this.user.id}`, data);
+        const response = await axios.put(
+          `/api/accounts/${this.user.id}/password`,
+          data
+        );
         this.user = response.data.user;
-        localStorage.setItem("user", JSON.stringify(this.user));
+        if (this.user) localStorage.setItem("user", JSON.stringify(this.user));
         toast.success("Successfully updated profile");
         return true;
       } catch (e) {
         return false;
       }
     },
-    async logout() {
-      this.userPermissions = [];
+    async updateProfile(data) {
+      try {
+        const response = await axios.put(`/api/accounts/${this.user.id}`, data);
+        this.user = response.data.user;
+        if (this.user) localStorage.setItem("user", JSON.stringify(this.user));
+        toast.success("Successfully updated profile");
+      } catch (e) {
+        toast.error("Error while updating profile");
+      }
+    },
+    resetUser() {
       this.user = null;
       localStorage.removeItem("user");
-      localStorage.removeItem("permissions");
+    },
+    async logout(withMsg = true) {
+      this.resetUser();
       try {
         const response = await axios.get("/api/auth/logout");
         if (response.status === 200) {
+          if (withMsg) toast.info("Successfully logged out");
+          this.router.push({ name: "login" });
+        } else {
+          toast.error("Error while logging out");
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    async logoutEveryhere() {
+      this.resetUser();
+      try {
+        const response = await axios.get("/api/auth/logout-everywhere");
+        if (response.status === 200) {
           toast.info("Successfully logged out");
-          this.router.push("/");
+          this.router.push({ name: "login" });
         } else {
           toast.error("Error while logging out");
         }

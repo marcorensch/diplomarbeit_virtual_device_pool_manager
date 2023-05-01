@@ -3,21 +3,70 @@ import chai from "chai";
 const { expect } = chai;
 import {app} from "../server.mjs";
 
-const agent = supertest.agent(app);
-
 const adminCredentials = {
     username: "administrator",
     password: "test"
 }
 
 describe("Test API Availability", () => {
+    const agent = supertest.agent(app);
     it("should return 200 for get on  /", async () => {
         const response = await agent.get("/");
         expect(response.status).to.equal(200, response.text);
     });
 });
 
+describe("Test Login Route", () => {
+    const agent = supertest.agent(app);
+    it("should return 200 for get on /api/auth/login", async () => {
+        const response = await agent.post("/api/auth/login").send(adminCredentials);
+        expect(response.status).to.eql(200, response.text);
+    });
+});
+
+describe("Test Logout Route", () => {
+    const agent = supertest.agent(app);
+    it("should return 200 for get on /api/auth/logout", async () => {
+        await agent.post("/api/auth/login").send(adminCredentials);
+        const response = await agent.get("/api/auth/logout");
+        expect(response.status).to.eql(200, response.text);
+    });
+
+    it("should return 200 for get on /api/auth/logout-everywhere", async () => {
+        await agent.post("/api/auth/login").send(adminCredentials);
+        const response = await agent.get("/api/auth/logout-everywhere");
+        expect(response.status).to.eql(200, response.text);
+    });
+
+    it("should return 401 on agent2 / agent3 after /api/auth/logout-everywhere is used on agent1", async () => {
+        const agent1 = supertest.agent(app);
+        const agent2 = supertest.agent(app);
+        const agent3 = supertest.agent(app);
+
+        await agent1.post("/api/auth/login").send(adminCredentials);
+        await agent2.post("/api/auth/login").send(adminCredentials);
+        await agent3.post("/api/auth/login").send(adminCredentials);
+
+        const response = await agent1.get("/api/auth/logout-everywhere");
+        expect(response.status).to.eql(200);
+
+        const response2 = await agent2.get("/api/admin/numbers");
+        expect(response2.status).to.eql(401);
+
+        const response3 = await agent3.get("/api/admin/numbers");
+        expect(response3.status).to.eql(401);
+
+        const response4 = await agent1.get("/api/admin/numbers");
+        expect(response4.status).to.eql(401);
+
+    });
+});
+
 describe("Test Authentication Routes", () => {
+    const agent = supertest.agent(app);
+    afterEach(async () => {
+        await agent.get("/api/auth/logout");
+    });
     it("should return 200 for /api/auth/login with correct credentials", async () => {
         const response = await agent.post("/api/auth/login").send(adminCredentials);
         expect(response.status).to.eql(200, response.text);
@@ -36,10 +85,10 @@ describe("Test Authentication Routes", () => {
         expect(response.body.user).to.not.have.property("password");
     });
 
-    it("should return permission data in body for /api/auth/login with correct credentials", async () => {
+    it("should return permission data in user object for /api/auth/login with correct credentials", async () => {
         const response = await agent.post("/api/auth/login").send(adminCredentials);
         expect(response.status).to.eql(200, response.text);
-        expect(response.body).to.have.property("permissions");
+        expect(response.body.user).to.have.property("permissions");
     });
 
     it("should set cookies on /api/auth/login with correct credentials", async () => {
@@ -62,34 +111,32 @@ describe("Test Authentication Routes", () => {
         expect(response.text).to.equal("Invalid Credentials", "Response Text is not 'Invalid Credentials'");
     });
 
-    it("should return 200 for /api/auth/logout", async () => {
-        const response = await agent.get("/api/auth/logout");
-        expect(response.status).to.equal(200, response.text);
-        expect(response.text).to.equal("Logout successful", "Response Text is not 'Logout successful'");
-        expect('set-cookie' in response.header).to.eql(true, "Response Header has no set-cookie property");
-    });
-
 });
 
 describe("Test Administrative Account Routes", () => {
     const newUsrAcc = {firstname: "test", lastname: "test", username: "test", password: "test", email:"", notes:"", hidden:"", role_id: 2};
+    const agent = supertest.agent(app);
     it("should return 401 and text Missing token for get on /api/admin/accounts when not logged in", async () => {
+        await agent.get("/api/auth/logout");
         const response = await agent.get("/api/admin/accounts");
         expect(response.status).to.eql(401, response.text);
-        expect(response.text).to.eql("Missing token");
+        expect(response.text).to.eql("Missing tokens");
 
     });
     it("should return 200 for /api/admin/accounts when logged in with ADMIN role", async () => {
+        await agent.get("/api/auth/logout");
         await agent.post("/api/auth/login").send(adminCredentials);
         const response = await agent.get("/api/admin/accounts");
         expect(response.status).to.eql(200, response.text);
     });
     it("should return 201 for post on /api/admin/accounts when creating new account with ADMIN role", async () => {
+        await agent.get("/api/auth/logout");
         await agent.post("/api/auth/login").send(adminCredentials);
         const response = await agent.post("/api/admin/accounts").send(newUsrAcc);
         expect(response.status).to.eql(201, response.text);
     });
     it("should return 409 with message 'Username already in use' for post on /api/admin/accounts with existing username", async () => {
+        await agent.get("/api/auth/logout");
         await agent.post("/api/auth/login").send(adminCredentials);
         const response = await agent.post("/api/admin/accounts").send(newUsrAcc);
         expect(response.status).to.eql(409, response.text);
@@ -120,43 +167,48 @@ describe("Test Administrative Account Routes", () => {
         await agent.post("/api/auth/login").send(adminCredentials);
         const data = await agent.get("/api/admin/accounts");
         const testUsr = data.body.users.find((usr) => usr.username === "test");
-        const response = await agent.put("/api/admin/accounts/" + testUsr.id).send({username: "dfu", role_id: 2});
+        const response = await agent.put("/api/admin/accounts/" + testUsr.id).send({username: "dfu", role_id: 3});
         expect(response.status).to.eql(400, response.text);
         expect(response.text).to.eql("Username does not meet the requirements");
     });
 
+    it("should return 403 when get on /api/admin/accounts when logged in with USER role", async () => {
+        await agent.get("/api/auth/logout");
+        const data = {username: "test", password: "test"};
+        await agent.post("/api/auth/login").send(data);
+        const response = await agent.get("/api/admin/accounts");
+        expect(response.status).to.eql(403, response.text);
+    })
+
     it("should return 200 when deleting existing user", async () => {
+        await agent.get("/api/auth/logout");
         await agent.post("/api/auth/login").send(adminCredentials);
         const data = await agent.get("/api/admin/accounts");
         const testUsr = data.body.users.find((usr) => usr.username === "test");
         const response = await agent.delete("/api/admin/accounts/" + testUsr.id);
-        expect(response.status).to.equal(200, response.text);
+        expect(response.status).to.eql(200, response.text);
     });
 
     it("should return 404 when deleting not existing user by id", async () => {
+        await agent.get("/api/auth/logout");
         await agent.post("/api/auth/login").send(adminCredentials);
         const response = await agent.delete("/api/admin/accounts/999999999999999");
-        expect(response.status).to.equal(404, response.text);
+        expect(response.status).to.eql(404, response.text);
     });
-    it("should return 401 on /api/admin/accounts when logged in with USER role", async () => {
-        const data = {username: "test", password: "test"};
-        await agent.get("/api/auth/logout");
-        await agent.post("/api/auth/login").send(data);
-        const response = await agent.get("/api/admin/accounts");
-        expect(response.status).to.eql(401, response.text);
-    });
-    it("should return 400 on /api/admin/accounts when logged in and trying to delete own account", async () => {
+
+    it("should return 405 on /api/admin/accounts when logged in and trying to delete own account", async () => {
         await agent.get("/api/auth/logout");
         const auth = await agent.post("/api/auth/login").send(adminCredentials);
         const response = await agent.delete(`/api/admin/accounts/${auth.body.user.id}`);
-        expect(response.status).to.eql(403, response.text);
+        expect(response.status).to.eql(405, response.text);
         expect(response.text).to.eql("You cannot delete your own account here");
     });
 });
 
 describe("Test User available Account Routes", () => {
-    const newUsrAcc = {firstname: "", lastname: "", username: "accountTestsUser", password: "accountTestsUser", email:"", notes:"", hidden:"", role_id: 2};
-    const secondUsrAcc = {firstname: "", lastname: "", username: "existingUserName", password: "accountTestsUser", email:"", notes:"", hidden:"", role_id: 2};
+    const agent = supertest.agent(app);
+    const newUsrAcc = {firstname: "", lastname: "", username: "accountTestsUser", password: "accountTestsUser", email:"", notes:"", hidden:"", role_id: 3};
+    const secondUsrAcc = {firstname: "", lastname: "", username: "existingUserName", password: "accountTestsUser", email:"", notes:"", hidden:"", role_id: 3};
     const accountTestsUserAcc = {
         username: "accountTestsUser",
         password: "accountTestsUser",
@@ -318,4 +370,118 @@ describe("Test User available Account Routes", () => {
             expect(response.text).to.eql("Password does not meet the requirements");
         });
     });
+});
+
+describe("Test MSISDN Manager API", () => {
+    const agent = supertest.agent(app);
+    const validData = {
+        msisdn: "41790001122",
+        sim_number:"89410112345678909876",
+        sim_type_id: 1,
+        abonnement:"Abonnement Name",
+        scn:"1234567",
+        notes:"Some notes",
+        hidden:"Hidden notes"
+    };
+    let validMainId;
+    let validSubId;
+
+    before(async () => {
+        await agent.post("/api/auth/login").send(adminCredentials);
+    });
+
+    after(async () => {
+        await agent.get("/api/auth/logout");
+    });
+
+    it("should store new MSISDN in database", async () => {
+        const response = await agent.post("/api/admin/numbers").send(validData);
+        expect(response.body).to.have.property("id");
+        expect(response.body).to.have.property("message");
+        expect(response.status).to.eql(201, response.text);
+        validMainId = response.body.id;
+    });
+
+    it("should exactly return one MSISDN after storing it", async () => {
+        const response = await agent.get("/api/admin/numbers");
+        expect(response.body).to.have.lengthOf(1);
+        expect(response.status).to.eql(200, response.text);
+    });
+
+    it("should return 201 when creating new Sub MSISDN (Multi Device SIM) for existing MSISDN", async () => {
+        const mdSim = validData;
+        mdSim.msisdn = "41750001123";
+        mdSim.parent_id = validMainId;
+        delete mdSim.abonnement;
+        delete mdSim.scn;
+        const response = await agent.post("/api/admin/numbers").send(mdSim);
+        expect(response.body).to.have.property("id");
+        expect(response.body).to.have.property("message");
+        expect(response.status).to.eql(201, response.text);
+        validSubId = response.body.id;
+    });
+
+    it("should return 400 when trying to store MSISDN with less than 11 characters", async () => {
+        const invalidData = {...validData};
+        invalidData.msisdn = "123456789";
+        const response = await agent.post("/api/admin/numbers").send(invalidData);
+        expect(response.status).to.eql(400, response.text);
+    });
+    it("should return 400 when trying to store MSISDN with more than 11 characters", async () => {
+        const invalidData = {...validData};
+        invalidData.msisdn = "12345678901234567890123456";
+        const response = await agent.post("/api/admin/numbers").send(invalidData);
+        expect(response.status).to.eql(400, response.text);
+    });
+    it("should return 400 when trying to store MSISDN with SIM number with more than 20 characters", async () => {
+        const invalidData = {...validData};
+        invalidData.sim_number = "8941010000";
+        const response = await agent.post("/api/admin/numbers").send(invalidData);
+        expect(response.status).to.eql(400, response.text);
+    });
+
+    it("should return 400 when trying to store MSISDN with SIM number with less than 20 characters", async () => {
+        const invalidData = {...validData};
+        invalidData.sim_number = "89410112345678909876543234453221";
+        const response = await agent.post("/api/admin/numbers").send(invalidData);
+        expect(response.status).to.eql(400, response.text);
+    });
+
+    it("should return 400 when trying to store MSISDN with SIM number in wrong format", async () => {
+        const invalidData = {...validData};
+        invalidData.sim_number = "8941011234567890987a";
+        const response = await agent.post("/api/admin/numbers").send(invalidData);
+        expect(response.status).to.eql(400, response.text);
+    });
+    it("should return 400 when trying to store MSISDN with SIM number that does not start with '894101", async () => {
+        const invalidData = {...validData};
+        invalidData.sim_number = "89510112345678909870";
+        const response = await agent.post("/api/admin/numbers").send(invalidData);
+        expect(response.status).to.eql(400, response.text);
+    });
+
+    it("should return 400 when updating MSISDN without complete set of data", async () => {
+        const response = await agent.put(`/api/admin/numbers/${validMainId}`).send({notes: "Updated notes"});
+        expect(response.status).to.eql(400);
+    });
+
+    it("should return 200 when updating MSISDN with complete set of data", async () => {
+        validData.notes = "Updated notes";
+        const response = await agent.put(`/api/admin/numbers/${validMainId}`).send(validData);
+        expect(response.status).to.eql(200);
+    });
+
+    it("should return 200 when updating Sub MSISDN with complete set of data", async () => {
+        validData.notes = "Updated notes in MD SIM";
+        const response = await agent.put(`/api/admin/numbers/${validSubId}`).send(validData);
+        expect(response.status).to.eql(200);
+    });
+
+    it("should return 200 when deleting Main MSISDN and Multi Device SIM should be deleted aswell", async () => {
+        const response = await agent.delete(`/api/admin/numbers/${validMainId}`);
+        expect(response.status).to.eql(200);
+        const response2 = await agent.get(`/api/admin/numbers/${validSubId}`);
+        expect(response2.body).to.eql(null);
+    });
+
 });
