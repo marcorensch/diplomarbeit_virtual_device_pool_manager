@@ -5,7 +5,7 @@ import msisdnValidator from "../middlewares/msisdnValidator.mjs";
 
 const router = express.Router();
 
-router.get('/', UserValidator.hasPermission('canAccessNumberList'), UserValidator.setCookies, async (req, res) => {
+router.get('/', UserValidator.hasPermission('canAccessMsisdnManager'), UserValidator.setCookies, async (req, res) => {
     const parentOnly = req.query.parentOnly || false;
     try {
         const numbers = await MsisdnHelper.getAllMsisdns(parentOnly);
@@ -16,7 +16,7 @@ router.get('/', UserValidator.hasPermission('canAccessNumberList'), UserValidato
     }
 });
 
-router.get('/:id', UserValidator.hasPermission('canUpdateNumbers'), UserValidator.setCookies, async (req, res) => {
+router.get('/:id', UserValidator.hasPermission('canUpdateMsisdn'), UserValidator.setCookies, async (req, res) => {
     try {
         const number = await MsisdnHelper.getMsisdnById(req.params.id);
         return res.status(200).json(number);
@@ -26,7 +26,7 @@ router.get('/:id', UserValidator.hasPermission('canUpdateNumbers'), UserValidato
     }
 });
 
-router.post('/', UserValidator.hasPermission('canCreateNumbers'), msisdnValidator, UserValidator.setCookies, async (req, res) => {
+router.post('/', UserValidator.hasPermission('canCreateMsisdn'), msisdnValidator, UserValidator.setCookies, async (req, res) => {
     const data = req.body;
     let id;
     const msisdn = MsisdnHelper.createMsisdn(data);
@@ -40,7 +40,7 @@ router.post('/', UserValidator.hasPermission('canCreateNumbers'), msisdnValidato
     return res.status(201).json({id, message: "MSISDN created successfully"});
 });
 
-router.put('/:id', UserValidator.hasPermission('canUpdateNumbers'), msisdnValidator, UserValidator.setCookies, async (req, res) => {
+router.put('/:id', UserValidator.hasPermission('canUpdateMsisdn'), msisdnValidator, UserValidator.setCookies, async (req, res) => {
     const data = req.body;
     try {
         const res = await MsisdnHelper.updateMsisdn(req.params.id, data);
@@ -52,7 +52,7 @@ router.put('/:id', UserValidator.hasPermission('canUpdateNumbers'), msisdnValida
     return res.status(200).send("MSISDN updated successfully");
 });
 
-router.delete('/:id', UserValidator.hasPermission('canDeleteNumbers'), UserValidator.setCookies, async (req, res) => {
+router.delete('/:id', UserValidator.hasPermission('canDeleteMsisdn'), UserValidator.setCookies, async (req, res) => {
 try {
         const status = await MsisdnHelper.deleteMsisdn(req.params.id);
         if(!status) return res.status(500).json({error: "Could not delete MSISDN"});

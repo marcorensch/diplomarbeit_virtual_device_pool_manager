@@ -10,7 +10,7 @@
               <div class="uk-slider-container">
                 <ul id="horizontal-submenu" class="uk-slider-items">
                   <template v-for="link of adminRouterLinks" :key="link.path">
-                    <li>
+                    <li v-if="auth.hasPermission(link.permission)">
                       <router-link class="uk-text-nowrap" :to="link.path">
                         <font-awesome-icon :icon="'fas fa-' + link.icon" />
                         {{ link.label }}
@@ -61,26 +61,31 @@ export default {
           label: "Dashboard",
           path: "/admin",
           icon: "grip",
+          permission: "canAccessAdmin",
         },
         {
           label: "MSISDN Manager",
           path: "/admin/msisdn-manager",
           icon: "mobile-screen-button",
+          permission: "canAccessMsisdnManager",
         },
         {
           label: "Account Manager",
           path: "/admin/accounts",
           icon: "users",
+          permission: "canAccessAccountManager",
         },
         {
           label: "Pool Builder",
           path: "/admin/pool-builder",
           icon: "cubes",
+          permission: "canAccessPoolBuilder",
         },
         {
           label: "GuideMe Manager",
           path: "/admin/guideme-manager",
           icon: "book",
+          permission: "canAccessGuideMeManager",
         },
       ],
     };

@@ -35,13 +35,13 @@ export default {
           label: "MISISDN Manager",
           icon: "fas fa-mobile-screen-button",
           route: "/admin/msisdn-manager",
-          requiredPermissions: ["canAccessNumberList"],
+          requiredPermissions: ["canAccessMsisdnManager"],
         },
         {
           label: "Account Manager",
           icon: "fas fa-users",
           route: "/admin/accounts",
-          requiredPermissions: ["canAccessAccountList"],
+          requiredPermissions: ["canAccessAccountManager"],
         },
         {
           label: "Pool Builder",
@@ -53,7 +53,7 @@ export default {
           label: "GuideMe Manager",
           icon: "fas fa-book",
           route: "/admin/guideme-manager",
-          requiredPermissions: ["canManageGuides"],
+          requiredPermissions: ["canAccessGuideMeManager"],
         },
       ],
     };
