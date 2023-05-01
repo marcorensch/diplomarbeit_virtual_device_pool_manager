@@ -6,18 +6,17 @@ const toast = useToast();
 export const useAuthStore = defineStore("auth", {
   state: () => ({
     user: null,
-    userPermissions: [],
   }),
   getters: {
     isLoggedIn: (state) => {
       return state.user !== null;
     },
     hasPermission: (state) => (permission) => {
-      return state.userPermissions.includes(permission);
+      return state.user.permissions.includes(permission);
     },
     hasPermissions: (state) => (permissions) => {
       return permissions.every((permission) =>
-        state.userPermissions.includes(permission)
+        state.user.permissions.includes(permission)
       );
     },
   },
@@ -47,10 +46,8 @@ export const useAuthStore = defineStore("auth", {
     },
     checkAuth() {
       const user = localStorage.getItem("user");
-      const permissions = localStorage.getItem("permissions");
-      if (user && permissions) {
+      if (user) {
         this.user = JSON.parse(user);
-        this.userPermissions = JSON.parse(permissions);
       }
     },
     async login(username, password) {
@@ -59,14 +56,8 @@ export const useAuthStore = defineStore("auth", {
           username,
           password,
         });
-        console.log(response);
         this.user = response.data.user;
-        this.userPermissions = response.data.permissions;
         localStorage.setItem("user", JSON.stringify(this.user));
-        localStorage.setItem(
-          "permissions",
-          JSON.stringify(this.userPermissions)
-        );
         toast.success("Successfully logged in");
         this.router.push("/");
       } catch (e) {
@@ -100,9 +91,7 @@ export const useAuthStore = defineStore("auth", {
     },
     resetUser() {
       this.user = null;
-      this.userPermissions = [];
       localStorage.removeItem("user");
-      localStorage.removeItem("permissions");
     },
     async logout(withMsg = true) {
       this.resetUser();

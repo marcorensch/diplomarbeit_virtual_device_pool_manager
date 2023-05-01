@@ -18,6 +18,7 @@ export default class User {
         this.role = null;
         this.token = null;
         this.refreshToken = null;
+        this.permissions = [];
     }
 
     setData(props) {

@@ -85,10 +85,10 @@ describe("Test Authentication Routes", () => {
         expect(response.body.user).to.not.have.property("password");
     });
 
-    it("should return permission data in body for /api/auth/login with correct credentials", async () => {
+    it("should return permission data in user object for /api/auth/login with correct credentials", async () => {
         const response = await agent.post("/api/auth/login").send(adminCredentials);
         expect(response.status).to.eql(200, response.text);
-        expect(response.body).to.have.property("permissions");
+        expect(response.body.user).to.have.property("permissions");
     });
 
     it("should set cookies on /api/auth/login with correct credentials", async () => {

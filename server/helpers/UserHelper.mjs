@@ -1,11 +1,21 @@
 import User from "../models/User.mjs";
 import DatabaseModel from "../models/DatabaseModel.mjs";
+import {PermissionHandler} from "./PermissionHandler.mjs";
 
 export default class UserHelper {
     static async createUser(data) {
         const user = new User();
+        data.permissions = await UserHelper.getUserPermissions(data.role);
         user.setData(data);
         return user;
+    }
+
+    static async getUserPermissions(role) {
+        const permissionHandler = new PermissionHandler();
+        const permissions = permissionHandler.getPermissions(role);
+        return Array.from(permissions.entries()).map(([key, value]) => {
+            if(value === true) return key;
+        });
     }
 
     static getUserById(id) {

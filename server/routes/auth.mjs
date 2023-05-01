@@ -7,12 +7,9 @@ const router = express.Router();
 
 router.post('/login', UserValidator.validateLogin, UserValidator.setCookies,(req, res) => {
 
-    const permissionHandler = new PermissionHandler();
-    const permissions = permissionHandler.getPermissions(req.user.role);
-    const permissionsArray = Array.from(permissions.entries()).map(([key, value]) => { return key});
     const user = req.user;
     delete user.password;
-    res.status(200).json({user, permissions: permissionsArray, message: 'Login successful'});
+    res.status(200).json({user, message: 'Login successful'});
 
 })
 
