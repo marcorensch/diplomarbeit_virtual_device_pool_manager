@@ -40,7 +40,7 @@
     </div>
     <router-view v-slot="{ Component, route }">
       <transition :name="route.meta.transition || 'fade'" mode="out-in">
-        <component :is="Component" />
+        <component :is="Component" @navSelected="handleNavSelected" />
       </transition>
     </router-view>
   </div>
@@ -101,6 +101,11 @@ export default {
     }
   },
   methods: {
+    handleNavSelected() {
+      this.$nextTick(() => {
+        this.setNavPosition();
+      });
+    },
     setNavPosition() {
       const navLinks = document.querySelectorAll("#horizontal-submenu a");
       for (const navLink of navLinks) {
