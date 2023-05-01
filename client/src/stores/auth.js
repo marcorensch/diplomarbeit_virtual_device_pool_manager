@@ -12,11 +12,11 @@ export const useAuthStore = defineStore("auth", {
       return state.user !== null;
     },
     hasPermission: (state) => (permission) => {
-      return state.user.permissions.includes(permission);
+      return state.user?.permissions.includes(permission);
     },
     hasPermissions: (state) => (permissions) => {
       return permissions.every((permission) =>
-        state.user.permissions.includes(permission)
+        state.user?.permissions.includes(permission)
       );
     },
   },
