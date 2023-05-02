@@ -52,6 +52,12 @@ const routes = [
         component: () => import("../views/manufacturers/ConfigView.vue"),
         meta: { transition: "fade" },
       },
+      {
+        path: "edit",
+        name: "edit-manufacturer",
+        component: () => import("../views/manufacturers/ConfigView.vue"),
+        meta: { transition: "fade" },
+      },
     ],
   },
   {

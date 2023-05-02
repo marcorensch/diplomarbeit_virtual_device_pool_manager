@@ -12,9 +12,11 @@
           <div v-if="authStore.hasPermission('canCreateDevices')">
             <router-link
               :to="{ name: 'create-device' }"
-              class="uk-button uk-button-primary"
+              class="uk-button uk-button-primary uk-flex uk-flex-middle"
             >
-              <font-awesome-icon :icon="['fas', 'plus']" /> Add Device
+              <div>
+                <font-awesome-icon :icon="['fas', 'plus']" /> Add Device
+              </div>
             </router-link>
           </div>
         </div>

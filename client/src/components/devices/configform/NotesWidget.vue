@@ -1,6 +1,6 @@
 <template>
-  <div class="uk-margin uk-card uk-card-default">
-    <div class="uk-card-body">
+  <div :class="{ 'uk-margin uk-card uk-card-default': inCard }">
+    <div :class="{ 'uk-card-body': inCard }">
       <div>
         <label for="notes">Notes</label>
         <textarea
@@ -26,6 +26,12 @@ import { useDeviceEditStore } from "@/stores/deviceEdit";
 const deviceEditStore = useDeviceEditStore();
 export default {
   name: "NotesWidget",
+  props: {
+    inCard: {
+      type: Boolean,
+      default: true,
+    },
+  },
   data() {
     return {
       device: deviceEditStore.getDevice,

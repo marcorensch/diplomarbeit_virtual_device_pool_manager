@@ -6,14 +6,46 @@
     <div class="uk-container nxd-padding-xlarge-bottom">
       <h1 v-if="!manufacturerEditStore.manufacturer.id">Add Manufacturer</h1>
       <h1 v-else>Edit {{ manufacturerEditStore.manufacturer.name }}</h1>
-      <div class="uk-position-relative" uk-grid="masonry=true">
-        <div class="uk-width-1-1 uk-width-1-3@m uk-flex-last@m">
-          <ImageWidget />
-          <NotesWidget class="uk-visible@m" />
+      <div
+        class="uk-position-relative"
+        uk-grid=""
+        uk-height-match="target: .uk-card-body"
+      >
+        <div class="uk-width-1-1 uk-width-2-3@m">
+          <div class="uk-card uk-card-default uk-card-body">
+            <div class="uk-margin">
+              <label for="name">Name</label>
+              <input
+                id="name"
+                class="uk-input"
+                type="text"
+                v-model="manufacturerEditStore.manufacturer.name"
+              />
+            </div>
+            <div>
+              <label for="notes">Notes</label>
+              <textarea
+                id="notes"
+                class="uk-textarea"
+                v-model="manufacturerEditStore.manufacturer.notes"
+              ></textarea>
+            </div>
+            <div class="uk-margin">
+              <label for="hidden">Hidden Notes</label>
+              <textarea
+                id="hidden"
+                class="uk-textarea"
+                v-model="manufacturerEditStore.manufacturer.hidden"
+              ></textarea>
+            </div>
+          </div>
         </div>
-        <div class="uk-width-1-1 uk-width-2-3@m"></div>
-        <div class="uk-width-1-1 uk-hidden@m">
-          <NotesWidget />
+        <div class="uk-width-1-1 uk-width-1-3@m uk-flex-last@m">
+          <ImageWidget
+            :title="'Logo'"
+            :image="manufacturerEditStore.manufacturer.image"
+            @image-changed="handleImageChanged"
+          />
         </div>
       </div>
     </div>
@@ -26,18 +58,15 @@
 
 <script>
 import { useManufacturerEditStore } from "@/stores/manufacturerEdit";
-import Manufacturer from "@/models/Manufacturer";
 import ImageWidget from "@/components/devices/configform/ImageWidget.vue";
-import NotesWidget from "@/components/devices/configform/NotesWidget.vue";
 import ControlsFooterWidget from "@/components/ControlsFooterWidget.vue";
 
 export default {
   name: "ManufacturerConfigView",
-  components: { NotesWidget, ImageWidget, ControlsFooterWidget },
+  components: { ImageWidget, ControlsFooterWidget },
   data() {
     return {
       manufacturerEditStore: useManufacturerEditStore(),
-      manufacturer: new Manufacturer(),
     };
   },
   mounted() {
@@ -50,6 +79,10 @@ export default {
     },
     handleSaveClicked() {
       this.manufacturerEditStore.save();
+    },
+    handleImageChanged(imageUri) {
+      console.log("image changed");
+      this.manufacturerEditStore.manufacturer.image = imageUri;
     },
   },
 };

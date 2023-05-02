@@ -12,9 +12,11 @@
           <div v-if="authStore.hasPermission('canCreateManufacturer')">
             <router-link
               :to="{ name: 'create-manufacturer' }"
-              class="uk-button uk-button-primary"
+              class="uk-button uk-button-primary uk-flex uk-flex-middle"
             >
-              <font-awesome-icon :icon="['fas', 'plus']" /> Add Manufacturer
+              <div>
+                <font-awesome-icon :icon="['fas', 'plus']" /> Add Manufacturer
+              </div>
             </router-link>
           </div>
         </div>
