@@ -28,10 +28,10 @@
 
 <script>
 import { useDeviceEditStore } from "@/stores/deviceEdit";
-import BasicsWidget from "@/components/devices/configform/BasicsWidget.vue";
+import BasicsWidget from "@/components/widgets/configform/BasicsWidget.vue";
 import Device from "@/models/Device.mjs";
-import ImageWidget from "@/components/devices/configform/ImageWidget.vue";
-import NotesWidget from "@/components/devices/configform/NotesWidget.vue";
+import ImageWidget from "@/components/widgets/configform/ImageWidget.vue";
+import NotesWidget from "@/components/widgets/configform/NotesWidget.vue";
 import ControlsFooterWidget from "@/components/ControlsFooterWidget.vue";
 
 export default {
@@ -48,7 +48,7 @@ export default {
   },
   methods: {
     handleCancelClicked() {
-      this.$router.push({ name: "devices" });
+      this.$router.push({ name: "widgets" });
     },
     handleSaveClicked() {
       this.deviceEditStore.saveDevice();

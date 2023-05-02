@@ -13,7 +13,7 @@ const routes = [
     children: [
       {
         path: "",
-        name: "devices",
+        name: "widgets",
         component: () => import("../views/devices/ListView.vue"),
         meta: { transition: "fade" },
       },
@@ -53,7 +53,7 @@ const routes = [
         meta: { transition: "fade" },
       },
       {
-        path: "edit",
+        path: ":id/edit",
         name: "edit-manufacturer",
         component: () => import("../views/manufacturers/ConfigView.vue"),
         meta: { transition: "fade" },
@@ -196,7 +196,7 @@ const routes = [
     name: "NotFound",
     beforeEnter: () => {
       toast.error("Page not found");
-      return { name: "devices" };
+      return { name: "widgets" };
     },
   },
 ];

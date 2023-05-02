@@ -24,7 +24,7 @@ export const useDeviceEditStore = defineStore("deviceEdit", {
     },
     // async getDevice(id) {
     //   try {
-    //     const response = await axios.get(`/api/devices/${id}`);
+    //     const response = await axios.get(`/api/widgets/${id}`);
     //     this.device = response.data;
     //     return true;
     //   } catch (e) {

@@ -38,4 +38,8 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.uk-card-body {
+  min-height: 230px;
+}
+</style>

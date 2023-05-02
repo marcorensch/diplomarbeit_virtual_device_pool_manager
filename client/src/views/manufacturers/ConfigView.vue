@@ -58,7 +58,7 @@
 
 <script>
 import { useManufacturerEditStore } from "@/stores/manufacturerEdit";
-import ImageWidget from "@/components/devices/configform/ImageWidget.vue";
+import ImageWidget from "@/components/widgets/configform/ImageWidget.vue";
 import ControlsFooterWidget from "@/components/ControlsFooterWidget.vue";
 
 export default {
@@ -69,7 +69,8 @@ export default {
       manufacturerEditStore: useManufacturerEditStore(),
     };
   },
-  mounted() {
+  async mounted() {
+    await this.manufacturerEditStore.load(this.$route.params.id);
     this.device = this.manufacturerEditStore.get;
   },
   methods: {

@@ -1,9 +1,8 @@
-export default class Manufacturer{
-    id;image;name;notes;hidden;created_at;modified_at;
-    constructor(){
+export default class Manufacturer {
+    constructor() {
         this.id = null;
-        this.image = "";
         this.name = null;
+        this.image = "";
         this.notes = "";
         this.hidden = "";
         this.created_at = null;
@@ -11,7 +10,7 @@ export default class Manufacturer{
     }
 
     setData(data){
-        for (const prop of this) {
+        for (const prop of Object.keys(this)) {
             if (prop in data) {
                 this[prop] = data[prop];
             }

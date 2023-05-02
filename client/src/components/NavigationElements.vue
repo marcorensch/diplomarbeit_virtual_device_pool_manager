@@ -1,7 +1,7 @@
 <template>
   <ul :class="buildClassNamesString()">
     <router-link
-      :to="{ name: 'devices' }"
+      :to="{ name: 'widgets' }"
       custom
       v-slot="{ href, navigate, isActive, isExactActive }"
     >

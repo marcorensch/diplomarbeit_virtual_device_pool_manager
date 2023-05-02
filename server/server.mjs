@@ -23,6 +23,7 @@ import authRouter from "./routes/auth.mjs";
 import adminRouter from "./routes/admin.mjs";
 import rolesRouter from "./routes/roles.mjs";
 import accountsRouter from "./routes/accounts.mjs";
+import manufacturersRouter from "./routes/manufacturers.mjs";
 import rateLimiterMiddleware from "./middlewares/RateLimiter.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -47,10 +48,12 @@ if(process.env.NODE_ENV.toUpperCase() !== 'TEST') {
     app.use(rateLimiterMiddleware)
 }
 
+app.use("/public", express.static('public'));
 app.use('/api/auth', authRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/roles', rolesRouter);
 app.use('/api/accounts', accountsRouter);
+app.use('/api/manufacturers', manufacturersRouter);
 
 app.get('/', (req, res) => {
     res.send('Hello there! The Backend is reachable');
