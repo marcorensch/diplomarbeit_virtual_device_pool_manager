@@ -38,6 +38,23 @@ const routes = [
     ],
   },
   {
+    path: "/manufacturers",
+    children: [
+      {
+        path: "",
+        name: "manufacturers",
+        component: () => import("../views/manufacturers/ListView.vue"),
+        meta: { transition: "fade" },
+      },
+      {
+        path: "create",
+        name: "create-manufacturer",
+        component: () => import("../views/manufacturers/ConfigView.vue"),
+        meta: { transition: "fade" },
+      },
+    ],
+  },
+  {
     path: "/login",
     name: "login",
     component: () => import("../views/LoginView.vue"),

@@ -15,6 +15,21 @@
       </li>
     </router-link>
     <router-link
+      v-if="auth.hasPermission('canAccessManufacturersList')"
+      :to="{ name: 'manufacturers' }"
+      custom
+      v-slot="{ href, navigate, isActive, isExactActive }"
+    >
+      <li
+        id="manufacturers-link"
+        :class="{
+          'uk-active active': isActive || isExactActive,
+        }"
+      >
+        <a :href="href" @click="navigate"><span>Manufacturers</span></a>
+      </li>
+    </router-link>
+    <router-link
       v-if="auth.hasPermission('canAccessAdmin')"
       :to="{ name: 'admin' }"
       custom
