@@ -18,11 +18,16 @@ import {
   faChevronLeft,
   faChevronRight,
   faChevronUp,
+  faCloudArrowUp,
   faCubes,
   faDatabase,
+  faFolder,
+  faFolderOpen,
+  faFolderPlus,
   faGears,
   faGrip,
   faGripLines,
+  faHome,
   faKey,
   faLaptop,
   faMicrochip,
@@ -34,6 +39,8 @@ import {
   faSort,
   faSortDown,
   faSortUp,
+  faSquareCheck,
+  faTableCells,
   faTableList,
   faTabletScreenButton,
   faTrash,
@@ -61,7 +68,8 @@ library.add(
   faPencil,
   faTableList,
   faGripLines,
-  faGrip
+  faGrip,
+  faFolderOpen
 );
 library.add(
   faTrash,
@@ -91,6 +99,14 @@ library.add(
   faTv,
   faCameraRetro,
   faMicrochip
+);
+library.add(
+  faSquareCheck,
+  faFolderPlus,
+  faCloudArrowUp,
+  faTableCells,
+  faFolder,
+  faHome
 );
 
 const pinia = createPinia();

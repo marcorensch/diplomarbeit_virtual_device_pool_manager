@@ -25,6 +25,7 @@ import rolesRouter from "./routes/roles.mjs";
 import accountsRouter from "./routes/accounts.mjs";
 import manufacturersRouter from "./routes/manufacturers.mjs";
 import rateLimiterMiddleware from "./middlewares/RateLimiter.mjs";
+import filemanagerRouter from "./routes/filemanager.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -45,7 +46,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cookieParser());
 if(process.env.NODE_ENV.toUpperCase() !== 'TEST') {
-    app.use(rateLimiterMiddleware)
+    // app.use(rateLimiterMiddleware)
 }
 
 app.use("/public", express.static('public'));
@@ -54,6 +55,7 @@ app.use('/api/admin', adminRouter);
 app.use('/api/roles', rolesRouter);
 app.use('/api/accounts', accountsRouter);
 app.use('/api/manufacturers', manufacturersRouter);
+app.use('/api/filemanager', filemanagerRouter);
 
 app.get('/', (req, res) => {
     res.send('Hello there! The Backend is reachable');
