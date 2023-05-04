@@ -9,7 +9,7 @@
       <div
         class="uk-position-relative"
         uk-grid=""
-        uk-height-match="target: .uk-card-body"
+        uk-height-match="target: .uk-card"
       >
         <div class="uk-width-1-1 uk-width-2-3@m">
           <div class="uk-card uk-card-default uk-card-body">
@@ -70,21 +70,24 @@ export default {
       manufacturerEditStore: useManufacturerEditStore(),
     };
   },
+  async beforeMount() {
+    if (this.$route.params.id)
+      await this.manufacturerEditStore.load(this.$route.params.id);
+  },
   async mounted() {
-    await this.manufacturerEditStore.load(this.$route.params.id);
-    this.device = this.manufacturerEditStore.get;
+    console.log(this.manufacturerEditStore.manufacturer);
   },
   methods: {
     handleCancelClicked() {
-      console.log("cancel clicked");
       this.$router.push({ name: "manufacturers" });
     },
     handleSaveClicked() {
       this.manufacturerEditStore.save();
+      this.$router.push({ name: "manufacturers" });
     },
-    handleImageChanged(imageUri) {
-      console.log("image changed");
-      this.manufacturerEditStore.manufacturer.image = imageUri;
+    handleImageChanged(imageRelativePath) {
+      this.manufacturerEditStore.manufacturer.image =
+        "/public/" + imageRelativePath;
     },
   },
 };

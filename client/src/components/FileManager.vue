@@ -10,7 +10,14 @@
                 :class="{ 'uk-active': allSelected }"
                 @click="toggleSelectAll"
               >
-                <font-awesome-icon :icon="['fas', 'square-check']" />
+                <font-awesome-icon
+                  v-if="!allSelected"
+                  :icon="['fas', 'square-check']"
+                />
+                <font-awesome-icon
+                  v-if="allSelected"
+                  :icon="['fas', 'square']"
+                />
               </button>
             </div>
             <div class="uk-button-group">
@@ -224,16 +231,30 @@ export default {
     FontAwesomeIcon,
     FileManagerDirectoryItem,
   },
+  emits: ["file-selected"],
   props: {
+    updateTriggerCounter: {
+      type: Number,
+      default: 0,
+    },
     baseDir: {
       type: String,
       default: "/",
     },
   },
+  watch: {
+    updateTriggerCounter() {
+      this.allSelected = false;
+      this.anyChoosen = false;
+      this.selectedFile = null;
+      this.files.forEach((file) => {
+        file.choosen = false;
+      });
+    },
+  },
   data() {
     return {
       allSelected: false,
-      selectionTimer: null,
       displayMode: "grid",
       anyChoosen: false,
       currentFolder: null,
@@ -246,6 +267,7 @@ export default {
         fullPath: this.baseDir,
         name: "root",
       },
+      selectedFile: null,
     };
   },
   mounted() {
@@ -297,7 +319,6 @@ export default {
         }
       }
     },
-
     appendFolders(foldersToAdd, parentFolders = this.folderTree) {
       for (let parentFolder of parentFolders) {
         if (foldersToAdd[0].fullPath.includes(parentFolder.fullPath)) {
@@ -314,6 +335,7 @@ export default {
         }
       }
     },
+
     toggleSelectAll() {
       if (this.allSelected) {
         this.handleDeSelectAll();
@@ -327,11 +349,7 @@ export default {
       this.anyChoosen =
         this.files.some((file) => file.choosen) ||
         this.subFolders.some((folder) => folder.choosen);
-      if (!this.anyChoosen) {
-        console.log("no items to select");
-      } else {
-        this.allSelected = !this.allSelected;
-      }
+      this.allSelected = true;
     },
     handleDeSelectAll() {
       this.subFolders.forEach((folder) => (folder.choosen = false));
@@ -339,16 +357,12 @@ export default {
       this.anyChoosen =
         this.files.some((file) => file.choosen) ||
         this.subFolders.some((folder) => folder.choosen);
-      if (!this.anyChoosen) {
-        console.log("no items to deselect");
-      } else {
-        this.allSelected = !this.allSelected;
-      }
+      this.allSelected = false;
     },
+
     handleShowLightbox(e) {
       const img = e.target.closest(".file-media").querySelector("img");
       if (!img) return;
-      clearTimeout(this.selectionTimer);
       UIkit.lightboxPanel({
         items: [
           {
@@ -365,11 +379,8 @@ export default {
         )
       );
     },
-    // Actions
     handleDeleteClicked() {
-      const checkedFolders = this.currentSubFolders.filter(
-        (folder) => folder.choosen
-      );
+      const checkedFolders = this.subFolders.filter((folder) => folder.choosen);
       const checkedFiles = this.files.filter((file) => file.choosen);
 
       axios
@@ -394,12 +405,18 @@ export default {
     handleItemChoosen(item, e, fromCheckBox = false) {
       if (!fromCheckBox) e.preventDefault();
       if (e.detail === 1) {
-        this.selectionTimer = setTimeout(() => {
+        this.$nextTick(() => {
           item.choosen = !item.choosen;
           this.anyChoosen =
-            this.currentSubFolders.some((folder) => folder.choosen) ||
+            this.subFolders.some((folder) => folder.choosen) ||
             this.files.some((file) => file.choosen);
-        }, 200);
+          const selectedFiles = this.files.filter((file) => file.choosen);
+          if (selectedFiles.length === 1) {
+            this.$emit("file-selected", selectedFiles[0]);
+          } else {
+            this.$emit("file-selected", null);
+          }
+        });
       }
     },
     triggerFolderSelect(fullPath) {
@@ -523,6 +540,9 @@ export default {
       return breadcrumbs;
     },
     handleRootFolderSelected() {
+      this.$emit("file-selected", null);
+      this.anyChoosen = false;
+      this.allSelected = false;
       this.currentFolder = this.rootFolder;
       this.breadcrumbs = this.buildBreadcrumbs();
       this.folderTree.map((folder) => {
@@ -532,6 +552,9 @@ export default {
       this.getFolderContents(this.baseDir);
     },
     handleFolderSelected(folder) {
+      this.$emit("file-selected", null);
+      this.anyChoosen = false;
+      this.allSelected = false;
       this.currentFolder = folder;
       this.breadcrumbs = this.buildBreadcrumbs();
       this.folderTree.forEach((folderTreeItem) => {

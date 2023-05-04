@@ -39,6 +39,7 @@ import {
   faSort,
   faSortDown,
   faSortUp,
+  faSquare,
   faSquareCheck,
   faTableCells,
   faTableList,
@@ -102,6 +103,7 @@ library.add(
 );
 library.add(
   faSquareCheck,
+  faSquare,
   faFolderPlus,
   faCloudArrowUp,
   faTableCells,

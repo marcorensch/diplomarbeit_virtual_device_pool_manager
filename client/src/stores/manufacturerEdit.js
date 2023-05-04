@@ -35,7 +35,6 @@ export const useManufacturerEditStore = defineStore("manufacturerEdit", {
     },
     async load(id) {
       const response = await axios.get(`/api/manufacturers/${id}`);
-      console.log(response.data);
       this.manufacturer = response.data;
     },
     // async getDevice(id) {

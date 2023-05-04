@@ -1,18 +1,18 @@
 <template>
   <div class="uk-card uk-card-default">
-    <div class="uk-card-body uk-position-relative uk-padding-bottom">
+    <div class="uk-card-body uk-position-relative">
       <h3 class="uk-card-title">{{ title }}</h3>
       <div class="device-image-container" v-if="image">
         <img :alt="title" :src="image" />
       </div>
-      <div class="uk-position-bottom uk-width-1-1 uk-padding">
-        <button
-          class="uk-button uk-button-small uk-button-primary uk-width-1-1"
-          @click="handleOpenFileManagerModal"
-        >
-          Select
-        </button>
-      </div>
+    </div>
+    <div class="uk-card-footer">
+      <button
+        class="uk-button uk-button-small uk-button-primary uk-width-1-1"
+        @click="handleOpenFileManagerModal"
+      >
+        Select
+      </button>
     </div>
     <div id="file-manager-modal" class="uk-modal-container" uk-modal>
       <div class="uk-modal-dialog">
@@ -21,7 +21,11 @@
         </div>
         <div class="uk-modal-body uk-padding-remove">
           <div>
-            <FileManager :baseDir="'logos'" />
+            <FileManager
+              :updateTriggerCounter="updateTriggerCounter"
+              :baseDir="'logos'"
+              @file-selected="handleFileSelected"
+            />
           </div>
         </div>
         <div class="uk-modal-footer">
@@ -32,7 +36,13 @@
               </button>
             </div>
             <div>
-              <button class="uk-button uk-button-primary">Select</button>
+              <button
+                class="uk-button uk-button-primary"
+                :class="{ 'uk-disabled': !this.selectedFile }"
+                @click="handleImageChanged"
+              >
+                Select
+              </button>
             </div>
           </div>
         </div>
@@ -68,15 +78,20 @@ export default {
   data() {
     return {
       updateTriggerCounter: 0,
+      selectedFile: null,
     };
   },
   methods: {
-    handleImageChanged(selectedImageUri) {
-      this.$emit("image-changed", selectedImageUri);
+    handleImageChanged() {
+      this.$emit("image-changed", this.selectedFile.fullPath);
+      UIkit.modal("#file-manager-modal").hide();
     },
     handleOpenFileManagerModal() {
       this.updateTriggerCounter++;
       UIkit.modal("#file-manager-modal").show();
+    },
+    handleFileSelected(selectedFile) {
+      this.selectedFile = selectedFile;
     },
   },
 };
