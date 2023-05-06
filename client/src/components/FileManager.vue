@@ -55,13 +55,14 @@
       <div class="uk-width-medium">
         <div id="media-tree-container" class="folder-list">
           <ul class="media-tree-root">
-            <li class="media-tree-root-item">
+            <li class="media-tree-item media-tree-root-item">
               <a
                 :data-fullPath="baseDir"
                 class="tree-link"
                 @click="handleRootFolderSelected"
               >
-                <font-awesome-icon :icon="['fas', 'home']" /> Home
+                <font-awesome-icon :icon="['fas', 'home']" />
+                Home
               </a>
 
               <ul class="media-tree">
@@ -222,8 +223,11 @@
 <script>
 import FileManagerDirectoryItem from "@/components/FileManagerDirectoryItem.vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { useToast } from "vue-toastification";
 import UIkit from "uikit";
 import axios from "axios";
+
+const toast = useToast();
 
 export default {
   name: "FileManager",
@@ -240,6 +244,10 @@ export default {
     baseDir: {
       type: String,
       default: "/",
+    },
+    allowedExtensions: {
+      type: Array,
+      default: () => ["jpg", "jpeg", "png", "gif"],
     },
   },
   watch: {
@@ -277,7 +285,6 @@ export default {
   },
   methods: {
     getFolderContents(fullPath) {
-      this.currentFolder = fullPath;
       axios
         .get("/api/filemanager", {
           params: {
@@ -295,15 +302,11 @@ export default {
     },
 
     updateFolderTree(fullPath, folders) {
-      if (!this.folderTree.length) {
+      if (!this.folderTree.length || fullPath === this.rootFolder.fullPath) {
         this.folderTree = folders;
       } else {
-        if (folders.length) {
-          this.appendFolders(folders);
-        } else {
-          // close all other folders
-          this.closeFolders(fullPath, this.folderTree);
-        }
+        this.updateSubFolderTree(fullPath, folders);
+        this.closeFolders(fullPath, this.folderTree);
       }
     },
 
@@ -319,15 +322,26 @@ export default {
         }
       }
     },
-    appendFolders(foldersToAdd, parentFolders = this.folderTree) {
+    updateSubFolderTree(
+      fullPath,
+      arrayOfFolders,
+      parentFolders = this.folderTree
+    ) {
+      console.log(fullPath, arrayOfFolders);
       for (let parentFolder of parentFolders) {
-        if (foldersToAdd[0].fullPath.includes(parentFolder.fullPath)) {
+        if (fullPath.includes(parentFolder.fullPath)) {
           // Parent folder found
-          if (foldersToAdd[0].relativePath === parentFolder.fullPath) {
+          if (fullPath === parentFolder.fullPath) {
             // Found direct parent
-            parentFolder.subFolders = foldersToAdd;
+            console.log("Found direct parent");
+            console.log("Array of folders: ", arrayOfFolders);
+            parentFolder.subFolders = arrayOfFolders || [];
           } else {
-            this.appendFolders(foldersToAdd, parentFolder.subFolders);
+            this.updateSubFolderTree(
+              fullPath,
+              arrayOfFolders,
+              parentFolder.subFolders
+            );
           }
         } else {
           parentFolder.selected = false;
@@ -384,7 +398,7 @@ export default {
       const checkedFiles = this.files.filter((file) => file.choosen);
 
       axios
-        .delete("http://localhost:3000/api/file-manager", {
+        .delete("/api/filemanager", {
           data: {
             folders: checkedFolders,
             files: checkedFiles,
@@ -394,12 +408,14 @@ export default {
           console.log(response);
         })
         .catch((error) => {
-          console.log(error);
+          toast.error(error.response.data.message);
         })
         .finally(() => {
           this.triggerFolderSelect(this.currentFolder.fullPath);
           this.anyChoosen = false;
           this.allSelected = false;
+          this.files.map((file) => (file.choosen = false));
+          this.subFolders.map((folder) => (folder.choosen = false));
         });
     },
     handleItemChoosen(item, e, fromCheckBox = false) {
@@ -419,6 +435,7 @@ export default {
         });
       }
     },
+
     triggerFolderSelect(fullPath) {
       const mediaTreeContainer = document.getElementById(
         "media-tree-container"
@@ -427,7 +444,6 @@ export default {
         `[data-fullpath="${fullPath}"]`
       );
       if (element) {
-        console.log(element);
         element.click();
       }
     },
@@ -463,33 +479,31 @@ export default {
           UIkit.modal(uploadModal).hide();
         });
     },
-    handleCreateFolderClicked() {
-      let relativePath = this.currentFolder.relativePath;
-      let parentDir = this.currentFolder.name;
-
-      if (!this.currentFolder) {
+    async handleCreateFolderClicked() {
+      const parentFolder = this.currentFolder.fullPath;
+      if (!parentFolder) {
         alert("Please select a folder");
         return;
       }
-      if (
-        this.currentFolder.name === "root" &&
-        this.currentFolder.relativePath === "."
-      ) {
-        parentDir = "";
-        relativePath = "";
-      }
-      let folderName = prompt("Enter folder name");
-      const regex = /^[a-z]+[a-z|\d \-_.]*$/i;
-      if (!regex.test(folderName) || folderName === "root") {
-        console.log("invalid folder name");
+
+      const newFolderName = await UIkit.modal
+        .prompt("New Folder Name:", "", {
+          stack: true,
+        })
+        .then((value) => value);
+      const regex = /^[a-z]+[a-z|\d \-_]*$/i;
+      if (!regex.test(newFolderName)) {
+        toast.error(
+          "Invalid Folder Name\nFolder not created\nFolder name has to be Alphanumeric and can contain spaces, dashes & underscores"
+        );
         return;
       }
-      if (folderName) {
+
+      if (newFolderName) {
         axios
-          .post("http://localhost:3000/api/file-manager/create-folder", {
-            folderName,
-            parentDir,
-            relativePath,
+          .post("/api/filemanager/create-folder", {
+            newFolderName,
+            parentFolder,
           })
           .then((response) => {
             console.log(response);
@@ -498,6 +512,7 @@ export default {
             console.error(error);
           })
           .finally(() => {
+            console.log("finally called");
             this.triggerFolderSelect(this.currentFolder.fullPath);
           });
       }
@@ -552,6 +567,7 @@ export default {
       this.getFolderContents(this.baseDir);
     },
     handleFolderSelected(folder) {
+      console.log("folder selected", folder);
       this.$emit("file-selected", null);
       this.anyChoosen = false;
       this.allSelected = false;
@@ -810,6 +826,7 @@ ul.media-tree {
     &:not(:first-of-type) {
       margin-left: -6px;
     }
+
     > div {
       max-width: 250px;
     }

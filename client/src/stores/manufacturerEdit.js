@@ -23,6 +23,9 @@ export const useManufacturerEditStore = defineStore("manufacturerEdit", {
         return false;
       }
     },
+    reset() {
+      this.manufacturer = new Manufacturer();
+    },
     async create() {
       const result = await axios.post("/api/manufacturers", this.manufacturer);
       this.manufacturer.id = result.data.id;
@@ -37,14 +40,5 @@ export const useManufacturerEditStore = defineStore("manufacturerEdit", {
       const response = await axios.get(`/api/manufacturers/${id}`);
       this.manufacturer = response.data;
     },
-    // async getDevice(id) {
-    //   try {
-    //     const response = await axios.get(`/api/widgets/${id}`);
-    //     this.device = response.data;
-    //     return true;
-    //   } catch (e) {
-    //     return false;
-    //   }
-    // },
   },
 });

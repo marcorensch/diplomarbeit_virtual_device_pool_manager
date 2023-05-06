@@ -33,4 +33,41 @@ router.get("/", async (req, res) => {
 
 });
 
+router.delete("/", async (req, res) => {
+    const files = req.body.files;
+    const folders = req.body.folders;
+    const items = [...folders, ...files];
+
+    if (items.length === 0) {
+        res.status(400).send({success: false, message: "No files or folders selected"});
+        return;
+    }
+
+    try {
+        await FileManager.delete(items);
+    } catch (e) {
+        res.status(e.status).send({success: false, message: e.message});
+        return;
+    }
+
+    console.log(files);
+    console.log(folders);
+
+    res.send('ok');
+});
+
+router.post("/create-folder", async (req, res) => {
+    const dirName = req.body.newFolderName;
+    const parentFolderPath = req.body.parentFolder;
+
+    try{
+        await FileManager.createFolder(parentFolderPath, dirName);
+    }catch (e) {
+        res.status(e.status).send({success: false, message: e.message});
+        return;
+    }
+
+    res.status(201).send('ok');
+});
+
 export default router;

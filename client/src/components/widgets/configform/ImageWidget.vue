@@ -1,9 +1,24 @@
 <template>
   <div class="uk-card uk-card-default">
-    <div class="uk-card-body uk-position-relative">
+    <div class="uk-card-body uk-position-relative uk-padding-remove-bottom">
       <h3 class="uk-card-title">{{ title }}</h3>
-      <div class="device-image-container" v-if="image">
-        <img :alt="title" :src="image" />
+      <div
+        class="uk-position-relative device-image-container-outter uk-padding-remove-vertical"
+        v-if="image.length"
+      >
+        <div class="device-image-container uk-border-rounded">
+          <img :src="image" :title="title" uk-cover class="uk-animation-fade" />
+        </div>
+
+        <div class="uk-position-top-right">
+          <div
+            id="delete-image"
+            class="uk-padding-small uk-overlay uk-overlay-primary uk-border-rounded uk-animation-fade"
+            @click="handleImageRemoved"
+          >
+            <font-awesome-icon :icon="['fas', 'trash']" />
+          </div>
+        </div>
       </div>
     </div>
     <div class="uk-card-footer">
@@ -25,6 +40,7 @@
               :updateTriggerCounter="updateTriggerCounter"
               :baseDir="'logos'"
               @file-selected="handleFileSelected"
+              :allowedExtensions="['jpg', 'jpeg', 'png', 'gif']"
             />
           </div>
         </div>
@@ -37,7 +53,7 @@
             </div>
             <div>
               <button
-                class="uk-button uk-button-primary"
+                class="uk-button uk-button-primary uk-modal-close"
                 :class="{ 'uk-disabled': !this.selectedFile }"
                 @click="handleImageChanged"
               >
@@ -55,9 +71,11 @@
 <script>
 import UIkit from "uikit";
 import FileManager from "@/components/FileManager.vue";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 export default {
   name: "ImageWidget",
   components: {
+    FontAwesomeIcon,
     FileManager,
   },
   emits: ["image-changed"],
@@ -84,7 +102,6 @@ export default {
   methods: {
     handleImageChanged() {
       this.$emit("image-changed", this.selectedFile.fullPath);
-      UIkit.modal("#file-manager-modal").hide();
     },
     handleOpenFileManagerModal() {
       this.updateTriggerCounter++;
@@ -93,12 +110,49 @@ export default {
     handleFileSelected(selectedFile) {
       this.selectedFile = selectedFile;
     },
+    handleImageRemoved() {
+      console.log("handleImageRemoved");
+      this.$emit("image-changed", "");
+    },
   },
 };
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .uk-card-body {
   min-height: 230px;
+}
+#delete-image {
+  cursor: pointer;
+}
+
+.device-image-container-outter {
+}
+.device-image-container {
+  display: block;
+  position: relative;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.02),
+    rgba(0, 0, 0, 0.05),
+    rgba(0, 0, 0, 0.02)
+  );
+  background-size: 200% 200%;
+  padding-bottom: 100%;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  animation: gradient 1s ease infinite;
+}
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 </style>

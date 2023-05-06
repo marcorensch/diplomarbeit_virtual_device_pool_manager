@@ -23,7 +23,7 @@
       </div>
     </div>
     <div class="uk-container">
-      <table class="uk-table uk-table-divider">
+      <table class="uk-table uk-table-divider uk-table-middle">
         <thead>
           <tr>
             <th>Logo</th>
@@ -33,8 +33,14 @@
         </thead>
         <tbody>
           <tr v-for="manufacturer of manufacturers" :key="manufacturer.id">
-            <td class="uk-width-1-5">
-              <img :src="manufacturer.image" alt="LOGO" />
+            <td class="">
+              <img
+                v-if="manufacturer.image"
+                :src="manufacturer.image"
+                :alt="manufacturer.name"
+                width="150"
+                class="uk-border-rounded"
+              />
             </td>
             <td class="uk-width-expand">{{ manufacturer.name }}</td>
             <td>

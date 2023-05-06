@@ -71,8 +71,11 @@ export default {
     };
   },
   async beforeMount() {
-    if (this.$route.params.id)
+    if (this.$route.params.id) {
       await this.manufacturerEditStore.load(this.$route.params.id);
+    } else {
+      this.manufacturerEditStore.reset();
+    }
   },
   async mounted() {
     console.log(this.manufacturerEditStore.manufacturer);
@@ -86,8 +89,8 @@ export default {
       this.$router.push({ name: "manufacturers" });
     },
     handleImageChanged(imageRelativePath) {
-      this.manufacturerEditStore.manufacturer.image =
-        "/public/" + imageRelativePath;
+      let path = imageRelativePath.length ? "/public/" + imageRelativePath : "";
+      this.manufacturerEditStore.manufacturer.image = path;
     },
   },
 };
