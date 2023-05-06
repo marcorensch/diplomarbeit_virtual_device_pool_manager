@@ -8,7 +8,12 @@
       <h1 v-else>Edit {{ deviceEditStore.device.name }}</h1>
       <div class="uk-position-relative" uk-grid="masonry=true">
         <div class="uk-width-1-1 uk-width-1-3@m uk-flex-last@m">
-          <ImageWidget />
+          <ImageWidget
+            :title="'Image'"
+            :image="deviceEditStore.device.image"
+            :baseDir="'images'"
+            @image-changed="handleImageChanged"
+          />
           <NotesWidget class="uk-visible@m" />
         </div>
         <div class="uk-width-1-1 uk-width-2-3@m">
@@ -47,6 +52,9 @@ export default {
     this.device = this.deviceEditStore.getDevice;
   },
   methods: {
+    handleImageChanged(image) {
+      this.deviceEditStore.device.image = image;
+    },
     handleCancelClicked() {
       this.$router.push({ name: "widgets" });
     },

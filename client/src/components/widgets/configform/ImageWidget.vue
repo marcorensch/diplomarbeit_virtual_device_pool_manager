@@ -33,13 +33,13 @@
     <div id="file-manager-modal" class="uk-modal-container" uk-modal>
       <div class="uk-modal-dialog">
         <div class="uk-modal-header">
-          <h2 class="uk-modal-title">Select Logo</h2>
+          <h2 class="uk-modal-title">Select {{ title }}</h2>
         </div>
         <div class="uk-modal-body uk-padding-remove">
           <div>
             <FileManager
               :updateTriggerCounter="updateTriggerCounter"
-              :baseDir="'logos'"
+              :baseDir="baseDir"
               @file-selected="handleFileSelected"
               :allowedFiletypes="'image/jpeg, image/png, image/gif'"
             />
@@ -94,9 +94,9 @@ export default {
       type: String,
       default: "",
     },
-    basedir: {
+    baseDir: {
       type: String,
-      default: "/",
+      required: true,
     },
   },
   data() {

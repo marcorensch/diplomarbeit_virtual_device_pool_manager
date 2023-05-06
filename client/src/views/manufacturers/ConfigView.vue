@@ -44,7 +44,7 @@
           <ImageWidget
             :title="'Logo'"
             :image="manufacturerEditStore.manufacturer.image"
-            :baseDir="'/'"
+            :baseDir="'logos'"
             @image-changed="handleImageChanged"
           />
         </div>
