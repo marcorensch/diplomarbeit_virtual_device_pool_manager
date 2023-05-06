@@ -6,7 +6,7 @@
         class="uk-position-relative device-image-container-outter uk-padding-remove-vertical"
         v-if="image.length"
       >
-        <div class="device-image-container uk-border-rounded">
+        <div class="device-image-container uk-border-rounded uk-overflow-auto">
           <img :src="image" :title="title" uk-cover class="uk-animation-fade" />
         </div>
 
@@ -15,6 +15,7 @@
             id="delete-image"
             class="uk-padding-small uk-overlay uk-overlay-primary uk-border-rounded uk-animation-fade"
             @click="handleImageRemoved"
+            uk-tooltip="title: Remove Image; pos: bottom-right"
           >
             <font-awesome-icon :icon="['fas', 'trash']" />
           </div>
@@ -45,15 +46,20 @@
           </div>
         </div>
         <div class="uk-modal-footer">
-          <div class="uk-grid-small uk-flex uk-flex-right@m">
+          <div
+            class="uk-child-width-1-1 uk-child-width-auto@s uk-grid-small uk-flex-right@s"
+            uk-grid
+          >
             <div>
-              <button class="uk-button uk-button-secondary uk-modal-close">
+              <button
+                class="uk-width-1-1 uk-button uk-button-secondary uk-modal-close"
+              >
                 Cancel
               </button>
             </div>
             <div>
               <button
-                class="uk-button uk-button-primary uk-modal-close"
+                class="uk-width-1-1 uk-button uk-button-primary uk-modal-close"
                 :class="{ 'uk-disabled': !this.selectedFile }"
                 @click="handleImageChanged"
               >

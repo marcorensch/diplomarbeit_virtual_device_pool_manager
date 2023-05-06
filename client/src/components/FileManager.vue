@@ -1,9 +1,9 @@
 <template>
   <div class="file-manager">
     <div class="folder-controls">
-      <div class="uk-flex uk-flex-right uk-flex-middle">
-        <div>
-          <div class="uk-margin-right">
+      <div class="uk-grid-small uk-flex-right@s uk-flex-middle" uk-grid>
+        <div class="uk-width-3-4 uk-width-auto@s">
+          <div class="uk-padding-small nxd-padding-remove-medium">
             <div class="uk-position-relative">
               <input
                 type="text"
@@ -24,8 +24,87 @@
             </div>
           </div>
         </div>
-        <div>
-          <div class="actions">
+        <div class="uk-width-1-4 uk-width-auto@s">
+          <div class="mobile-actions uk-width-1-1 uk-hidden@m uk-text-right">
+            <div
+              class="uk-padding-small uk-margin-right"
+              uk-toggle="target: #mobile-options"
+            >
+              <font-awesome-icon
+                :icon="['fas', 'bars']"
+                class="uk-preserve-width"
+              />
+            </div>
+            <div
+              id="mobile-options"
+              uk-offcanvas="stack:true; overlay: false; flip: true; bg-close:false"
+            >
+              <div class="uk-offcanvas-bar uk-flex uk-flex-column">
+                <button
+                  class="uk-offcanvas-close"
+                  type="button"
+                  uk-close
+                ></button>
+                <ul
+                  class="uk-nav uk-nav-primary uk-nav-center uk-margin-auto-vertical"
+                >
+                  <li class="uk-nav-header">Options</li>
+                  <li>
+                    <a href="#" @click="handleCreateFolderClicked"
+                      ><font-awesome-icon :icon="['fas', 'folder-plus']" />
+                      Create Folder</a
+                    >
+                  </li>
+                  <li>
+                    <a href="#" @click="handleShowFileUploadClicked">
+                      <font-awesome-icon :icon="['fas', 'cloud-arrow-up']" />
+                      Upload File
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      :class="{ 'uk-disabled': !exactlyOneChoosen }"
+                      @click="handleRenameElementClicked"
+                    >
+                      <font-awesome-icon :icon="['fas', 'pencil']" /> Rename
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      :class="{ 'uk-disabled': !anyChoosen }"
+                      @click="handleDeleteClicked"
+                    >
+                      <font-awesome-icon :icon="['fas', 'trash']" /> Delete
+                    </a>
+                  </li>
+                  <li class="uk-nav-header">Layout</li>
+                  <li v-if="displayMode === 'grid'">
+                    <a
+                      href="#"
+                      @click="setDisplayMode('table')"
+                      :class="{ 'uk-button-primary': displayMode === 'table' }"
+                    >
+                      <font-awesome-icon :icon="['fas', 'table-list']" />
+                      Switch to Table Layout
+                    </a>
+                  </li>
+                  <li v-else>
+                    <a
+                      href="#"
+                      @click="setDisplayMode('grid')"
+                      :class="{ 'uk-button-primary': displayMode === 'grid' }"
+                    >
+                      <font-awesome-icon :icon="['fas', 'table-cells']" />
+                      Switch to Grid Layout
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="actions uk-visible@m">
             <div class="uk-button-group">
               <button
                 class="uk-button uk-button-default uk-button-small"
@@ -71,10 +150,18 @@
               </button>
             </div>
             <div class="uk-button-group">
-              <button class="uk-button uk-button-default uk-button-small">
+              <button
+                class="uk-button uk-button-default uk-button-small"
+                @click="setDisplayMode('table')"
+                :class="{ 'uk-button-primary': displayMode === 'table' }"
+              >
                 <font-awesome-icon :icon="['fas', 'table-list']" />
               </button>
-              <button class="uk-button uk-button-default uk-button-small">
+              <button
+                class="uk-button uk-button-default uk-button-small"
+                @click="setDisplayMode('grid')"
+                :class="{ 'uk-button-primary': displayMode === 'grid' }"
+              >
                 <font-awesome-icon :icon="['fas', 'table-cells']" />
               </button>
             </div>
@@ -83,7 +170,7 @@
       </div>
     </div>
     <div class="uk-flex uk-grid-match">
-      <div class="uk-width-medium">
+      <div class="uk-width-medium uk-visible@m">
         <div id="media-tree-container" class="folder-list">
           <ul class="media-tree-root">
             <li class="media-tree-item media-tree-root-item">
@@ -131,7 +218,11 @@
           </div>
         </div>
         <div class="folder-content">
-          <div class="uk-grid-small uk-child-width-1-6 uk-text-center" uk-grid>
+          <div
+            v-if="displayMode === 'grid'"
+            class="uk-grid-small uk-child-width-1-2 uk-child-width-1-3@s uk-child-width-1-6@m uk-text-center"
+            uk-grid
+          >
             <div
               v-for="(folder, index) of subFolders"
               :key="index"
@@ -145,6 +236,7 @@
                   <font-awesome-icon
                     :icon="['fas', 'folder']"
                     style="font-size: 50px"
+                    class="uk-preserve-width"
                   />
                 </div>
                 <div
@@ -186,6 +278,7 @@
                     :src="buildUrl(file)"
                     alt=""
                     width="50"
+                    class="uk-preserve-width"
                   />
                   <font-awesome-icon
                     v-else
@@ -215,6 +308,99 @@
                 </div>
               </div>
             </div>
+          </div>
+          <div v-else>
+            <table class="uk-table uk-table-divider uk-table-middle">
+              <thead>
+                <th>
+                  <input
+                    type="checkbox"
+                    class="uk-checkbox"
+                    name="checked"
+                    :checked="allSelected"
+                    @click="toggleSelectAll"
+                  />
+                </th>
+                <th></th>
+                <th>Name</th>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="(folder, index) of subFolders"
+                  :key="index"
+                  :class="{ 'uk-hidden': !folder.visible }"
+                >
+                  <td>
+                    <input
+                      type="checkbox"
+                      class="uk-checkbox"
+                      name="checked"
+                      :checked="folder.choosen"
+                      @click="handleItemChoosen(folder, $event, true)"
+                    />
+                  </td>
+                  <td class="uk-text-center">
+                    <font-awesome-icon
+                      :icon="['fas', 'folder']"
+                      style="font-size: 25px"
+                      class="uk-preserve-width"
+                    />
+                  </td>
+                  <td class="uk-width-expand">
+                    <a
+                      href="#"
+                      :data-fullpath="folder.fullPath"
+                      @click="triggerFolderSelect(folder.fullPath)"
+                      :uk-tooltip="folder.name"
+                    >
+                      {{ folder.name }}
+                    </a>
+                  </td>
+                </tr>
+                <tr
+                  v-for="(file, index) in files"
+                  :key="index"
+                  :class="{ 'uk-hidden': !file.visible }"
+                  class="uk-position-relative"
+                >
+                  <td>
+                    <input
+                      type="checkbox"
+                      class="uk-checkbox"
+                      name="checked"
+                      :checked="file.choosen"
+                      @click="handleItemChoosen(file, $event, true)"
+                    />
+                  </td>
+                  <td class="uk-text-center">
+                    <img
+                      v-if="checkIsImage(file)"
+                      :src="buildUrl(file)"
+                      alt=""
+                      width="30"
+                      class="uk-preserve-width file-media"
+                    />
+                    <font-awesome-icon
+                      v-else
+                      :icon="['fas', 'file']"
+                      style="font-size: 25px"
+                    />
+                  </td>
+                  <td class="uk-width-expand">
+                    <span>
+                      {{ file.name }}
+                    </span>
+                  </td>
+                  <div
+                    class="uk-position-cover"
+                    :uk-tooltip="file.name"
+                    :data-fullpath="file.fullPath"
+                    @click="handleItemChoosen(file, $event)"
+                    @dblclick="handleShowLightbox($event)"
+                  ></div>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -316,12 +502,20 @@ export default {
       selectedFile: null,
     };
   },
+  computed() {
+    return {};
+  },
   mounted() {
+    this.displayMode = localStorage.getItem("displayMode") || "grid";
     this.getFolderContents(this.baseDir);
     this.currentFolder = this.rootFolder;
     this.breadcrumbs = this.buildBreadcrumbs();
   },
   methods: {
+    setDisplayMode(mode) {
+      this.displayMode = mode;
+      localStorage.setItem("displayMode", mode);
+    },
     clearFilter() {
       this.search_folder_contents = "";
       this.filterFolderView();
@@ -434,12 +628,19 @@ export default {
     },
 
     handleShowLightbox(e) {
-      const img = e.target.closest(".file-media").querySelector("img");
+      let img;
+      if (this.displayMode === "grid") {
+        img = e.target.closest(".file-media")?.querySelector("img");
+      } else {
+        img = e.target.closest("tr").querySelector("img");
+      }
       if (!img) return;
       UIkit.lightboxPanel({
         items: [
           {
             source: img.getAttribute("src"),
+            caption: img.getAttribute("alt"),
+            maxWidth: "100px",
           },
         ],
       }).show();
@@ -729,7 +930,8 @@ export default {
     background-color: #fff;
     border-radius: 0;
     padding: 20px;
-    height: 70vh;
+    height: 60vh;
+    overflow-y: auto;
   }
 
   .folder-controls {
@@ -783,8 +985,18 @@ export default {
 }
 
 #media-tree-container {
-  max-height: calc(70vh + 34px);
+  max-height: calc(60vh + 34px);
   overflow-y: scroll;
+}
+
+@media (min-width: 760px) {
+  .folder-content {
+    height: 70vh !important;
+  }
+  #media-tree-container {
+    max-height: calc(70vh + 34px);
+    overflow-y: scroll;
+  }
 }
 
 .media-tree-root {
@@ -959,6 +1171,44 @@ ul.media-tree {
     }
     &:not(:first-of-type) {
     }
+  }
+}
+.uk-lightbox-items {
+  img {
+    max-width: 80vw;
+  }
+}
+
+#mobile-options {
+  z-index: 9999;
+  color: @color-grey-dark;
+  .uk-nav-header {
+    color: @color-grey-dark;
+  }
+  .uk-nav > li > a,
+  .uk-nav .uk-nav-sub > li > a {
+    color: @color-primary;
+    &:hover {
+      color: @color-primary;
+    }
+    span {
+      color: @color-grey-dark;
+    }
+  }
+  .uk-nav > li > a.uk-disabled,
+  .uk-nav .uk-nav-sub > li > a.uk-disabled {
+    color: @color-grey-light;
+  }
+}
+@media (min-width: 640px) {
+  .nxd-padding-remove-small {
+    padding: 0;
+  }
+}
+
+@media (min-width: 960px) {
+  .nxd-padding-remove-medium {
+    padding: 0;
   }
 }
 </style>

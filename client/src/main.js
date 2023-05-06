@@ -12,6 +12,7 @@ import "./api/axios";
 
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
+  faBars,
   faBook,
   faCameraRetro,
   faChevronDown,
@@ -108,7 +109,8 @@ library.add(
   faCloudArrowUp,
   faTableCells,
   faFolder,
-  faHome
+  faHome,
+  faBars
 );
 
 const pinia = createPinia();
