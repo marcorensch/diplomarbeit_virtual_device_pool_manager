@@ -40,7 +40,7 @@
               :updateTriggerCounter="updateTriggerCounter"
               :baseDir="'logos'"
               @file-selected="handleFileSelected"
-              :allowedExtensions="['jpg', 'jpeg', 'png', 'gif']"
+              :allowedFiletypes="'image/jpeg, image/png, image/gif'"
             />
           </div>
         </div>

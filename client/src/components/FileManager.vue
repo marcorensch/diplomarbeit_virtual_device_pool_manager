@@ -4,11 +4,24 @@
       <div class="uk-flex uk-flex-right uk-flex-middle">
         <div>
           <div class="uk-margin-right">
-            <input
-              type="text"
-              class="uk-input"
-              placeholder="Search in Folder"
-            />
+            <div class="uk-position-relative">
+              <input
+                type="text"
+                class="uk-input"
+                placeholder="Search in Folder"
+                v-model="search_folder_contents"
+                @keyup="filterFolderView"
+              />
+              <div
+                v-if="search_folder_contents.length > 0"
+                class="uk-position-center-right clear-search-icon"
+                style="margin-right: 15px"
+                @click="clearFilter"
+                uk-tooltip="Clear search filter"
+              >
+                <font-awesome-icon :icon="['fas', 'xmark']" />
+              </div>
+            </div>
           </div>
         </div>
         <div>
@@ -119,7 +132,11 @@
         </div>
         <div class="folder-content">
           <div class="uk-grid-small uk-child-width-1-6 uk-text-center" uk-grid>
-            <div v-for="(folder, index) of subFolders" :key="index">
+            <div
+              v-for="(folder, index) of subFolders"
+              :key="index"
+              :class="{ 'uk-hidden': !folder.visible }"
+            >
               <div
                 class="uk-position-relative uk-card uk-card-default uk-card-small uk-card-body"
                 :class="{ choosen: folder.choosen }"
@@ -157,6 +174,7 @@
               v-for="(file, index) in files"
               :key="index"
               :uk-tooltip="file.name"
+              :class="{ 'uk-hidden': !file.visible }"
             >
               <div
                 class="file-media uk-position-relative uk-card uk-card-default uk-card-small uk-card-body"
@@ -208,14 +226,13 @@
         <h2 class="uk-modal-title">File Upload</h2>
       </div>
       <div class="uk-modal-body">
-        <span v-if="currentFolder"
-          >Upload files to
-          <span class="modal-folder-path">{{
-            currentFolder.fullPath === "." ? "root" : currentFolder.fullPath
-          }}</span></span
-        >
         <div class="uk-margin">
-          <input type="file" id="file-upload" multiple />
+          <input
+            type="file"
+            id="file-upload"
+            multiple
+            :accept="allowedFiletypes"
+          />
         </div>
       </div>
       <div class="uk-modal-footer">
@@ -264,9 +281,9 @@ export default {
       type: String,
       default: "/",
     },
-    allowedExtensions: {
-      type: Array,
-      default: () => ["jpg", "jpeg", "png", "gif"],
+    allowedFiletypes: {
+      type: String,
+      default: () => "image/jpeg, image/png, image/gif",
     },
   },
   watch: {
@@ -281,6 +298,7 @@ export default {
   },
   data() {
     return {
+      search_folder_contents: "",
       allSelected: false,
       displayMode: "grid",
       anyChoosen: false,
@@ -304,7 +322,24 @@ export default {
     this.breadcrumbs = this.buildBreadcrumbs();
   },
   methods: {
+    clearFilter() {
+      this.search_folder_contents = "";
+      this.filterFolderView();
+    },
+    filterFolderView() {
+      this.subFolders.forEach((folder) => {
+        folder.visible = folder.name
+          .toLowerCase()
+          .includes(this.search_folder_contents.toLowerCase());
+      });
+      this.files.forEach((file) => {
+        file.visible = file.name
+          .toLowerCase()
+          .includes(this.search_folder_contents.toLowerCase());
+      });
+    },
     getFolderContents(fullPath) {
+      this.clearFilter();
       axios
         .get("/api/filemanager", {
           params: {
@@ -312,8 +347,16 @@ export default {
           },
         })
         .then((response) => {
-          this.files = response.data.files;
-          this.subFolders = response.data.folders;
+          this.files = response.data.files.map((file) => {
+            file.choosen = false;
+            file.visible = true;
+            return file;
+          });
+          this.subFolders = response.data.folders.map((folder) => {
+            folder.chosen = false;
+            folder.visible = true;
+            return folder;
+          });
           this.updateFolderTree(fullPath, response.data.folders);
         })
         .catch((error) => {
@@ -695,9 +738,14 @@ export default {
     border-top-right-radius: @nxd-border-radius;
     border-top-left-radius: @nxd-border-radius;
 
+    input {
+      border-color: @color-grey-light;
+    }
+
     > .uk-flex {
       > div {
-        border-right: 1px solid @color-grey-light;
+        border-right: 1px solid @color-grey-lighter;
+        margin-right: 16px;
         padding: 0;
 
         &:last-child {
