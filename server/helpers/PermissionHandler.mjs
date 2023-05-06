@@ -25,6 +25,11 @@ export const permissions = {
     CREATE_MANUFACTURER: 'canCreateManufacturer',
     DELETE_MANUFACTURER: 'canDeleteManufacturer',
     UPDATE_MANUFACTURER: 'canUpdateManufacturer',
+    // Filesystem
+    ACCESS_FILEMANAGER: 'canAccessFileManager',
+    CREATE_FILEMANAGER_ITEM: 'canCreateFileManagerItem',
+    DELETE_FILEMANAGER_ITEM: 'canDeleteFileManagerItem',
+    UPDATE_FILEMANAGER_ITEM: 'canUpdateFileManagerItem',
     // MSISDN Manager
     ACCESS_MSISDN_MANAGER: 'canAccessMsisdnManager',
     CREATE_MSISDN: 'canCreateMsisdn',
@@ -102,6 +107,11 @@ export const rolePermissions = {
         permissions.CREATE_GUIDES,
         permissions.DELETE_GUIDES,
         permissions.UPDATE_GUIDES,
+
+        permissions.ACCESS_FILEMANAGER,
+        permissions.CREATE_FILEMANAGER_ITEM,
+        permissions.DELETE_FILEMANAGER_ITEM,
+        permissions.UPDATE_FILEMANAGER_ITEM,
     ],
     [roles.USER]: [
         permissions.ACCESS_DEVICE_LIST,
@@ -118,6 +128,8 @@ export const rolePermissions = {
         permissions.DELETE_LINKS,
         permissions.UPDATE_LINKS,
         permissions.ACCESS_GUIDES,
+
+        permissions.ACCESS_FILEMANAGER,
     ],
     [roles.GUEST]: [
         permissions.ACCESS_DEVICE_LIST,

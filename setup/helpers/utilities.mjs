@@ -31,11 +31,10 @@ export async function createSSL(apiHostname) {
     }
 }
 
-export async function createAdministrator(dbName, pwd, connectionData) {
-    const username = 'administrator';
+export async function createAccount(dbName, username, pwd, role, connectionData) {
     const password = pwd ? String(pwd) : crypto.randomBytes(12).toString('hex');
     const hashedPassword = await bcrypt.hash(password, 10);
-    const adminUserRoleData = await DatabaseConnector.execute('SELECT id FROM roles WHERE name = ?', ['admin'], connectionData);
+    const adminUserRoleData = await DatabaseConnector.execute('SELECT id FROM roles WHERE name = ?', [role], connectionData);
     const status = await DatabaseConnector.execute(`INSERT INTO accounts (username, password, notes, hidden, role_id) VALUES (?, ?, ?, ?, ?)`, [username, hashedPassword, '', '', adminUserRoleData[0].id], connectionData);
 
     if (status.affectedRows === 1) {

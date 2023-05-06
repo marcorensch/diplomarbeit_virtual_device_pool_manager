@@ -9,7 +9,7 @@ import {fileURLToPath} from 'url';
 import chalk from "chalk";
 import crypto from "crypto";
 import EnvBuilder from "./model/EnvBuilder.mjs";
-import {createSSL, installDatabase, createAdministrator} from "./helpers/utilities.mjs";
+import {createSSL, installDatabase, createAccount} from "./helpers/utilities.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -233,7 +233,11 @@ if (answers.createTestDatabase) {
         }
         await installDatabase(answers.DATABASE_NAME_TEST, connectionData);
         connectionData.useDatabase = true;
-        await createAdministrator(answers.DATABASE_NAME_TEST, "test", connectionData);
+        await createAccount(answers.DATABASE_NAME_TEST, "administrator","test", "ADMIN", connectionData);
+        await createAccount(answers.DATABASE_NAME_TEST, "moderator","test", "MANAGER", connectionData);
+        await createAccount(answers.DATABASE_NAME_TEST, "user","test", "USER", connectionData);
+        await createAccount(answers.DATABASE_NAME_TEST, "guest","test", "GUEST", connectionData);
+
     }catch (e) {
         console.error(e);
         process.exit(1);
@@ -251,7 +255,7 @@ try {
     }
     await installDatabase(answers.DATABASE_NAME, connectionData);
     connectionData.useDatabase = true;
-    await createAdministrator(answers.DATABASE_NAME_TEST, answers.adminPassword, connectionData);
+    await createAccount(answers.DATABASE_NAME_TEST, "administrator", answers.adminPassword, "ADMIN", connectionData);
 }catch (e) {
     console.error(e);
     process.exit(1);

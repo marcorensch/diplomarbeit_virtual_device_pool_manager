@@ -2,6 +2,10 @@ import supertest from "supertest";
 import chai from "chai";
 const { expect } = chai;
 import {app} from "../server.mjs";
+import path from "path";
+import {fileURLToPath} from "url";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const adminCredentials = {
     username: "administrator",
@@ -484,4 +488,54 @@ describe("Test MSISDN Manager API", () => {
         expect(response2.body).to.eql(null);
     });
 
+});
+
+describe("Test FileManager API", () => {
+    const agent = supertest.agent(app);
+    afterEach(async () => {
+        await agent.get("/api/auth/logout");
+    });
+    it("should return 400 when loading list of files without path", async () => {
+        await agent.post("/api/auth/login").send(adminCredentials);
+        const response = await agent.get("/api/filemanager");
+        expect(response.status).to.eql(400);
+    });
+    it("should return 200 when loading list of files of logos path", async () => {
+        await agent.post("/api/auth/login").send(adminCredentials);
+        const response = await agent.get("/api/filemanager?path=logos");
+        expect(response.status).to.eql(200);
+    });
+    it("should return stored files and folders when loading contents of logos path", async () => {
+        await agent.post("/api/auth/login").send(adminCredentials);
+        const response = await agent.get("/api/filemanager?path=logos");
+        expect(response.body).to.have.property("folders");
+        expect(response.body).to.have.property("files");
+    });
+    it("should return 401 when trying access File Manager without being logged in", async () => {
+        const response = await agent.get("/api/filemanager?path=logos");
+        expect(response.status).to.eql(401);
+    });
+    it("should return 403 when trying access File Manager with wrong permissions", async () => {
+        await agent.post("/api/auth/login").send({username: "guest", password: "test"});
+        const response = await agent.get("/api/filemanager?path=logos");
+        expect(response.status).to.eql(403);
+    });
+    it("should return 201 when uploading file to server", async () => {
+        await agent.post("/api/auth/login").send(adminCredentials);
+        const pathToLocalFile = path.join(__dirname, "nxd-logo.png");
+        const response = await agent.post("/api/filemanager/upload").field("relativePath", "test").attach("file", pathToLocalFile);
+        expect(response.status).to.eql(201);
+    });
+    it("should return 200 when deleting file from server", async () => {
+        const existingFile = {name: "nxd-logo.png", relativePath: "test", fullPath: "public/test/nxd-logo.png"};
+        await agent.post("/api/auth/login").send(adminCredentials);
+        const response = await agent.delete("/api/filemanager").send({files: [existingFile]});
+        expect(response.status).to.eql(200);
+    });
+    it("should return 400 when uploading file to server without relativePath", async () => {
+        await agent.post("/api/auth/login").send(adminCredentials);
+        const pathToLocalFile = path.join(__dirname, "nxd-logo.png");
+        const response = await agent.post("/api/filemanager/upload").attach("file", pathToLocalFile);
+        expect(response.status).to.eql(400);
+    });
 });

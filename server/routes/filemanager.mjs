@@ -7,23 +7,26 @@ import path from "path";
 import fs from "fs";
 import FileManager from "../helpers/FileManager.mjs";
 import multer from "multer";
+import UserValidator from "../middlewares/UserValidator.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const publicDir = path.join(__dirname, '..', 'public');
-const uploadDir = path.join(__dirname, '..', 'uploads');
-const upload = multer({dest: 'uploads/'});
+const upload = multer({dest: path.join(__dirname, 'uploads')});
 
 const regex = /^[a-z]+[a-z|\d \-_.]*$/i;
 
-router.get("/", async (req, res) => {
+router.use(UserValidator.validateTokens);
+
+router.get("/", UserValidator.hasPermission("canAccessFileManager"), async (req, res) => {
     let files = [];
     let folders = [];
     const relPath = req.query.path || "";
     const name = req.query.name || "";
+
+    if(!relPath) return res.status(400).send({success: false, message: "Path cannot be empty"});
     const absolutePath = path.join(publicDir, relPath, name);
-    console.log(absolutePath);
-    if (absolutePath.includes("..")) {
+    if (absolutePath.includes("/../")) {
         res.send({folders: [], files: []});
         return;
     }
@@ -37,9 +40,9 @@ router.get("/", async (req, res) => {
 
 });
 
-router.delete("/", async (req, res) => {
-    const files = req.body.files;
-    const folders = req.body.folders;
+router.delete("/", UserValidator.hasPermission("canDeleteFileManagerItem"), async (req, res) => {
+    const files = req.body.files || [];
+    const folders = req.body.folders || [];
     const items = [...folders, ...files];
 
     if (items.length === 0) {
@@ -54,13 +57,10 @@ router.delete("/", async (req, res) => {
         return;
     }
 
-    console.log(files);
-    console.log(folders);
-
     res.send('ok');
 });
 
-router.post("/create-folder", async (req, res) => {
+router.post("/create-folder", UserValidator.hasPermission("canCreateFileManagerItem"), async (req, res) => {
     const dirName = req.body.newFolderName;
     const parentFolderPath = req.body.parentFolder;
 
@@ -79,7 +79,7 @@ router.post("/create-folder", async (req, res) => {
     res.status(201).send('ok');
 });
 
-router.put("/rename", async (req, res) => {
+router.put("/rename", UserValidator.hasPermission("canUpdateFileManagerItem"), async (req, res) => {
     const oldName = req.body.oldName;
     const newName = req.body.newName;
     const parentFolderPath = req.body.parentDir;
@@ -100,9 +100,13 @@ router.put("/rename", async (req, res) => {
     res.send('ok');
 });
 
-router.post("/upload", upload.any(), async (req, res) => {
+router.post("/upload", UserValidator.hasPermission("canCreateFileManagerItem"), upload.any(), async (req, res) => {
     const parentFolderPath = req.body.relativePath;
     const files = req.files;
+
+    console.log(parentFolderPath);
+    console.log(files);
+
 
     if (parentFolderPath.includes("/../")) return res.code(400).send({success: false, message: "Invalid path"});
     if (!parentFolderPath) return res.status(400).send({success: false, message: "Parent folder cannot be empty"});
@@ -113,7 +117,7 @@ router.post("/upload", upload.any(), async (req, res) => {
         return res.status(e.status).send({success: false, message: e.message});
     }
 
-    res.send('ok');
+    res.status(201).send('ok');
 });
 
 export default router;
