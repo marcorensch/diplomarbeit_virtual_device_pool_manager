@@ -60,7 +60,7 @@ router.delete("/", UserValidator.hasPermission("canDeleteFileManagerItem"), asyn
     res.send('ok');
 });
 
-router.post("/create-folder", UserValidator.hasPermission("canCreateFileManagerItem"), async (req, res) => {
+router.post("/folders", UserValidator.hasPermission("canCreateFileManagerItem"), async (req, res) => {
     const dirName = req.body.newFolderName;
     const parentFolderPath = req.body.parentFolder;
 
@@ -101,15 +101,12 @@ router.put("/rename", UserValidator.hasPermission("canUpdateFileManagerItem"), a
 });
 
 router.post("/upload", UserValidator.hasPermission("canCreateFileManagerItem"), upload.any(), async (req, res) => {
-    const parentFolderPath = req.body.relativePath;
+    const parentFolderPath = req.body.relativePath || "";
     const files = req.files;
 
-    console.log(parentFolderPath);
-    console.log(files);
-
-
-    if (parentFolderPath.includes("/../")) return res.code(400).send({success: false, message: "Invalid path"});
+    if (parentFolderPath.includes("/../")) return res.status(400).send({success: false, message: "Invalid path"});
     if (!parentFolderPath) return res.status(400).send({success: false, message: "Parent folder cannot be empty"});
+    if (!files.length) return res.status(400).send({success: false, message: "No file was uploaded"});
 
     try {
         await FileManager.upload(parentFolderPath, files);

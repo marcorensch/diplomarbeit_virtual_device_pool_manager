@@ -57,7 +57,6 @@ export default class FileManager {
 
             const absPath = path.join(publicDir, el.fullPath);
 
-
             if (!fs.existsSync(absPath)) {
                 console.log(`Trying to delete ${absPath} that does not exist`);
                 throw({status: 404, message: "File or Folder not found" })

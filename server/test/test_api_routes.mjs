@@ -526,16 +526,85 @@ describe("Test FileManager API", () => {
         const response = await agent.post("/api/filemanager/upload").field("relativePath", "test").attach("file", pathToLocalFile);
         expect(response.status).to.eql(201);
     });
-    it("should return 200 when deleting file from server", async () => {
-        const existingFile = {name: "nxd-logo.png", relativePath: "test", fullPath: "public/test/nxd-logo.png"};
-        await agent.post("/api/auth/login").send(adminCredentials);
-        const response = await agent.delete("/api/filemanager").send({files: [existingFile]});
+    it("should return 403 when trying to delete a file with guest permissions", async () => {
+        const existingFileData = {name: "nxd-logo.png", relativePath: "test", fullPath: "test/nxd-logo.png"};
+        await agent.post("/api/auth/login").send({username: "guest", password: "test"});
+        const response = await agent.delete("/api/filemanager").send({files: [existingFileData]});
+        expect(response.status).to.eql(403);
+    });
+
+    it("should return 403 when trying to rename file with guest permissions", async () => {
+        await agent.post("/api/auth/login").send({username: "guest", password: "test"});
+        const response = await agent.put("/api/filemanager/rename").send({oldName: "nxd-logo.png", newName: "nxd-logo2.png", parentDir: "test"});
+        expect(response.status).to.eql(403);
+    });
+
+    it("should return 200 when trying to rename file with manager permissions", async () => {
+        await agent.post("/api/auth/login").send({username: "moderator", password: "test"});
+        const response = await agent.put("/api/filemanager/rename").send({oldName: "nxd-logo.png", newName: "nxd-logo2.png", parentDir: "test"});
+        console.log(response.text)
         expect(response.status).to.eql(200);
     });
-    it("should return 400 when uploading file to server without relativePath", async () => {
+
+    it("should return 404 when deleting file from server", async () => {
+        const nonExistingFileData = {name: "nxd-logo.png", relativePath: "test", fullPath: "test/thisisNotHere.png"};
+        await agent.post("/api/auth/login").send(adminCredentials);
+        const response = await agent.delete("/api/filemanager").send({files: [nonExistingFileData]});
+        expect(response.status).to.eql(404);
+    });
+
+    it("should return 200 when deleting file from server", async () => {
+        const existingFileData = {name: "nxd-logo.png", relativePath: "test", fullPath: "test/nxd-logo2.png"};
+        await agent.post("/api/auth/login").send(adminCredentials);
+        const response = await agent.delete("/api/filemanager").send({files: [existingFileData]});
+        expect(response.status).to.eql(200);
+    });
+    it("should return 400 with correct message when uploading file to server without relativePath", async () => {
         await agent.post("/api/auth/login").send(adminCredentials);
         const pathToLocalFile = path.join(__dirname, "nxd-logo.png");
         const response = await agent.post("/api/filemanager/upload").attach("file", pathToLocalFile);
+
         expect(response.status).to.eql(400);
+        expect(response.body).to.have.property("message");
+        expect(response.body.message).to.eql("Parent folder cannot be empty");
+    });
+    it("should return 400 with correct message when uploading file to server without file", async () => {
+        await agent.post("/api/auth/login").send(adminCredentials);
+        const response = await agent.post("/api/filemanager/upload").field("relativePath", "test");
+
+        expect(response.status).to.eql(400);
+        expect(response.body).to.have.property("message");
+        expect(response.body.message).to.eql("No file was uploaded");
+    });
+    it("should return 400 with correct message when uploading file to server with invalid relativePath", async () => {
+        await agent.post("/api/auth/login").send(adminCredentials);
+        const pathToLocalFile = path.join(__dirname, "nxd-logo.png");
+        const response = await agent.post("/api/filemanager/upload").field("relativePath", "test/../../").attach("file", pathToLocalFile);
+
+        expect(response.status).to.eql(400);
+        expect(response.body).to.have.property("message");
+        expect(response.body.message).to.eql("Invalid path");
+    });
+    it("should return 403 with correct message when trying to create a folder with guest permissions", async () => {
+        await agent.post("/api/auth/login").send({username: "guest", password: "test"});
+        const response = await agent.post("/api/filemanager/folders").send({newFolderName: "subTest", parentFolder: "test"});
+        expect(response.status).to.eql(403);
+        expect(response.body).to.have.property("message");
+        expect(response.body.message).to.eql("Unauthorized");
+    });
+    it("should return 201 with correct message when trying to create a folder with guest permissions", async () => {
+        await agent.post("/api/auth/login").send(adminCredentials);
+        const response = await agent.post("/api/filemanager/folders").send({newFolderName: "adminCreatedFolder", parentFolder: "test"});
+        expect(response.status).to.eql(201);
+    });
+    it("should return 200 when trying to delete a folder with manager permissions", async () => {
+        await agent.post("/api/auth/login").send({username: "moderator", password: "test"});
+        const response = await agent.delete("/api/filemanager").send({folders: [{name: "adminCreatedFolder", relativePath: "test", fullPath: "test/adminCreatedFolder"}]});
+        expect(response.status).to.eql(200);
+    });
+    it("should return 403 when trying to delete a folder out of public scope", async () => {
+        await agent.post("/api/auth/login").send(adminCredentials);
+        const response = await agent.delete("/api/filemanager").send({folders: [{name: "public", relativePath: "/../../../", fullPath: "/../../"}]});
+        expect(response.status).to.eql(403);
     });
 });
