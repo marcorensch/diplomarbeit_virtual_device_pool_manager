@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import mime from "mime-types";
 import {fileURLToPath} from "url";
+import DatabaseModel from "../models/DatabaseModel.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -72,6 +73,60 @@ export default class FileManager {
             } catch (e) {
                 throw(e)
             }
+        }
+    }
+
+    static async upload(relativePath, files) {
+        const absPath = path.join(publicDir, relativePath);
+
+        if (!fs.existsSync(absPath)) {
+            try {
+                fs.mkdirSync(absPath, {recursive: true});
+            } catch (e) {
+                console.log(e);
+                throw({status: 500, message: e.message});
+            }
+        }
+
+        for (const file of files) {
+            const absFilePath = path.join(absPath, file.originalname);
+            if (fs.existsSync(absFilePath)) {
+                throw({status: 400, message: "File already exists"})
+            }
+            try{
+                await fs.promises.rename(file.path, path.join(absPath, file.originalname));
+            }catch (e) {
+                console.log(e);
+                throw({status: 500, message: "Error uploading file"});
+            }
+        }
+    }
+
+    static async rename(parentFolder, oldName, newName) {
+        const absPath = path.join(publicDir, parentFolder, oldName);
+        const newAbsPath = path.join(publicDir, parentFolder, newName);
+
+        const oldRelativePath = path.join(parentFolder, oldName);
+        const newRelativePath = path.join(parentFolder, newName);
+
+        if (absPath.includes("..") || newAbsPath.includes("..")) throw({status: 403, message: "Forbidden path"});
+
+        if (!fs.existsSync(absPath)) throw({status: 404, message: "File or Folder not found" });
+
+        try {
+            fs.renameSync(absPath, newAbsPath);
+        } catch (e) {
+            console.log(e)
+            throw({status: 500, message: "Error renaming filesystem element"})
+        }
+
+        const databaseModel = new DatabaseModel();
+        const query = `UPDATE manufacturers SET image = REPLACE(image, '${oldRelativePath}', '${newRelativePath}') WHERE image LIKE '%${oldRelativePath}%'`;
+        try{
+            await databaseModel.query(query);
+        } catch (e) {
+            console.log(e)
+            throw({status: 500, message: "Error updating database"})
         }
     }
 }

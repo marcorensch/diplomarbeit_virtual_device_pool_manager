@@ -1,7 +1,16 @@
 <template>
   <div class="file-manager">
     <div class="folder-controls">
-      <div class="uk-flex uk-grid-small uk-flex-right">
+      <div class="uk-flex uk-flex-right uk-flex-middle">
+        <div>
+          <div class="uk-margin-right">
+            <input
+              type="text"
+              class="uk-input"
+              placeholder="Search in Folder"
+            />
+          </div>
+        </div>
         <div>
           <div class="actions">
             <div class="uk-button-group">
@@ -34,12 +43,21 @@
                 <font-awesome-icon :icon="['fas', 'cloud-arrow-up']" />
               </button>
               <button
+                class="uk-button uk-button-default uk-button-small"
+                :class="{ 'uk-disabled': !exactlyOneChoosen }"
+                @click="handleRenameElementClicked"
+              >
+                <font-awesome-icon :icon="['fas', 'pencil']" />
+              </button>
+              <button
                 class="uk-button uk-button-danger uk-button-small"
                 :class="{ 'uk-disabled': !anyChoosen }"
                 @click="handleDeleteClicked"
               >
                 <font-awesome-icon :icon="['fas', 'trash']" />
               </button>
+            </div>
+            <div class="uk-button-group">
               <button class="uk-button uk-button-default uk-button-small">
                 <font-awesome-icon :icon="['fas', 'table-list']" />
               </button>
@@ -228,6 +246,7 @@ import UIkit from "uikit";
 import axios from "axios";
 
 const toast = useToast();
+const regex = /^[a-z]+[a-z|\d \-_.]*$/i;
 
 export default {
   name: "FileManager",
@@ -265,6 +284,7 @@ export default {
       allSelected: false,
       displayMode: "grid",
       anyChoosen: false,
+      exactlyOneChoosen: false,
       currentFolder: null,
       folderTree: [],
       subFolders: [],
@@ -322,19 +342,17 @@ export default {
         }
       }
     },
+
     updateSubFolderTree(
       fullPath,
       arrayOfFolders,
       parentFolders = this.folderTree
     ) {
-      console.log(fullPath, arrayOfFolders);
       for (let parentFolder of parentFolders) {
         if (fullPath.includes(parentFolder.fullPath)) {
           // Parent folder found
           if (fullPath === parentFolder.fullPath) {
             // Found direct parent
-            console.log("Found direct parent");
-            console.log("Array of folders: ", arrayOfFolders);
             parentFolder.subFolders = arrayOfFolders || [];
           } else {
             this.updateSubFolderTree(
@@ -360,17 +378,15 @@ export default {
     handleSelectAll() {
       this.subFolders.forEach((folder) => (folder.choosen = true));
       this.files.forEach((file) => (file.choosen = true));
-      this.anyChoosen =
-        this.files.some((file) => file.choosen) ||
-        this.subFolders.some((folder) => folder.choosen);
+      this.anyChoosen = true;
+      this.exactlyOneChoosen = false;
       this.allSelected = true;
     },
     handleDeSelectAll() {
       this.subFolders.forEach((folder) => (folder.choosen = false));
       this.files.forEach((file) => (file.choosen = false));
-      this.anyChoosen =
-        this.files.some((file) => file.choosen) ||
-        this.subFolders.some((folder) => folder.choosen);
+      this.anyChoosen = false;
+      this.exactlyOneChoosen = false;
       this.allSelected = false;
     },
 
@@ -423,10 +439,13 @@ export default {
       if (e.detail === 1) {
         this.$nextTick(() => {
           item.choosen = !item.choosen;
-          this.anyChoosen =
-            this.subFolders.some((folder) => folder.choosen) ||
-            this.files.some((file) => file.choosen);
+          const selectedFolders = this.subFolders.filter(
+            (folder) => folder.choosen
+          );
           const selectedFiles = this.files.filter((file) => file.choosen);
+          this.anyChoosen = selectedFolders.length || selectedFiles.length;
+          this.exactlyOneChoosen =
+            selectedFolders.length + selectedFiles.length === 1;
           if (selectedFiles.length === 1) {
             this.$emit("file-selected", selectedFiles[0]);
           } else {
@@ -449,8 +468,7 @@ export default {
     },
     handleShowFileUploadClicked() {
       const uploadModal = document.getElementById("upload-modal");
-      console.log(this.currentFolder);
-      UIkit.modal(uploadModal).show();
+      UIkit.modal(uploadModal, { stack: true }).show();
     },
     handleFileUploadClicked() {
       const uploadModal = document.getElementById("upload-modal");
@@ -459,10 +477,9 @@ export default {
       for (let i = 0; i < fileUpload.files.length; i++) {
         formData.append("files", fileUpload.files[i]);
       }
-      formData.append("parentDir", this.currentFolder.name);
-      formData.append("relativePath", this.currentFolder.relativePath);
+      formData.append("relativePath", this.currentFolder.fullPath);
       axios
-        .post("http://localhost:3000/api/file-manager/upload", formData, {
+        .post("/api/filemanager/upload", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
@@ -491,10 +508,10 @@ export default {
           stack: true,
         })
         .then((value) => value);
-      const regex = /^[a-z]+[a-z|\d \-_]*$/i;
+
       if (!regex.test(newFolderName)) {
         toast.error(
-          "Invalid Folder Name\nFolder not created\nFolder name has to be Alphanumeric and can contain spaces, dashes & underscores"
+          "Invalid Folder Name\nFolder not created\nFolder name has to be Alphanumeric and can contain spaces, dashes, underscores & dots"
         );
         return;
       }
@@ -520,7 +537,6 @@ export default {
     buildUrl(file) {
       return `/public/${file.relativePath}/${file.name}`;
     },
-
     buildBreadcrumbs(limit = 5) {
       let breadcrumbs = [];
       let bcPath = this.currentFolder.fullPath.replace(this.baseDir, "");
@@ -581,6 +597,39 @@ export default {
       });
       folder.selected = true;
       this.getFolderContents(folder.fullPath);
+    },
+    async handleRenameElementClicked() {
+      const element =
+        this.files.filter((file) => file.choosen)[0] ||
+        this.subFolders.filter((folder) => folder.choosen)[0];
+      const newName = await UIkit.modal
+        .prompt("New Name:", element.name, {
+          stack: true,
+        })
+        .then((value) => value);
+
+      if (!regex.test(newName)) {
+        toast.error(
+          "Invalid Name\nElement not renamed\nElement name has to be Alphanumeric and can contain spaces, dashes, underscores & dots"
+        );
+        return;
+      }
+
+      if (newName) {
+        axios
+          .put("/api/filemanager/rename", {
+            oldName: element.name,
+            newName: newName,
+            parentDir: element.relativePath,
+          })
+          .then((response) => {
+            console.log(response);
+            this.triggerFolderSelect(this.currentFolder.fullPath);
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
     },
   },
 };
@@ -659,15 +708,23 @@ export default {
       .uk-button-group {
         button {
           min-width: 0;
-          border-radius: 0;
-          border-right: 1px solid @color-grey-light;
+          border-right: 1px solid @color-grey-lighter;
 
           &:first-child {
             border-left: 0;
+            border-top-left-radius: @nxd-border-radius;
+            border-bottom-left-radius: @nxd-border-radius;
           }
 
           &:last-child {
             border-right: 0;
+            border-top-right-radius: @nxd-border-radius;
+            border-bottom-right-radius: @nxd-border-radius;
+          }
+
+          &:hover {
+            background-color: @color-primary;
+            color: @color-white;
           }
         }
 
@@ -829,6 +886,30 @@ ul.media-tree {
 
     > div {
       max-width: 250px;
+    }
+  }
+}
+
+.folder-controls {
+  background: @color-horizon;
+}
+.actions {
+  padding: 4px;
+  .uk-button-group {
+    &:not(:last-of-type) {
+      margin-right: 10px;
+
+      &:after {
+        content: "";
+        display: inline-block;
+        width: 1px;
+        top: 4px;
+        height: 40px;
+        background-color: @color-grey-lighter;
+        margin-left: 10px;
+      }
+    }
+    &:not(:first-of-type) {
     }
   }
 }
