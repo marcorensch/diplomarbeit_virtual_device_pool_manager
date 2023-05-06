@@ -518,7 +518,7 @@ export default {
 
       if (newFolderName) {
         axios
-          .post("/api/filemanager/create-folder", {
+          .post("/api/filemanager/folders", {
             newFolderName,
             parentFolder,
           })

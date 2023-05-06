@@ -602,9 +602,24 @@ describe("Test FileManager API", () => {
         const response = await agent.delete("/api/filemanager").send({folders: [{name: "adminCreatedFolder", relativePath: "test", fullPath: "test/adminCreatedFolder"}]});
         expect(response.status).to.eql(200);
     });
-    it("should return 403 when trying to delete a folder out of public scope", async () => {
+    it("should return 403 when trying to delete a folder out of public scope by relative Path", async () => {
         await agent.post("/api/auth/login").send(adminCredentials);
-        const response = await agent.delete("/api/filemanager").send({folders: [{name: "public", relativePath: "/../../../", fullPath: "/../../"}]});
+        const response = await agent.delete("/api/filemanager").send({folders: [{name: "public", relativePath: "/../../../", fullPath: "server/public/../../../"}]});
         expect(response.status).to.eql(403);
+    });
+    it("should return 403 when trying to delete a folder out of public scope by full path", async () => {
+        await agent.post("/api/auth/login").send(adminCredentials);
+        const response = await agent.delete("/api/filemanager").send({folders: [{name: "public", relativePath: "test", fullPath: "/../../"}]});
+        expect(response.status).to.eql(403);
+    });
+    after(async () => {
+        await agent.post("/api/auth/login").send(adminCredentials);
+        await agent.delete("/api/filemanager").send({
+            folders: [{
+                name: "test",
+                relativePath: "test",
+                fullPath: "test"
+            }]
+        });
     });
 });
