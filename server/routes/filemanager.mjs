@@ -12,7 +12,7 @@ import UserValidator from "../middlewares/UserValidator.mjs";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const publicDir = path.join(__dirname, '..', 'public');
-const upload = multer({dest: path.join(__dirname, 'uploads')});
+const upload = multer({dest: path.join(__dirname, "..", "uploads")});
 
 const regex = /^[a-z]+[a-z|\d \-_.]*$/i;
 
