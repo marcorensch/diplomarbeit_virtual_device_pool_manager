@@ -71,6 +71,7 @@
                 <button
                   class="uk-button uk-button-danger"
                   v-if="authStore.hasPermission('canDeleteManufacturer')"
+                  @click="deleteManufacturer(manufacturer)"
                 >
                   <font-awesome-icon
                     class="uk-preserve-width"
@@ -90,6 +91,7 @@
 import { useAuthStore } from "@/stores/auth";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import UIkit from "uikit";
 
 export default {
   name: "listView",
@@ -107,8 +109,6 @@ export default {
   },
   mounted() {
     this.fetchManufacturers().then((manufacturers) => {
-      console.log("done");
-      console.log(manufacturers);
       this.manufacturers = manufacturers;
     });
   },
@@ -120,6 +120,33 @@ export default {
     editManufacturer(id) {
       console.log(id);
       this.$router.push({ name: "edit-manufacturer", params: { id: id } });
+    },
+    async deleteManufacturer(manufacturer) {
+      const confirm = await UIkit.modal
+        .confirm(
+          `Are you sure you want to delete <b>${manufacturer.name}</b> from the list of Manufacturers?<br>Linked devices to this manufacturer will not be deleted.`,
+          {
+            labels: { ok: "Yes", cancel: "No" },
+          }
+        )
+        .then(
+          function () {
+            return true;
+          },
+          function () {
+            return false;
+          }
+        );
+
+      if (!confirm) return;
+      const result = await axios.delete(
+        "/api/manufacturers/" + manufacturer.id
+      );
+      if (result.status === 200) {
+        this.fetchManufacturers().then((manufacturers) => {
+          this.manufacturers = manufacturers;
+        });
+      }
     },
   },
 };
