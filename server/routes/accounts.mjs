@@ -55,7 +55,7 @@ router.put('/:id/password', UserValidator.hasPermission('canUpdateOwnAccount'), 
     user.password = await user.encryptPassword(newPassword);
 
     try {
-        await user.save();
+        await UserHelper.saveUser(user);
         delete user.password;
         return res.status(200).json({message: "Password updated", user});
     }catch (e) {
@@ -81,7 +81,7 @@ router.delete('/:id', UserValidator.hasPermission('canDeleteOwnAccount'), UserVa
     }
 
     try {
-        await user.delete();
+        await UserHelper.deleteUser(user);
         return res.status(200).json({message: "User deleted"});
     } catch (e) {
         return res.status(500).send("Error while deleting user");
