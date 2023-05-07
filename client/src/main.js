@@ -119,9 +119,9 @@ pinia.use(({ store }) => {
 });
 const toastOptions = {
   position: "top-right",
-  timeout: 3000,
+  timeout: 5000,
   closeOnClick: true,
-  pauseOnHover: false,
+  pauseOnHover: true,
   draggablePercent: 0.6,
 };
 

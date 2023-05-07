@@ -449,7 +449,7 @@ import UIkit from "uikit";
 import axios from "axios";
 
 const toast = useToast();
-const regex = /^[a-z]+[a-z|\d \-_.]*$/i;
+const regex = /^[a-z|\d]+[a-z|\d \-_.]*$/i;
 
 export default {
   name: "FileManager",
@@ -671,7 +671,9 @@ export default {
           toast.error(error.response.data.message);
         })
         .finally(() => {
-          this.triggerFolderSelect(this.currentFolder.fullPath);
+          this.$nextTick(() => {
+            this.getFolderContents(this.currentFolder.fullPath);
+          });
           this.anyChoosen = false;
           this.allSelected = false;
           this.files.map((file) => (file.choosen = false));
@@ -755,7 +757,7 @@ export default {
 
       if (!regex.test(newFolderName)) {
         toast.error(
-          "Invalid Folder Name\nFolder not created\nFolder name has to be Alphanumeric and can contain spaces, dashes, underscores & dots"
+          "Invalid Folder Name\nName has to be Alphanumeric & can contain spaces, dashes, underscores & dots and has to start with a letter or number"
         );
         return;
       }
@@ -827,7 +829,6 @@ export default {
       this.getFolderContents(this.baseDir);
     },
     handleFolderSelected(folder) {
-      console.log("folder selected", folder);
       this.$emit("file-selected", null);
       this.anyChoosen = false;
       this.allSelected = false;
