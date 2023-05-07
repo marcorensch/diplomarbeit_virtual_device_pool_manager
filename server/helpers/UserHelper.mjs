@@ -82,8 +82,9 @@ export default class UserHelper {
         }
     }
 
-    static async deleteUser(id) {
+    static async deleteUser(user) {
         const database = new DatabaseModel();
-        return await database.query("DELETE FROM accounts WHERE id = ?", [id]);
+        const result = await database.query("DELETE FROM accounts WHERE id = ?", [user.id]);
+        return result.affectedRows === 1;
     }
 }

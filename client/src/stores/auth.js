@@ -128,7 +128,8 @@ export const useAuthStore = defineStore("auth", {
         const response = await axios.delete(`/api/accounts/${this.user.id}`);
         if (response.status === 200) {
           toast.info("Successfully deleted account");
-          await this.logout();
+          this.resetUser();
+          this.router.push({ name: "devices" });
         } else {
           toast.error("Failed to delete account, Reason:\n" + response.text);
         }
