@@ -52,8 +52,9 @@ export default {
     this.device = this.deviceEditStore.getDevice;
   },
   methods: {
-    handleImageChanged(image) {
-      this.deviceEditStore.device.image = image;
+    handleImageChanged(imageRelativePath) {
+      let path = imageRelativePath.length ? "/public/" + imageRelativePath : "";
+      this.deviceEditStore.device.image = path;
     },
     handleCancelClicked() {
       this.$router.push({ name: "widgets" });
