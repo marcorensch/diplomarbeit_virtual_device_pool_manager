@@ -4,7 +4,7 @@
       <h3 class="uk-card-title">{{ title }}</h3>
       <div
         class="uk-position-relative device-image-container-outter uk-padding-remove-vertical"
-        v-if="image.length"
+        v-if="image"
       >
         <div class="device-image-container uk-border-rounded uk-overflow-auto">
           <img :src="image" :title="title" uk-cover class="uk-animation-fade" />

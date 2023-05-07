@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS `devices`
 (
     id              int(11)      NOT NULL AUTO_INCREMENT,
     name            varchar(255) NOT NULL,
-    image           varchar(255) NOT NULL,
+    image           varchar(255)          DEFAULT NULL,
     notes           text         NOT NULL,
     hidden          text         NOT NULL,
     device_type_id  int(11)               DEFAULT NULL,

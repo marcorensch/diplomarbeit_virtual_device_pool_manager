@@ -50,6 +50,7 @@ export default class FileManager {
     }
 
     static async delete(elements) {
+        const databaseModel = new DatabaseModel();
         for (const el of elements) {
             if (el.fullPath.includes("..")) {
                 throw({status: 403, message: "Forbidden path"})
@@ -72,6 +73,15 @@ export default class FileManager {
             } catch (e) {
                 throw(e)
             }
+
+            const query = `UPDATE manufacturers SET image = NULL WHERE image LIKE '%${el.fullPath}%'`;
+            try{
+                await databaseModel.query(query);
+            } catch (e) {
+                console.log(e)
+                throw({status: 500, message: "Error updating database"})
+            }
+
         }
     }
 
