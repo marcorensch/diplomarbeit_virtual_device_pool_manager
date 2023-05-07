@@ -17,6 +17,7 @@ const upload = multer({dest: path.join(__dirname, 'uploads')});
 const regex = /^[a-z]+[a-z|\d \-_.]*$/i;
 
 router.use(UserValidator.validateTokens);
+router.use(UserValidator.setCookies);
 
 router.get("/", UserValidator.hasPermission("canAccessFileManager"), async (req, res) => {
     let files = [];
