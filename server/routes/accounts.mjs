@@ -81,7 +81,8 @@ router.delete('/:id', UserValidator.hasPermission('canDeleteOwnAccount'), UserVa
     }
 
     try {
-        await UserHelper.deleteUser(user);
+        const result = await UserHelper.deleteUser(user);
+        if (!result) return res.status(500).send("Error while deleting user");
         return res.status(200).json({message: "User deleted"});
     } catch (e) {
         return res.status(500).send("Error while deleting user");

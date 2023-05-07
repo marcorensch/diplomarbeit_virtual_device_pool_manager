@@ -387,9 +387,9 @@ export default {
       console.log(this.form);
       try {
         await axios.put(`/api/admin/accounts/${this.form.id}`, this.form);
-        this.hideModal();
         this.toast.success("Account Updated Successfully");
         this.$emit("account-updated");
+        this.hideModal();
       } catch (error) {
         console.log(error);
         this.toast.error("Error Updating Account - Please Try Again");

@@ -115,9 +115,8 @@ describe("Test User Model", () => {
                 user.setData({
                     id: userAccountId
                 });
-                const result = await UserHelper.deleteUser(user.id);
-                expect(result).to.be.an("object");
-                expect(result).to.have.property("affectedRows").to.equal(1);
+                const result = await UserHelper.deleteUser(user);
+                expect(result).to.be.true;
             });
         });
     });
