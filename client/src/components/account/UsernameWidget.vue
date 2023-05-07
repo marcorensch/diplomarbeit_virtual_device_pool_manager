@@ -97,8 +97,6 @@ export default {
     async usernameHasChanged() {
       const formIsValid = await this.v$.$validate();
       const notTheSame = this.username !== this.auth.user.username;
-      console.log(notTheSame, formIsValid);
-      console.log(notTheSame && formIsValid);
       this.usernameIsValid = notTheSame && formIsValid;
     },
     async updateUsername() {

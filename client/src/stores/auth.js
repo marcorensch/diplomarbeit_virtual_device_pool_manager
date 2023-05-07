@@ -85,8 +85,10 @@ export const useAuthStore = defineStore("auth", {
         this.user = response.data.user;
         if (this.user) localStorage.setItem("user", JSON.stringify(this.user));
         toast.success("Successfully updated profile");
+        return true;
       } catch (e) {
         toast.error("Error while updating profile");
+        return false;
       }
     },
     resetUser() {
