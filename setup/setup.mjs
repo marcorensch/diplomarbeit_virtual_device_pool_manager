@@ -234,7 +234,7 @@ if (answers.createTestDatabase) {
         await installDatabase(answers.DATABASE_NAME_TEST, connectionData);
         connectionData.useDatabase = true;
         await createAccount(answers.DATABASE_NAME_TEST, "administrator","test", "ADMIN", connectionData);
-        await createAccount(answers.DATABASE_NAME_TEST, "moderator","test", "MANAGER", connectionData);
+        await createAccount(answers.DATABASE_NAME_TEST, "manager","test", "MANAGER", connectionData);
         await createAccount(answers.DATABASE_NAME_TEST, "user","test", "USER", connectionData);
         await createAccount(answers.DATABASE_NAME_TEST, "guest","test", "GUEST", connectionData);
 

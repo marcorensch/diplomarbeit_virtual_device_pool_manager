@@ -540,7 +540,7 @@ describe("Test FileManager API", () => {
     });
 
     it("should return 200 when trying to rename file with manager permissions", async () => {
-        await agent.post("/api/auth/login").send({username: "moderator", password: "test"});
+        await agent.post("/api/auth/login").send({username: "manager", password: "test"});
         const response = await agent.put("/api/filemanager/rename").send({oldName: "nxd-logo.png", newName: "nxd-logo2.png", parentDir: "test"});
         console.log(response.text)
         expect(response.status).to.eql(200);
@@ -598,7 +598,7 @@ describe("Test FileManager API", () => {
         expect(response.status).to.eql(201);
     });
     it("should return 200 when trying to delete a folder with manager permissions", async () => {
-        await agent.post("/api/auth/login").send({username: "moderator", password: "test"});
+        await agent.post("/api/auth/login").send({username: "manager", password: "test"});
         const response = await agent.delete("/api/filemanager").send({folders: [{name: "adminCreatedFolder", relativePath: "test", fullPath: "test/adminCreatedFolder"}]});
         expect(response.status).to.eql(200);
     });
