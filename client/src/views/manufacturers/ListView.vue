@@ -28,7 +28,15 @@
           <tr>
             <th>Logo</th>
             <th>Name</th>
-            <th class="uk-text-center">Actions</th>
+            <th
+              class="uk-text-center"
+              v-if="
+                authStore.hasPermission('canUpdateManufacturer') ||
+                authStore.hasPermission('canDeleteManufacturer')
+              "
+            >
+              Actions
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -43,18 +51,27 @@
               />
             </td>
             <td class="uk-width-expand">{{ manufacturer.name }}</td>
-            <td>
+            <td
+              v-if="
+                authStore.hasPermission('canUpdateManufacturer') ||
+                authStore.hasPermission('canDeleteManufacturer')
+              "
+            >
               <div class="uk-button-group">
                 <button
                   class="uk-button uk-button-default"
                   @click="editManufacturer(manufacturer.id)"
+                  v-if="authStore.hasPermission('canUpdateManufacturer')"
                 >
                   <font-awesome-icon
                     class="uk-preserve-width"
                     :icon="['fas', 'pencil']"
                   />
                 </button>
-                <button class="uk-button uk-button-danger">
+                <button
+                  class="uk-button uk-button-danger"
+                  v-if="authStore.hasPermission('canDeleteManufacturer')"
+                >
                   <font-awesome-icon
                     class="uk-preserve-width"
                     :icon="['fas', 'trash']"

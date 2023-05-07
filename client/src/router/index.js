@@ -45,18 +45,54 @@ const routes = [
         name: "manufacturers",
         component: () => import("../views/manufacturers/ListView.vue"),
         meta: { transition: "fade" },
+        beforeEnter: () => {
+          const authStore = useAuthStore();
+          if (!authStore.isLoggedIn) {
+            toast.error("You must be logged in to access this page");
+            return { name: "login" };
+          }
+          if (authStore.hasPermission("canAccessManufacturersList")) {
+            return true;
+          } else {
+            return { name: "NotFound" };
+          }
+        },
       },
       {
         path: "create",
         name: "create-manufacturer",
         component: () => import("../views/manufacturers/ConfigView.vue"),
         meta: { transition: "fade" },
+        beforeEnter: () => {
+          const authStore = useAuthStore();
+          if (!authStore.isLoggedIn) {
+            toast.error("You must be logged in to access this page");
+            return { name: "login" };
+          }
+          if (authStore.hasPermission("canCreateManufacturer")) {
+            return true;
+          } else {
+            return { name: "NotFound" };
+          }
+        },
       },
       {
         path: ":id/edit",
         name: "edit-manufacturer",
         component: () => import("../views/manufacturers/ConfigView.vue"),
         meta: { transition: "fade" },
+        beforeEnter: () => {
+          const authStore = useAuthStore();
+          if (!authStore.isLoggedIn) {
+            toast.error("You must be logged in to access this page");
+            return { name: "login" };
+          }
+          if (authStore.hasPermission("canUpdateManufacturer")) {
+            return true;
+          } else {
+            return { name: "NotFound" };
+          }
+        },
       },
     ],
   },
