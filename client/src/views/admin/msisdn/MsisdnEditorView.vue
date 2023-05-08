@@ -274,7 +274,7 @@ export default {
   methods: {
     getMsisdnData() {
       axios
-        .get("/api/admin/numbers/" + this.id)
+        .get("/api/admin/msisdns/" + this.id)
         .then((response) => {
           console.log(response.data);
           this.item = response.data;
@@ -286,7 +286,7 @@ export default {
     },
     getParentMsisdns() {
       axios
-        .get("/api/admin/numbers", {
+        .get("/api/admin/msisdns", {
           params: {
             parentOnly: true,
           },
@@ -336,7 +336,7 @@ export default {
     },
     saveNewMsisdn() {
       axios
-        .post("/api/admin/numbers", this.item)
+        .post("/api/admin/msisdns", this.item)
         .then((res) => {
           this.handleResponse(res);
         })
@@ -346,7 +346,7 @@ export default {
     },
     updateMsisdn() {
       axios
-        .put("/api/admin/numbers/" + this.id, this.item)
+        .put("/api/admin/msisdns/" + this.id, this.item)
         .then(() => {
           this.$router.push({ name: "msisdn-manager" });
         })

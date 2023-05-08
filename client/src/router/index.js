@@ -179,7 +179,7 @@ const routes = [
             toast.error("You must be logged in to access this page");
             return { name: "login" };
           }
-          if (authStore.hasPermission("canUpdateNumbers")) {
+          if (authStore.hasPermission("canUpdateMsisdn")) {
             return true;
           } else {
             toast.error("You are not allowed to access this page");
@@ -198,7 +198,7 @@ const routes = [
             toast.error("You must be logged in to access this page");
             return { name: "login" };
           }
-          if (authStore.hasPermission("canCreateNumbers")) {
+          if (authStore.hasPermission("canCreateMsisdn")) {
             return true;
           } else {
             toast.error("You are not allowed to access this page");

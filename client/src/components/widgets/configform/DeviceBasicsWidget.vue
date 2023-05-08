@@ -1,5 +1,8 @@
 <template>
   <div class="uk-card uk-card-default">
+    <div class="uk-card-header">
+      <h3 class="uk-card-title">Basics</h3>
+    </div>
     <div class="uk-card-body">
       <div class="uk-child-width-1-1 uk-child-width-1-2@m" uk-grid>
         <div>
@@ -42,19 +45,6 @@
                 </div>
               </div>
             </div>
-          </div>
-
-          <div class="uk-margin">
-            <label>MSISDN's</label>
-            <ul class="uk-list uk-list-divider uk-list-small">
-              <li
-                :class="{ 'uk-margin-small-top': index > 0 }"
-                v-for="(msisdn, index) of msisdns"
-                :key="msisdn.id"
-              >
-                {{ msisdn.msisdn }}
-              </li>
-            </ul>
           </div>
         </div>
         <div>
@@ -119,7 +109,6 @@ export default {
   data() {
     return {
       device: deviceEditStore.getDevice,
-      msisdns: [{ msisdn: "+41 79 244 12 35" }, { msisdn: "+41 79 244 12 35" }],
       imeis: [],
       deviceTypes: [],
       manufacturers: [],

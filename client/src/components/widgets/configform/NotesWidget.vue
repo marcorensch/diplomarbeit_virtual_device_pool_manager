@@ -1,5 +1,8 @@
 <template>
   <div :class="{ 'uk-margin uk-card uk-card-default': inCard }">
+    <div class="uk-card-header" v-if="inCard">
+      <h3 class="uk-card-title">Notes</h3>
+    </div>
     <div :class="{ 'uk-card-body': inCard }">
       <div>
         <label for="notes">Notes</label>
@@ -18,6 +21,7 @@
         ></textarea>
       </div>
     </div>
+    <div class="uk-card-footer" v-if="inCard"></div>
   </div>
 </template>
 
