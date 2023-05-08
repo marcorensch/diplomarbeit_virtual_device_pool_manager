@@ -5,8 +5,13 @@
         <div>
           <label for="brand">Brand / Manufacturer</label>
           <select id="brand" class="uk-select" v-model="device.manufacturer_id">
-            <option value="samsung">Samsung</option>
-            <option value="apple">Apple</option>
+            <option
+              v-for="manufacturer of manufacturers"
+              :value="manufacturer.id"
+              :key="manufacturer.id"
+            >
+              {{ manufacturer.name }}
+            </option>
           </select>
         </div>
         <div>
@@ -20,10 +25,13 @@
         <div>
           <div>
             <label>Device Type</label>
-            <div class="uk-child-width-1-4 uk-grid-small uk-grid-match" uk-grid>
-              <div v-for="type of device_types" :key="type.id">
+            <div
+              class="uk-child-width-1-4 uk-grid-small uk-grid-match device-type-selector-container"
+              uk-grid
+            >
+              <div v-for="type of deviceTypes" :key="type.id">
                 <div
-                  class="uk-padding-small uk-text-large uk-card-default uk-text-center uk-cursor-pointer"
+                  class="uk-padding-small uk-text-large uk-card-default uk-text-center device-type-selector-option"
                   :class="{
                     'uk-card-primary': type.id === device.device_type_id,
                   }"
@@ -32,11 +40,6 @@
                 >
                   <font-awesome-icon :icon="'fas fa-' + type.icon" />
                 </div>
-              </div>
-              <div>
-                <div
-                  class="uk-padding-small uk-text-large uk-card-default uk-text-center"
-                ></div>
               </div>
             </div>
           </div>
@@ -101,8 +104,9 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { useDeviceEditStore } from "@/stores/deviceEdit";
 
 const deviceEditStore = useDeviceEditStore();
+
 export default {
-  name: "BasicsWidget",
+  name: "DeviceBasicsWidget",
   components: { FontAwesomeIcon },
   watch: {
     imeis: {
@@ -116,25 +120,30 @@ export default {
     return {
       device: deviceEditStore.getDevice,
       msisdns: [{ msisdn: "+41 79 244 12 35" }, { msisdn: "+41 79 244 12 35" }],
-      imeis: [
-        { imei: "123456789012345" },
-        { imei: "23456789012346" },
-        { imei: "3456789012347" },
-        { imei: "456789012348" },
-        { imei: "56789012349" },
-      ],
-      device_types: [
-        { id: 1, name: "Smartphone", icon: "mobile-screen-button" },
-        { id: 2, name: "Simple Phone", icon: "mobile-retro" },
-        { id: 3, name: "Tablet", icon: "tablet-screen-button" },
-        { id: 4, name: "Laptop", icon: "laptop" },
-        { id: 5, name: "TV", icon: "tv" },
-        { id: 6, name: "Camera", icon: "camera-retro" },
-        { id: 7, name: "Smart Device", icon: "microchip" },
-      ],
+      imeis: [],
+      deviceTypes: [],
+      manufacturers: [],
     };
   },
+  mounted() {
+    this.getDeviceTypes();
+    this.getManufacturers();
+    this.getAvailableMSISDNs();
+  },
   methods: {
+    async getAvailableMSISDNs() {
+      await deviceEditStore.setAvailableMSISDNs();
+      this.msisdns = await deviceEditStore.getAvailableMSISDNs;
+    },
+    async getManufacturers() {
+      await deviceEditStore.setAvailableManufacturers();
+      this.manufacturers = await deviceEditStore.getManufacturers;
+      console.log(this.manufacturers);
+    },
+    async getDeviceTypes() {
+      await deviceEditStore.setAvailableDeviceTypes();
+      this.deviceTypes = await deviceEditStore.getDeviceTypes;
+    },
     handleDeviceTypeClicked(id) {
       deviceEditStore.setDeviceType(id);
     },
@@ -148,4 +157,10 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style lang="less" scoped>
+.device-type-selector-container {
+  div.device-type-selector-option {
+    cursor: pointer;
+  }
+}
+</style>

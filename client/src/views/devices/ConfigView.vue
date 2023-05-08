@@ -17,7 +17,7 @@
           <NotesWidget class="uk-visible@m" />
         </div>
         <div class="uk-width-1-1 uk-width-2-3@m">
-          <BasicsWidget />
+          <DeviceBasicsWidget />
         </div>
         <div class="uk-width-1-1 uk-hidden@m">
           <NotesWidget />
@@ -33,7 +33,7 @@
 
 <script>
 import { useDeviceEditStore } from "@/stores/deviceEdit";
-import BasicsWidget from "@/components/widgets/configform/BasicsWidget.vue";
+import DeviceBasicsWidget from "@/components/widgets/configform/DeviceBasicsWidget.vue";
 import Device from "@/models/Device.mjs";
 import ImageWidget from "@/components/widgets/configform/ImageWidget.vue";
 import NotesWidget from "@/components/widgets/configform/NotesWidget.vue";
@@ -41,7 +41,12 @@ import ControlsFooterWidget from "@/components/ControlsFooterWidget.vue";
 
 export default {
   name: "DeviceConfigView",
-  components: { NotesWidget, ImageWidget, BasicsWidget, ControlsFooterWidget },
+  components: {
+    NotesWidget,
+    ImageWidget,
+    DeviceBasicsWidget,
+    ControlsFooterWidget,
+  },
   data() {
     return {
       deviceEditStore: useDeviceEditStore(),

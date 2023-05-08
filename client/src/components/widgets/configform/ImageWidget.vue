@@ -6,7 +6,7 @@
         class="uk-position-relative device-image-container-outter uk-padding-remove-vertical"
         v-if="image"
       >
-        <div class="device-image-container uk-border-rounded uk-overflow-auto">
+        <div class="configurator-main-image-container uk-border-rounded">
           <img :src="image" :title="title" uk-cover class="uk-animation-fade" />
         </div>
 
@@ -132,9 +132,7 @@ export default {
   cursor: pointer;
 }
 
-.device-image-container-outter {
-}
-.device-image-container {
+.configurator-main-image-container {
   display: block;
   position: relative;
   background: linear-gradient(

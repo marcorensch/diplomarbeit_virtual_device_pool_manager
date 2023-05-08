@@ -118,7 +118,6 @@ export default {
       return result.data;
     },
     editManufacturer(id) {
-      console.log(id);
       this.$router.push({ name: "edit-manufacturer", params: { id: id } });
     },
     async deleteManufacturer(manufacturer) {

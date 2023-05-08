@@ -1,1 +1,2 @@
-INSERT INTO `device_types` (name, icon) VALUES ('Smartphone','mobile-screen-button'),('Simple Phone','mobile-retro'), ('Tablet','tablet-screen-button'), ('Laptop','laptop'), ('TV','tv'), ('Camera','camera-retro'), ('Smart Device','mikrochip');
+INSERT INTO `device_types` (name, icon) VALUES ('Smartphone','mobile-screen-button'),('Simple Phone','mobile-retro'), ('Tablet','tablet-screen-button'), ('Laptop','laptop'), ('TV','tv'), ('Camera','camera-retro'),
+                                               ('Smart Device','microchip'), ('Unknown / Other','question-circle');

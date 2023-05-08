@@ -126,7 +126,7 @@ export default {
     },
     getMsisdnList() {
       axios
-        .get("/api/admin/numbers")
+        .get("/api/admin/msisdns")
         .then((response) => {
           response.data.map((number) => {
             number.visible = true;
@@ -176,7 +176,7 @@ export default {
     },
     handleDeleteMsisdnClicked(id) {
       axios
-        .delete("/api/admin/numbers/" + id)
+        .delete("/api/admin/msisdns/" + id)
         .then(() => {
           this.getMsisdnList();
         })

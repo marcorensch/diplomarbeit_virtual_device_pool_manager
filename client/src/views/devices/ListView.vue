@@ -27,6 +27,10 @@
 
 <script>
 import { useAuthStore } from "@/stores/auth";
+import { useToast } from "vue-toastification";
+import axios from "axios";
+
+const toast = useToast();
 
 export default {
   name: "ListView",
@@ -35,6 +39,29 @@ export default {
     return {
       authStore,
     };
+  },
+  mounted() {
+    this.getDevices(20, 0);
+  },
+  methods: {
+    getDevices(limit, offset) {
+      if (!limit) {
+        limit = 20;
+      }
+      if (!offset) {
+        offset = 0;
+      }
+      axios
+        .get("/api/devices?limit=" + limit + "&offset=" + offset)
+        .then((response) => {
+          this.devices = response.data;
+          console.log(response.data);
+        })
+        .catch((error) => {
+          console.log(error);
+          toast.error("Error getting devices");
+        });
+    },
   },
 };
 </script>

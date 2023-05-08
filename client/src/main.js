@@ -19,6 +19,7 @@ import {
   faChevronLeft,
   faChevronRight,
   faChevronUp,
+  faCircleQuestion,
   faCloudArrowUp,
   faCubes,
   faDatabase,
@@ -110,7 +111,8 @@ library.add(
   faTableCells,
   faFolder,
   faHome,
-  faBars
+  faBars,
+  faCircleQuestion
 );
 
 const pinia = createPinia();
