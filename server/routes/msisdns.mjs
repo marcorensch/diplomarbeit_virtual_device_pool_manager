@@ -6,7 +6,7 @@ const router = express.Router();
 router.get("/", async (req, res) => {
     const parentOnly = req.query.parentOnly || false;
     try {
-        const numbers = await MsisdnHelper.getAllMsisdns(parentOnly);
+        const numbers = await MsisdnHelper.getAllMsisdns(parentOnly, false);
         return res.status(200).json(numbers);
     }catch (e) {
         console.log(e)

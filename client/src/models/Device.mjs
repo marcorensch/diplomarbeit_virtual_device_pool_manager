@@ -1,7 +1,21 @@
 export default class Device{
-    id;image;name;manufacturer_id;notes;hidden;device_type_id;same_as_id;imei;params;slot_id;number_id;created_at;modified_at;
-    constructor(data = null){
-        if(data) this.setData(data);
+    constructor(){
+        this.id = null;
+        this.image = null;
+        this.name = null;
+        this.manufacturer_id = null;
+        this.notes = "";
+        this.hidden = "";
+        this.device_type_id = null;
+        this.same_as_id = null;
+        this.imei = null;
+        this.params = "";
+        this.slot_id = null;
+        this.added = null;
+        this.msisdns = [];
+        this.similar_devices = [];
+        this.created_at = null;
+        this.modified_at = null;
     }
 
     setData(data){

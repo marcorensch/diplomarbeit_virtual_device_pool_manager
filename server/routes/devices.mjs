@@ -1,6 +1,7 @@
 import express from "express";
 import UserValidator from "../middlewares/UserValidator.mjs";
 import DeviceHelper from "../helpers/DeviceHelper.mjs";
+import Device from "../models/Device.mjs";
 
 const router = express.Router();
 
@@ -18,11 +19,14 @@ router.get("/", async (req, res) => {
     }
 });
 
-router.post("/", UserValidator.validateTokens, UserValidator.setCookies, (req, res) => {
+router.post("/", UserValidator.validateTokens, UserValidator.setCookies, async (req, res) => {
 
-    const deviceData = req.body;
+    const device = new Device();
+    device.setData(req.body)
 
-    if (deviceData.slot_id) {
+    console.log(device)
+
+    if (device.slot_id) {
         if (!UserValidator.hasPermission("canUpdateDevices")) return res.status(403).send({
             success: false,
             message: "You do not have permission to update this device"
@@ -32,6 +36,15 @@ router.post("/", UserValidator.validateTokens, UserValidator.setCookies, (req, r
             success: false,
             message: "You do not have permission to update this device"
         });
+    }
+
+    try{
+        const result = await DeviceHelper.store(device);
+        console.log(result)
+        res.status(201).send(result);
+    }catch (e){
+        console.log(e.message);
+        res.status(500).send({success: false, message: e.message});
     }
 });
 

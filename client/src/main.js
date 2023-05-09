@@ -15,11 +15,13 @@ import {
   faBars,
   faBook,
   faCameraRetro,
+  faCheck,
   faChevronDown,
   faChevronLeft,
   faChevronRight,
   faChevronUp,
   faCircleQuestion,
+  faCloud,
   faCloudArrowUp,
   faCubes,
   faDatabase,
@@ -35,6 +37,7 @@ import {
   faMicrochip,
   faMobileRetro,
   faMobileScreenButton,
+  faNoteSticky,
   faPencil,
   faPlus,
   faSlash,
@@ -112,7 +115,10 @@ library.add(
   faFolder,
   faHome,
   faBars,
-  faCircleQuestion
+  faCircleQuestion,
+  faNoteSticky,
+  faCheck,
+  faCloud
 );
 
 const pinia = createPinia();

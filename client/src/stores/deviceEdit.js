@@ -35,8 +35,15 @@ export const useDeviceEditStore = defineStore("deviceEdit", {
       console.log("setDeviceType", deviceTypeId);
       this.device.device_type_id = deviceTypeId;
     },
-    async saveDevice() {
-      console.log("saveDevice", this.device);
+
+    addMSISDN(msisdn) {
+      console.log("addMSISDN", msisdn);
+      this.device.msisdns.push(msisdn);
+    },
+
+    removeMSISDN(msisdn) {
+      console.log("removeMSISDN", msisdn);
+      this.device.msisdns = this.device.msisdns.filter((m) => m !== msisdn);
     },
 
     setAvailableMSISDNs() {
@@ -45,6 +52,15 @@ export const useDeviceEditStore = defineStore("deviceEdit", {
         .then((response) => {
           console.log(response.data);
           this.availableMSISDNs = response.data;
+          this.availableMSISDNs.forEach((msisdn) => {
+            if (msisdn.multi_device) {
+              for (const md of msisdn.multi_device) {
+                md.mainMsisdn = msisdn.msisdn;
+                md.mainAbonnement = msisdn.abonnement;
+              }
+            }
+          });
+          console.log(this.availableMSISDNs);
         })
         .catch((error) => {
           console.log(error);
@@ -78,6 +94,48 @@ export const useDeviceEditStore = defineStore("deviceEdit", {
           toast.error("Error while loading manufacturers");
           return [];
         });
+    },
+    setDevice(id) {
+      return axios
+        .get(`/api/devices/${id}`)
+        .then((response) => {
+          console.log(response.data);
+          this.device = this.device.setData(response.data);
+          console.log(this.device);
+        })
+        .catch((error) => {
+          console.log(error);
+          toast.error("Error while loading device");
+          return [];
+        });
+    },
+    saveDevice() {
+      this.device.msisdns = this.device.msisdns.map((m) => m.id);
+      if (this.device.imei) this.device.imei = JSON.stringify(this.device.imei);
+      console.log(this.device);
+      if (this.device.id) {
+        return axios
+          .put(`/api/devices/${this.device.id}`, this.device)
+          .then((response) => {
+            console.log(response.data);
+          })
+          .catch((error) => {
+            console.log(error);
+            toast.error("Error while saving device");
+            return [];
+          });
+      } else {
+        return axios
+          .post(`/api/devices`, this.device)
+          .then((response) => {
+            console.log(response.data);
+          })
+          .catch((error) => {
+            console.log(error);
+            toast.error("Error while saving device");
+            return [];
+          });
+      }
     },
     // async getDevice(id) {
     //   try {

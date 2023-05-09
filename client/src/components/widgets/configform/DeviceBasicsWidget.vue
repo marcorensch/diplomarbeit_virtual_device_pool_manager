@@ -82,7 +82,12 @@
         class="uk-grid-small uk-child-width-1-1 uk-child-width-1-2@m"
         uk-grid
       >
-        <div></div>
+        <div>
+          <div class="uk-margin">
+            <label for="added">In Pool since</label>
+            <input type="date" class="uk-input" v-model="device.added" />
+          </div>
+        </div>
         <div></div>
       </div>
     </div>

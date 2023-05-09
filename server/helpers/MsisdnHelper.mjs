@@ -27,7 +27,7 @@ export default class MsisdnHelper {
         return numbers;
     }
 
-    static async getAllMsisdns(parentOnly = false) {
+    static async getAllMsisdns(parentOnly = false, flat = false) {
         const database = new DatabaseModel();
         const numbersData = await database.query("SELECT a.*, b.name AS simTypeName FROM numbers as a LEFT JOIN sim_types AS b ON a.sim_type_id = b.id WHERE a.parent_id IS NULL ORDER BY a.abonnement ASC, a.msisdn ASC");
         if (numbersData.length === 0) return [];
@@ -40,7 +40,12 @@ export default class MsisdnHelper {
 
         for (const number of numbers) {
             const multiDevice = await this.getMsisdnsByParentId(number.id);
-            number.multi_device = multiDevice;
+            if(flat){
+                numbers.push(...multiDevice)
+            }else{
+                number.multi_device = multiDevice;
+            }
+
         }
         return numbers;
     }
