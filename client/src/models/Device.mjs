@@ -8,7 +8,7 @@ export default class Device{
         this.hidden = "";
         this.device_type_id = null;
         this.same_as_id = null;
-        this.imei = null;
+        this.imei = [];
         this.params = "";
         this.slot_id = null;
         this.added = null;
@@ -19,7 +19,7 @@ export default class Device{
     }
 
     setData(data){
-        for (const prop of this) {
+        for (const prop of Object.keys(this)) {
             if (prop in data) {
                 this[prop] = data[prop];
             }

@@ -3,7 +3,7 @@
     class="uk-section uk-section-small device-config-view uk-position-relative"
     uk-height-viewport="offset-top:true"
   >
-    <div class="uk-container nxd-padding-xlarge-bottom">
+    <div v-if="device" class="uk-container nxd-padding-xlarge-bottom">
       <h1 v-if="!deviceEditStore.device.id">Add Device</h1>
       <h1 v-else>Edit {{ deviceEditStore.device.name }}</h1>
       <div
@@ -12,7 +12,7 @@
         uk-height-match="target: .uk-card-body"
       >
         <div class="uk-width-1-1 uk-width-2-3@s">
-          <DeviceBasicsWidget />
+          <DeviceBasicsWidget :v$="v$" />
         </div>
         <div class="uk-width-1-1 uk-width-1-3@s">
           <ImageWidget
@@ -40,11 +40,12 @@
 <script>
 import { useDeviceEditStore } from "@/stores/deviceEdit";
 import DeviceBasicsWidget from "@/components/widgets/configform/DeviceBasicsWidget.vue";
-import Device from "@/models/Device.mjs";
 import ImageWidget from "@/components/widgets/configform/ImageWidget.vue";
 import NotesWidget from "@/components/widgets/configform/NotesWidget.vue";
 import ControlsFooterWidget from "@/components/ControlsFooterWidget.vue";
 import MsisdnWidget from "@/components/widgets/configform/MsisdnWidget.vue";
+import { useVuelidate } from "@vuelidate/core";
+import { required } from "@vuelidate/validators";
 
 export default {
   name: "DeviceConfigView",
@@ -55,14 +56,33 @@ export default {
     ControlsFooterWidget,
     MsisdnWidget,
   },
+  props: {
+    id: {
+      type: String,
+      required: false,
+    },
+  },
+  setup() {
+    const v$ = useVuelidate();
+    return { v$ };
+  },
+  validations() {
+    return {
+      deviceEditStore: {
+        device: {
+          name: { required },
+        },
+      },
+    };
+  },
   data() {
     return {
       deviceEditStore: useDeviceEditStore(),
-      device: new Device(),
+      device: null,
     };
   },
-  mounted() {
-    this.device = this.deviceEditStore.getDevice;
+  async mounted() {
+    this.device = await this.deviceEditStore.loadDevice(this.id);
   },
   methods: {
     handleImageChanged(imageRelativePath) {
@@ -72,7 +92,11 @@ export default {
     handleCancelClicked() {
       this.$router.push({ name: "widgets" });
     },
-    handleSaveClicked() {
+    async handleSaveClicked() {
+      const formIsValid =
+        (await this.v$.$validate()) && this.deviceEditStore.validate();
+
+      if (!formIsValid) return;
       this.deviceEditStore.saveDevice();
     },
   },

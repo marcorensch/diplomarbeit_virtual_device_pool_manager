@@ -313,7 +313,6 @@ export default {
         });
     },
     handleCancelClicked() {
-      console.log("cancel clicked");
       this.$router.push({ name: "msisdn-manager" });
     },
     async handleSaveClicked() {

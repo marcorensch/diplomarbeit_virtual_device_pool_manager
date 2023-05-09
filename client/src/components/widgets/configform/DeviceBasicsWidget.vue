@@ -7,7 +7,11 @@
       <div class="uk-child-width-1-1 uk-child-width-1-2@m" uk-grid>
         <div>
           <label for="brand">Brand / Manufacturer</label>
-          <select id="brand" class="uk-select" v-model="device.manufacturer_id">
+          <select
+            id="brand"
+            class="uk-select"
+            v-model="deviceEditStore.device.manufacturer_id"
+          >
             <option
               v-for="manufacturer of manufacturers"
               :value="manufacturer.id"
@@ -20,7 +24,14 @@
         <div>
           <div class="uk-margin">
             <label for="model">Model / Name</label>
-            <input type="text" class="uk-input" v-model="device.name" />
+            <input
+              type="text"
+              class="uk-input"
+              v-model="deviceEditStore.device.name"
+              :class="{
+                'form-invalid': v$.deviceEditStore.device.name.$errors.length,
+              }"
+            />
           </div>
         </div>
       </div>
@@ -36,7 +47,8 @@
                 <div
                   class="uk-padding-small uk-text-large uk-card-default uk-text-center device-type-selector-option"
                   :class="{
-                    'uk-card-primary': type.id === device.device_type_id,
+                    'uk-card-primary':
+                      type.id === deviceEditStore.device.device_type_id,
                   }"
                   @click="handleDeviceTypeClicked(type.id)"
                   :uk-tooltip="'title:' + type.name"
@@ -53,11 +65,16 @@
             <div
               :class="{ 'uk-margin-small-top': index > 0 }"
               v-for="(imei, index) of imeis"
-              :key="imei.id"
+              :key="index"
             >
               <div class="uk-grid-small uk-grid-match" uk-grid>
                 <div class="uk-width-expand">
-                  <input type="text" class="uk-input" v-model="imei.imei" />
+                  <input
+                    type="number"
+                    class="uk-input"
+                    v-model="imei.imei"
+                    @keyup="filterNonDigit(imei)"
+                  />
                 </div>
                 <div class="uk-width-auto uk-flex-middle">
                   <font-awesome-icon
@@ -85,7 +102,11 @@
         <div>
           <div class="uk-margin">
             <label for="added">In Pool since</label>
-            <input type="date" class="uk-input" v-model="device.added" />
+            <input
+              type="date"
+              class="uk-input"
+              v-model="deviceEditStore.device.added"
+            />
           </div>
         </div>
         <div></div>
@@ -103,20 +124,20 @@ const deviceEditStore = useDeviceEditStore();
 export default {
   name: "DeviceBasicsWidget",
   components: { FontAwesomeIcon },
-  watch: {
-    imeis: {
-      handler: function (newVal) {
-        deviceEditStore.setIMEIs(newVal);
-      },
-      deep: true,
+  setup() {
+    return { deviceEditStore };
+  },
+  props: {
+    v$: {
+      type: Object,
+      required: true,
     },
   },
   data() {
     return {
-      device: deviceEditStore.getDevice,
-      imeis: [],
       deviceTypes: [],
       manufacturers: [],
+      imeis: this.deviceEditStore.device.imei,
     };
   },
   mounted() {
@@ -132,7 +153,6 @@ export default {
     async getManufacturers() {
       await deviceEditStore.setAvailableManufacturers();
       this.manufacturers = await deviceEditStore.getManufacturers;
-      console.log(this.manufacturers);
     },
     async getDeviceTypes() {
       await deviceEditStore.setAvailableDeviceTypes();
@@ -146,6 +166,9 @@ export default {
     },
     handleRemoveImeiClicked(index) {
       this.imeis.splice(index, 1);
+    },
+    filterNonDigit(imei) {
+      if (imei.imei) imei.imei = imei.imei.replace(/\D/g, "");
     },
   },
 };

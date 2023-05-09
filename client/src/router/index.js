@@ -35,6 +35,25 @@ const routes = [
           }
         },
       },
+      {
+        path: "edit/:id",
+        name: "edit-device",
+        component: () => import("../views/devices/ConfigView.vue"),
+        meta: { transition: "fade" },
+        props: true,
+        beforeEnter: () => {
+          const authStore = useAuthStore();
+          if (!authStore.isLoggedIn) {
+            toast.error("You must be logged in to access this page");
+            return { name: "login" };
+          }
+          if (authStore.hasPermission("canUpdateDevices")) {
+            return true;
+          } else {
+            return { name: "NotFound" };
+          }
+        },
+      },
     ],
   },
   {

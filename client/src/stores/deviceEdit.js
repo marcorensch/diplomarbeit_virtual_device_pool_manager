@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import { useToast } from "vue-toastification";
 import Device from "@/models/Device.mjs";
 import axios from "axios";
+import * as imeiChecker from "node-imei";
 
 const toast = useToast();
 
@@ -15,6 +16,9 @@ export const useDeviceEditStore = defineStore("deviceEdit", {
   getters: {
     getDevice: (state) => {
       return state.device;
+    },
+    getIMEIs: (state) => {
+      return state.device.imei;
     },
     getDeviceTypes: (state) => {
       return state.deviceTypes;
@@ -95,27 +99,33 @@ export const useDeviceEditStore = defineStore("deviceEdit", {
           return [];
         });
     },
-    setDevice(id) {
+    loadDevice(id) {
+      if (!id) {
+        this.device = new Device();
+        return this.device;
+      }
       return axios
         .get(`/api/devices/${id}`)
         .then((response) => {
-          console.log(response.data);
-          this.device = this.device.setData(response.data);
-          console.log(this.device);
+          this.device.setData(response.data);
+          this.device.added = this.device.added.split("T")[0];
+          this.device.imei = JSON.parse(this.device.imei) || [];
+          return this.device;
         })
         .catch((error) => {
           console.log(error);
           toast.error("Error while loading device");
-          return [];
+          this.device = new Device();
+          return this.device;
         });
     },
     saveDevice() {
       this.device.msisdns = this.device.msisdns.map((m) => m.id);
-      if (this.device.imei) this.device.imei = JSON.stringify(this.device.imei);
-      console.log(this.device);
+      const data = { ...this.device };
+      if (this.device.imei) data.imei = JSON.stringify(this.device.imei);
       if (this.device.id) {
         return axios
-          .put(`/api/devices/${this.device.id}`, this.device)
+          .put(`/api/devices/${this.device.id}`, data)
           .then((response) => {
             console.log(response.data);
           })
@@ -126,15 +136,30 @@ export const useDeviceEditStore = defineStore("deviceEdit", {
           });
       } else {
         return axios
-          .post(`/api/devices`, this.device)
+          .post(`/api/devices`, data)
           .then((response) => {
-            console.log(response.data);
+            this.device.id = response.data.id;
           })
           .catch((error) => {
             console.log(error);
             toast.error("Error while saving device");
             return [];
           });
+      }
+    },
+    validate() {
+      if (this.device.imei) {
+        console.log("validate", this.device.imei);
+        const imei = this.device.imei[0];
+        const checker = new imeiChecker();
+        console.log(checker.isValid(imei.imei));
+        if (checker.isValid(imei.imei)) {
+          toast.success("IMEI is valid");
+          return true;
+        } else {
+          toast.warning("IMEI does not look valid");
+          return true;
+        }
       }
     },
     // async getDevice(id) {

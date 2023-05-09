@@ -66,7 +66,10 @@
           <h2 class="uk-modal-title">Select MSISDN's</h2>
         </div>
         <div class="uk-modal-body">
-          <div class="nxd-modal-msisdn-list-container">
+          <div
+            v-if="deviceEditStore.availableMSISDNs.length"
+            class="nxd-modal-msisdn-list-container"
+          >
             <table
               class="uk-table uk-table-divider uk-table-hover uk-table-responsive"
             >
@@ -118,6 +121,15 @@
                 </template>
               </tbody>
             </table>
+          </div>
+          <div v-else>
+            <div class="uk-text-center">
+              <div
+                class="uk-height-small uk-flex uk-flex-middle uk-flex-center"
+              >
+                <div class="uk-h4 uk-text-muted">No MSISDN's in Database</div>
+              </div>
+            </div>
           </div>
         </div>
         <div class="uk-modal-footer">

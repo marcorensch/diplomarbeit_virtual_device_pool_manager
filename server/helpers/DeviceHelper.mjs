@@ -11,8 +11,8 @@ export default class DeviceHelper {
                               dt.name AS device_type_name,
                               dt.icon AS device_type_icon
                        FROM devices as d
-                                JOIN device_types as dt ON d.device_type_id = dt.id
-                                JOIN manufacturers as m ON d.manufacturer_id = m.id
+                                LEFT JOIN device_types as dt ON d.device_type_id = dt.id
+                                LEFT JOIN manufacturers as m ON d.manufacturer_id = m.id
                        ORDER BY d.id DESC
                        LIMIT ${limit} OFFSET ${offset}`;
         try{
