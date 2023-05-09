@@ -67,7 +67,7 @@
         </div>
         <div class="uk-modal-body">
           <div
-            v-if="deviceEditStore.availableMSISDNs.length"
+            v-if="availableMsisdns.length"
             class="nxd-modal-msisdn-list-container"
           >
             <table
@@ -79,10 +79,7 @@
                 <th>Abonnement</th>
               </thead>
               <tbody>
-                <template
-                  v-for="msisdn in deviceEditStore.availableMSISDNs"
-                  :key="msisdn.id"
-                >
+                <template v-for="msisdn in availableMsisdns" :key="msisdn.id">
                   <tr @click="handleMsisdnClicked(msisdn)">
                     <td>
                       <input
@@ -153,39 +150,38 @@
 
 <script>
 import UIkit from "uikit";
-import { useDeviceEditStore } from "@/stores/deviceEdit";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 export default {
   name: "MsisdnWidget",
   components: { FontAwesomeIcon },
+  props: {
+    availableMsisdns: {
+      type: Array,
+      required: true,
+    },
+  },
   data() {
     return {
-      deviceEditStore: useDeviceEditStore(),
       selectedMsisdns: [],
     };
   },
   methods: {
-    beforeMount() {
-      this.updateMsisdns();
-    },
     handleMsisdnClicked(msisdn) {
       msisdn.selected = !msisdn.selected;
       if (msisdn.selected) {
-        this.deviceEditStore.addMSISDN(msisdn);
+        this.selectedMsisdns.push(msisdn);
       } else {
-        this.deviceEditStore.removeMSISDN(msisdn);
+        this.selectedMsisdns = this.selectedMsisdns.filter(
+          (m) => m.id !== msisdn.id
+        );
       }
-      this.selectedMsisdns = this.deviceEditStore.getDevice.msisdns;
     },
     checkIfSelected(msisdn) {
       return this.selectedMsisdns.includes(msisdn);
     },
     showMsisdnModal() {
       UIkit.modal("#msisdn-modal").show();
-    },
-    async updateMsisdns() {
-      await this.deviceEditStore.setAvailableMSISDNs();
     },
   },
 };

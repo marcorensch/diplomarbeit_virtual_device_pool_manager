@@ -26,8 +26,6 @@
 </template>
 
 <script>
-import { useDeviceEditStore } from "@/stores/deviceEdit";
-const deviceEditStore = useDeviceEditStore();
 export default {
   name: "NotesWidget",
   props: {
@@ -38,7 +36,10 @@ export default {
   },
   data() {
     return {
-      device: deviceEditStore.getDevice,
+      device: {
+        notes: "",
+        hidden: "",
+      },
     };
   },
 };
