@@ -243,6 +243,24 @@ const routes = [
           }
         },
       },
+      {
+        path: "pool-builder",
+        name: "pool-builder",
+        component: () => import("../views/admin/BuilderView.vue"),
+        beforeEnter: () => {
+          const authStore = useAuthStore();
+          if (!authStore.isLoggedIn) {
+            toast.error("You must be logged in to access this page");
+            return { name: "login" };
+          }
+          if (authStore.hasPermission("canAccessPoolBuilder")) {
+            return true;
+          } else {
+            toast.error("You are not allowed to access this page");
+            return { path: "" };
+          }
+        },
+      },
     ],
   },
 

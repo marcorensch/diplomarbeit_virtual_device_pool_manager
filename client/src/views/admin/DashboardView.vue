@@ -46,7 +46,7 @@ export default {
         },
         {
           label: "Pool Builder",
-          icon: "fas fa-database",
+          icon: "fas fa-cubes",
           path: "/admin/pool-builder",
           requiredPermissions: ["canAccessPoolBuilder"],
         },
