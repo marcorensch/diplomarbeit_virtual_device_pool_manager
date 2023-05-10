@@ -61,7 +61,7 @@ router.post("/", UserValidator.validateTokens, UserValidator.setCookies, async (
         device.setData({id: result.insertId});
     }catch (e){
         console.log(e.message);
-        res.status(500).send({success: false, message: e.message});
+        return res.status(500).send({success: false, message: e.message});
     }
 
     if(device.msisdns.length) {
@@ -75,7 +75,7 @@ router.post("/", UserValidator.validateTokens, UserValidator.setCookies, async (
             }
         }catch (e){
             console.log(e.message);
-            res.status(500).send({success: false, message: e.message});
+            return res.status(500).send({success: false, message: e.message});
         }
     }
 
