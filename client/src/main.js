@@ -14,6 +14,7 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import {
   faBars,
   faBook,
+  faBuilding,
   faCameraRetro,
   faCheck,
   faChevronDown,
@@ -120,6 +121,7 @@ library.add(
   faCheck,
   faCloud
 );
+library.add(faBuilding);
 
 const pinia = createPinia();
 pinia.use(({ store }) => {
