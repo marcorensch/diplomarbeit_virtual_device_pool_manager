@@ -54,13 +54,13 @@ describe("Test Logout Route", () => {
         const response = await agent1.get("/api/auth/logout-everywhere");
         expect(response.status).to.eql(200);
 
-        const response2 = await agent2.get("/api/admin/numbers");
+        const response2 = await agent2.get("/api/admin/msisdns");
         expect(response2.status).to.eql(401);
 
-        const response3 = await agent3.get("/api/admin/numbers");
+        const response3 = await agent3.get("/api/admin/msisdns");
         expect(response3.status).to.eql(401);
 
-        const response4 = await agent1.get("/api/admin/numbers");
+        const response4 = await agent1.get("/api/admin/msisdns");
         expect(response4.status).to.eql(401);
 
     });
@@ -399,7 +399,7 @@ describe("Test MSISDN Manager API", () => {
     });
 
     it("should store new MSISDN in database", async () => {
-        const response = await agent.post("/api/admin/numbers").send(validData);
+        const response = await agent.post("/api/admin/msisdns").send(validData);
         expect(response.body).to.have.property("id");
         expect(response.body).to.have.property("message");
         expect(response.status).to.eql(201, response.text);
@@ -407,7 +407,7 @@ describe("Test MSISDN Manager API", () => {
     });
 
     it("should exactly return one MSISDN after storing it", async () => {
-        const response = await agent.get("/api/admin/numbers");
+        const response = await agent.get("/api/admin/msisdns");
         expect(response.body).to.have.lengthOf(1);
         expect(response.status).to.eql(200, response.text);
     });
@@ -418,7 +418,7 @@ describe("Test MSISDN Manager API", () => {
         mdSim.parent_id = validMainId;
         delete mdSim.abonnement;
         delete mdSim.scn;
-        const response = await agent.post("/api/admin/numbers").send(mdSim);
+        const response = await agent.post("/api/admin/msisdns").send(mdSim);
         expect(response.body).to.have.property("id");
         expect(response.body).to.have.property("message");
         expect(response.status).to.eql(201, response.text);
@@ -428,63 +428,63 @@ describe("Test MSISDN Manager API", () => {
     it("should return 400 when trying to store MSISDN with less than 11 characters", async () => {
         const invalidData = {...validData};
         invalidData.msisdn = "123456789";
-        const response = await agent.post("/api/admin/numbers").send(invalidData);
+        const response = await agent.post("/api/admin/msisdns").send(invalidData);
         expect(response.status).to.eql(400, response.text);
     });
     it("should return 400 when trying to store MSISDN with more than 11 characters", async () => {
         const invalidData = {...validData};
         invalidData.msisdn = "12345678901234567890123456";
-        const response = await agent.post("/api/admin/numbers").send(invalidData);
+        const response = await agent.post("/api/admin/msisdns").send(invalidData);
         expect(response.status).to.eql(400, response.text);
     });
     it("should return 400 when trying to store MSISDN with SIM number with more than 20 characters", async () => {
         const invalidData = {...validData};
         invalidData.sim_number = "8941010000";
-        const response = await agent.post("/api/admin/numbers").send(invalidData);
+        const response = await agent.post("/api/admin/msisdns").send(invalidData);
         expect(response.status).to.eql(400, response.text);
     });
 
     it("should return 400 when trying to store MSISDN with SIM number with less than 20 characters", async () => {
         const invalidData = {...validData};
         invalidData.sim_number = "89410112345678909876543234453221";
-        const response = await agent.post("/api/admin/numbers").send(invalidData);
+        const response = await agent.post("/api/admin/msisdns").send(invalidData);
         expect(response.status).to.eql(400, response.text);
     });
 
     it("should return 400 when trying to store MSISDN with SIM number in wrong format", async () => {
         const invalidData = {...validData};
         invalidData.sim_number = "8941011234567890987a";
-        const response = await agent.post("/api/admin/numbers").send(invalidData);
+        const response = await agent.post("/api/admin/msisdns").send(invalidData);
         expect(response.status).to.eql(400, response.text);
     });
     it("should return 400 when trying to store MSISDN with SIM number that does not start with '894101", async () => {
         const invalidData = {...validData};
         invalidData.sim_number = "89510112345678909870";
-        const response = await agent.post("/api/admin/numbers").send(invalidData);
+        const response = await agent.post("/api/admin/msisdns").send(invalidData);
         expect(response.status).to.eql(400, response.text);
     });
 
     it("should return 400 when updating MSISDN without complete set of data", async () => {
-        const response = await agent.put(`/api/admin/numbers/${validMainId}`).send({notes: "Updated notes"});
+        const response = await agent.put(`/api/admin/msisdns/${validMainId}`).send({notes: "Updated notes"});
         expect(response.status).to.eql(400);
     });
 
     it("should return 200 when updating MSISDN with complete set of data", async () => {
         validData.notes = "Updated notes";
-        const response = await agent.put(`/api/admin/numbers/${validMainId}`).send(validData);
+        const response = await agent.put(`/api/admin/msisdns/${validMainId}`).send(validData);
         expect(response.status).to.eql(200);
     });
 
     it("should return 200 when updating Sub MSISDN with complete set of data", async () => {
         validData.notes = "Updated notes in MD SIM";
-        const response = await agent.put(`/api/admin/numbers/${validSubId}`).send(validData);
+        const response = await agent.put(`/api/admin/msisdns/${validSubId}`).send(validData);
         expect(response.status).to.eql(200);
     });
 
     it("should return 200 when deleting Main MSISDN and Multi Device SIM should be deleted aswell", async () => {
-        const response = await agent.delete(`/api/admin/numbers/${validMainId}`);
+        const response = await agent.delete(`/api/admin/msisdns/${validMainId}`);
         expect(response.status).to.eql(200);
-        const response2 = await agent.get(`/api/admin/numbers/${validSubId}`);
+        const response2 = await agent.get(`/api/admin/msisdns/${validSubId}`);
         expect(response2.body).to.eql(null);
     });
 
