@@ -45,6 +45,7 @@ export default class DeviceHelper {
                 device.setData(response.data);
                 device.added = device.added.split("T")[0];
                 device.imei = JSON.parse(device.imei) || [];
+                device.msisdns = response.data.linked_msisdns?.split(",").map((el) => parseInt(el)) || [];
                 return device;
             })
             .catch((error) => {

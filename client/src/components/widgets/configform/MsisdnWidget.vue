@@ -151,23 +151,42 @@
 <script>
 import UIkit from "uikit";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import DeviceHelper from "@/helpers/DeviceHelper.mjs";
 
 export default {
   name: "MsisdnWidget",
   components: { FontAwesomeIcon },
   emits: ["msisdn-selected"],
   props: {
-    availableMsisdns: {
+    storedDeviceMsisdns: {
       type: Array,
-      required: true,
+      required: false,
+      default: () => [],
     },
   },
   data() {
     return {
       selectedMsisdns: [],
+      availableMsisdns: [],
     };
   },
+  async mounted() {
+    this.availableMsisdns = await DeviceHelper.getAvailableMSISDNs();
+    this.setStoredDeviceMsisdns();
+  },
   methods: {
+    setStoredDeviceMsisdns() {
+      this.storedDeviceMsisdns.forEach((msisdnId) => {
+        const foundMsisdn = this.availableMsisdns.find(
+          (m) => parseInt(m.id) === msisdnId
+        );
+        console.log(this.availableMsisdns, msisdnId);
+        if (foundMsisdn) {
+          foundMsisdn.selected = true;
+          this.selectedMsisdns.push(foundMsisdn);
+        }
+      });
+    },
     handleMsisdnClicked(msisdn) {
       msisdn.selected = !msisdn.selected;
       if (msisdn.selected) {

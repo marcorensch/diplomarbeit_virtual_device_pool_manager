@@ -170,7 +170,7 @@
         </div>
         <div class="uk-width-1-1 uk-width-2-3@s">
           <MsisdnWidget
-            :availableMsisdns="msisdns"
+            :storedDeviceMsisdns="device.msisdns"
             @msisdnSelected="handleUpdateSelectedMsisdns"
           />
         </div>
@@ -240,13 +240,11 @@ export default {
     return {
       device: null,
       deviceTypes: [],
-      msisdns: [],
       manufacturers: [],
     };
   },
   async mounted() {
     this.device = await DeviceHelper.loadDevice(this.id);
-    this.msisdns = await DeviceHelper.getAvailableMSISDNs();
     this.deviceTypes = await DeviceHelper.getDeviceTypes();
     this.manufacturers = await DeviceHelper.getManufacturers();
   },
