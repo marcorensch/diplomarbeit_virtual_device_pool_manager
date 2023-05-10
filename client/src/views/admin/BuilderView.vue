@@ -2,23 +2,26 @@
   <div class="uk-section uk-section-small builder-view">
     <div class="uk-container">
       <BuilderNotAvailableMobile />
-      <div
-        class="uk-visible@m uk-card uk-card-default uk-position-relative"
-        uk-height-viewport="offset-top:true; offset-bottom:40px"
-      >
-        <div class="uk-position-cover">
-          <div class="uk-grid-collapse" uk-grid>
-            <div class="uk-width-1-4 builder-sidebar">
-              <div class="uk-position-relative">
-                <BuilderLocationsSection
-                  v-if="categories.length"
-                  :categories="categories"
-                />
+      <div>
+        <h1>Pool Builder</h1>
+        <div
+          class="uk-visible@m uk-card uk-card-default uk-position-relative"
+          uk-height-viewport="offset-top:true; offset-bottom:40px"
+        >
+          <div class="uk-position-cover">
+            <div class="uk-grid-collapse" uk-grid>
+              <div class="uk-width-1-4 builder-sidebar">
+                <div class="uk-position-relative">
+                  <BuilderLocationsSection
+                    v-if="categories.length"
+                    :categories="categories"
+                  />
+                </div>
               </div>
-            </div>
-            <div class="uk-width-3-4">
-              bar
-              <BuilderCabinet />
+              <div class="uk-width-3-4">
+                bar
+                <BuilderCabinet />
+              </div>
             </div>
           </div>
         </div>
