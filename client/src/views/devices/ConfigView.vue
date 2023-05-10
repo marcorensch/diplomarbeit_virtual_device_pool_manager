@@ -63,22 +63,37 @@
                   <div>
                     <label>Device Type</label>
                     <div
-                      class="uk-child-width-1-4 uk-grid-small uk-grid-match device-type-selector-container"
-                      uk-grid
+                      class="form-container"
+                      :class="{
+                        'container-invalid':
+                          v$.device.device_type_id.$errors.length,
+                      }"
                     >
-                      <div v-for="type of deviceTypes" :key="type.id">
-                        <div
-                          class="uk-padding-small uk-text-large uk-card-default uk-text-center device-type-selector-option"
-                          :class="{
-                            'uk-card-primary':
-                              type.id === device.device_type_id,
-                          }"
-                          @click="handleDeviceTypeClicked(type.id)"
-                          :uk-tooltip="'title:' + type.name"
-                        >
-                          <font-awesome-icon :icon="'fas fa-' + type.icon" />
+                      <div
+                        class="uk-child-width-1-4 uk-grid-small uk-grid-match device-type-selector-container"
+                        uk-grid
+                      >
+                        <div v-for="type of deviceTypes" :key="type.id">
+                          <div
+                            class="uk-padding-small uk-text-large uk-card-default uk-text-center device-type-selector-option"
+                            :class="{
+                              'uk-card-primary':
+                                type.id === device.device_type_id,
+                            }"
+                            @click="handleDeviceTypeClicked(type.id)"
+                            :uk-tooltip="'title:' + type.name"
+                          >
+                            <font-awesome-icon :icon="'fas fa-' + type.icon" />
+                          </div>
                         </div>
                       </div>
+                    </div>
+                    <div
+                      v-for="error of v$.device.device_type_id.$errors"
+                      :key="error"
+                      class="uk-text-danger"
+                    >
+                      {{ error.$message }}
                     </div>
                   </div>
                 </div>
