@@ -45,6 +45,13 @@
                         'form-invalid': v$.device.name.$errors.length,
                       }"
                     />
+                    <div
+                      v-for="error of v$.device.name.$errors"
+                      :key="error"
+                      class="uk-text-danger"
+                    >
+                      {{ error.$message }}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -135,7 +142,17 @@
                       type="date"
                       class="uk-input"
                       v-model="device.added"
+                      :class="{
+                        'form-invalid': v$.device.added.$errors.length,
+                      }"
                     />
+                    <div
+                      v-for="error of v$.device.added.$errors"
+                      :key="error"
+                      class="uk-text-danger"
+                    >
+                      {{ error.$message }}
+                    </div>
                   </div>
                 </div>
                 <div></div>
@@ -152,7 +169,10 @@
           />
         </div>
         <div class="uk-width-1-1 uk-width-2-3@s">
-          <MsisdnWidget :availableMsisdns="msisdns" />
+          <MsisdnWidget
+            :availableMsisdns="msisdns"
+            @msisdnSelected="handleUpdateSelectedMsisdns"
+          />
         </div>
         <div class="uk-width-1-1 uk-width-1-3@s">
           <NotesWidget />
@@ -174,6 +194,8 @@ import MsisdnWidget from "@/components/widgets/configform/MsisdnWidget.vue";
 import { useVuelidate } from "@vuelidate/core";
 import { required, numeric, helpers } from "@vuelidate/validators";
 import DeviceHelper from "@/helpers/DeviceHelper.mjs";
+
+const exactLength = (length) => (value) => value.toString().length === length;
 
 export default {
   name: "DeviceConfigView",
@@ -198,9 +220,17 @@ export default {
       device: {
         name: { required },
         device_type_id: { required },
+        added: { required },
         imei: {
           $each: helpers.forEach({
-            imei: { required, numeric },
+            imei: {
+              required,
+              numeric,
+              exactLength: helpers.withMessage(
+                "IMEI must be 15 digits long",
+                exactLength(15)
+              ),
+            },
           }),
         },
       },
@@ -221,6 +251,10 @@ export default {
     this.manufacturers = await DeviceHelper.getManufacturers();
   },
   methods: {
+    handleUpdateSelectedMsisdns(msisdns) {
+      this.device.msisdns = msisdns;
+      console.log(this.device);
+    },
     handleImageChanged(imageRelativePath) {
       let path = imageRelativePath.length ? "/public/" + imageRelativePath : "";
       this.device.image = path;

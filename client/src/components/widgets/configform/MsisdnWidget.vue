@@ -155,6 +155,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 export default {
   name: "MsisdnWidget",
   components: { FontAwesomeIcon },
+  emits: ["msisdn-selected"],
   props: {
     availableMsisdns: {
       type: Array,
@@ -176,6 +177,7 @@ export default {
           (m) => m.id !== msisdn.id
         );
       }
+      this.$emit("msisdn-selected", this.selectedMsisdns);
     },
     checkIfSelected(msisdn) {
       return this.selectedMsisdns.includes(msisdn);

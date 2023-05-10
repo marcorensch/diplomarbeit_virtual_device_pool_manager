@@ -9,6 +9,7 @@ export default class Device {
         this.manufacturer_id = null;
         this.same_as = null;
         this.imei = "";
+        this.msisdns = [];
         this.params = "";
         this.slot_id = null;
         this.created_at = null;

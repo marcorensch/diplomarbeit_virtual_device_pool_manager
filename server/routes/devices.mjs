@@ -2,6 +2,7 @@ import express from "express";
 import UserValidator from "../middlewares/UserValidator.mjs";
 import DeviceHelper from "../helpers/DeviceHelper.mjs";
 import Device from "../models/Device.mjs";
+import {deviceDataValidator} from "../middlewares/inputValidators.mjs";
 
 const router = express.Router();
 
@@ -28,6 +29,7 @@ router.get("/:id", async (req, res) => {
     if(!id) return res.status(400).send({success: false, message: "ID is required"});
     try{
         const device = await DeviceHelper.getDeviceById(id);
+        console.log(device)
         if(!device.length) return res.status(404).send({success: false, message: "Device not found"});
         res.send(device[0]);
     }catch (e) {
@@ -56,14 +58,32 @@ router.post("/", UserValidator.validateTokens, UserValidator.setCookies, async (
     try{
         const result = await DeviceHelper.store(device);
         if(!result.affectedRows) return res.status(500).send({success: false, message: "Device could not be created"});
-        res.status(201).send({id: result.insertId});
+        device.setData({id: result.insertId});
     }catch (e){
         console.log(e.message);
         res.status(500).send({success: false, message: e.message});
     }
+
+    if(device.msisdns.length) {
+        try {
+            for (const msisdn of device.msisdns) {
+                const result = await DeviceHelper.setOrUpdateMsisdnLink(device.id, msisdn);
+                if (!result.affectedRows) return res.status(500).send({
+                    success: false,
+                    message: "Device MSISDN link could not be set"
+                });
+            }
+        }catch (e){
+            console.log(e.message);
+            res.status(500).send({success: false, message: e.message});
+        }
+    }
+
+    res.status(201).send({id: device.id});
+
 });
 
-router.put("/:id", UserValidator.validateTokens, UserValidator.setCookies, async (req, res) => {
+router.put("/:id", UserValidator.validateTokens, UserValidator.setCookies, deviceDataValidator, async (req, res) => {
 
     if (!req.params.id) return res.status(400).send({success: false, message: "ID cannot be empty"});
 
@@ -81,6 +101,31 @@ router.put("/:id", UserValidator.validateTokens, UserValidator.setCookies, async
             success: false,
             message: "You do not have permission to update virtual devices"
         });
+    }
+
+    if(device.msisdns.length) {
+        console.log(device.msisdns)
+        try {
+            for (const msisdn of device.msisdns) {
+                const result = await DeviceHelper.setOrUpdateMsisdnLink(device.id, msisdn);
+                if (!result.affectedRows) return res.status(500).send({
+                    success: false,
+                    message: "Device MSISDN link could not be updated"
+                });
+            }
+        }catch (e){
+            console.log(e.message);
+            res.status(500).send({success: false, message: e.message});
+        }
+    }
+
+    try{
+        const msisdnsString = device.msisdns.length ? device.msisdns.join(",") : "";
+        const result = await DeviceHelper.deleteInactiveMsisdnLinks(device.id, device.msisdns);
+        console.log(result)
+    }catch (e) {
+        console.log(e.message);
+        res.status(500).send({success: false, message: e.message});
     }
 
     try{
