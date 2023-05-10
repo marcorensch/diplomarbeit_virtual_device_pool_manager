@@ -122,7 +122,7 @@
                     </div>
                     <div class="uk-margin-small-top">
                       <button
-                        class="uk-button uk-button-primary uk-button-small uk-width-1-1"
+                        class="uk-button uk-button-secondary uk-button-small uk-width-1-1"
                         @click="handleAddImeiClicked"
                       >
                         Add IMEI
@@ -130,32 +130,6 @@
                     </div>
                   </div>
                 </div>
-              </div>
-              <div
-                class="uk-grid-small uk-child-width-1-1 uk-child-width-1-2@m"
-                uk-grid
-              >
-                <div>
-                  <div class="uk-margin">
-                    <label for="added">In Pool since</label>
-                    <input
-                      type="date"
-                      class="uk-input"
-                      v-model="device.added"
-                      :class="{
-                        'form-invalid': v$.device.added.$errors.length,
-                      }"
-                    />
-                    <div
-                      v-for="error of v$.device.added.$errors"
-                      :key="error"
-                      class="uk-text-danger"
-                    >
-                      {{ error.$message }}
-                    </div>
-                  </div>
-                </div>
-                <div></div>
               </div>
             </div>
           </div>
@@ -167,6 +141,50 @@
             :baseDir="'images'"
             @image-changed="handleImageChanged"
           />
+        </div>
+        <div class="uk-width-1-1 uk-width-2-3@s">
+          <div>
+            <div class="uk-card uk-card-default">
+              <div class="uk-card-header">
+                <h3 class="uk-card-title">Location</h3>
+              </div>
+              <div class="uk-card-body">
+                <div class="uk-child-width-1-1 uk-child-width-1-2@s" uk-grid>
+                  <div>
+                    <div class="uk-margin">
+                      <label for="added">In Pool since</label>
+                      <input
+                        type="date"
+                        class="uk-input"
+                        v-model="device.added"
+                        :class="{
+                          'form-invalid': v$.device.added.$errors.length,
+                        }"
+                      />
+                      <div
+                        v-for="error of v$.device.added.$errors"
+                        :key="error"
+                        class="uk-text-danger"
+                      >
+                        {{ error.$message }}
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="uk-margin">
+                      <label for="pool-location">Pool Location</label>
+                      <div>Chur, 1.304</div>
+                      <button
+                        class="uk-margin-small-top uk-button uk-button-small uk-button-secondary"
+                      >
+                        Set Location
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="uk-width-1-1 uk-width-2-3@s">
           <MsisdnWidget

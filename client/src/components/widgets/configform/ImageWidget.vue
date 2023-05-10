@@ -24,7 +24,7 @@
     </div>
     <div class="uk-card-footer">
       <button
-        class="uk-button uk-button-small uk-button-primary uk-width-1-1"
+        class="uk-button uk-button-small uk-button-secondary uk-width-1-1"
         @click="handleOpenFileManagerModal"
       >
         Select

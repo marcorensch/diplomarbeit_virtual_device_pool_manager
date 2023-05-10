@@ -80,7 +80,7 @@
               </thead>
               <tbody>
                 <template v-for="msisdn in availableMsisdns" :key="msisdn.id">
-                  <tr @click="handleMsisdnClicked(msisdn)">
+                  <tr @click="handleMsisdnChange(msisdn)">
                     <td>
                       <input
                         type="checkbox"
@@ -96,7 +96,7 @@
                       class="multi-device-item"
                       v-for="md of msisdn.multi_device"
                       :key="md.id"
-                      @click="handleMsisdnClicked(md)"
+                      @click="handleMsisdnChange(md)"
                     >
                       <td>
                         <input
@@ -182,12 +182,11 @@ export default {
         );
         console.log(this.availableMsisdns, msisdnId);
         if (foundMsisdn) {
-          foundMsisdn.selected = true;
-          this.selectedMsisdns.push(foundMsisdn);
+          this.handleMsisdnChange(foundMsisdn);
         }
       });
     },
-    handleMsisdnClicked(msisdn) {
+    handleMsisdnChange(msisdn) {
       msisdn.selected = !msisdn.selected;
       if (msisdn.selected) {
         this.selectedMsisdns.push(msisdn);

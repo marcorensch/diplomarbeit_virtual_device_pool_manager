@@ -104,7 +104,6 @@ router.put("/:id", UserValidator.validateTokens, UserValidator.setCookies, devic
     }
 
     if(device.msisdns.length) {
-        console.log(device.msisdns)
         try {
             for (const msisdn of device.msisdns) {
                 const result = await DeviceHelper.setOrUpdateMsisdnLink(device.id, msisdn);
@@ -115,26 +114,25 @@ router.put("/:id", UserValidator.validateTokens, UserValidator.setCookies, devic
             }
         }catch (e){
             console.log(e.message);
-            res.status(500).send({success: false, message: e.message});
+            return res.status(500).send({success: false, message: e.message});
         }
     }
 
     try{
-        const msisdnsString = device.msisdns.length ? device.msisdns.join(",") : "";
         const result = await DeviceHelper.deleteInactiveMsisdnLinks(device.id, device.msisdns);
         console.log(result)
     }catch (e) {
         console.log(e.message);
-        res.status(500).send({success: false, message: e.message});
+        return res.status(500).send({success: false, message: e.message});
     }
 
     try{
         const result = await DeviceHelper.update(device);
         console.log(result)
-        res.status(201).send(result);
+        return res.status(201).send(result);
     }catch (e){
         console.log(e.message);
-        res.status(500).send({success: false, message: e.message});
+        return res.status(500).send({success: false, message: e.message});
     }
 
 });
