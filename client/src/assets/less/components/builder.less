@@ -1,18 +1,27 @@
 @import "../variables.less";
 
-.no-mobile-support-icon{
-}
+.builder-sidebar{
+  background: @color-horizon;
 
-.no-mobile-slash-icon{
-  path {
-    fill: red;
-    stroke: red;
-    stroke-width: 1px;
-    stroke-dasharray: 2,2;
-    stroke-linejoin: round;
+  ul li {
+    transition: all 0.2s ease-in-out;
+    span {
+      color: @color-grey;
+      cursor: pointer;
+    }
+    &:hover {
+      transition: all 0.2s ease-in-out;
+      color: @color-navy;
+      span {
+        color: @color-navy;
+      }
+    }
+    &.selected {
+      color: @color-navy;
+      span {
+        color: @color-navy;
+        font-weight: 600;
+      }
+    }
   }
-}
-
-body{
-  background:green;
 }
