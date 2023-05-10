@@ -94,13 +94,16 @@
                         <div class="uk-width-expand">
                           <input
                             type="number"
+                            ref="imei"
                             class="uk-input"
-                            v-model="imei.imei"
+                            @keyup="v$.$validate()"
                             :class="{
                               'form-invalid':
+                                v$.device.imei.$each.$response &&
                                 v$.device.imei.$each.$response.$errors[index]
                                   .imei.length,
                             }"
+                            v-model="imei.imei"
                           />
                         </div>
                         <div class="uk-width-auto uk-flex-middle">
@@ -110,15 +113,16 @@
                           />
                         </div>
                       </div>
-                      <div
-                        class="uk-text-danger uk-text-small"
-                        v-for="error in v$.device.imei.$each.$response.$errors[
-                          index
-                        ].imei"
-                        :key="error"
-                      >
-                        {{ error.$message }}
-                      </div>
+                      <template v-if="v$.device.imei.$each.$response">
+                        <div
+                          class="uk-text-danger uk-text-small"
+                          v-for="error in v$.device.imei.$each.$response
+                            .$errors[index].imei"
+                          :key="error"
+                        >
+                          {{ error.$message }}
+                        </div>
+                      </template>
                     </div>
                     <div class="uk-margin-small-top">
                       <button
@@ -250,6 +254,7 @@ export default {
               ),
             },
           }),
+          $lazy: true,
         },
       },
     };
@@ -281,6 +286,12 @@ export default {
 
     handleAddImeiClicked() {
       this.device.imei.push({ imei: "" });
+      this.$nextTick(() => {
+        this.$refs.imei[this.device.imei.length - 1].focus();
+        this.$nextTick(() => {
+          this.v$.$reset();
+        });
+      });
     },
     handleRemoveImeiClicked(index) {
       this.device.imei.splice(index, 1);
