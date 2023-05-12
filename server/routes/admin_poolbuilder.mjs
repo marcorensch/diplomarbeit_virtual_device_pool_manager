@@ -5,7 +5,7 @@ import {poolBuilderValidator} from "../middlewares/inputValidators.mjs";
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
+router.get("/items", async (req, res) => {
     const category_id = req.query.category_id || false;
     const parent_id = req.query.parent_id || false;
 
@@ -20,6 +20,19 @@ router.get("/", async (req, res) => {
     }
 });
 
+router.get("/items/:id", async (req, res) => {
+    const id = req.params.id || false;
+    if (!id) return res.status(400).json({error: "No ID specified"});
+
+    try {
+        const result = await PoolBuilderHelper.getItem(id);
+        return res.status(200).json(result);
+    } catch (e) {
+        console.log(e)
+        return res.status(500).json({error: "Could not get Item"});
+    }
+});
+
 router.get("/categories", async (req, res) => {
     try {
         const result = await PoolBuilderHelper.getCategories();
@@ -30,7 +43,7 @@ router.get("/categories", async (req, res) => {
     }
 });
 
-router.post("/", poolBuilderValidator, async (req, res) => {
+router.post("/items", poolBuilderValidator, async (req, res) => {
     let categories;
     const data = req.body || false;
     if (!data) return res.status(400).json({error: "No data specified"});
@@ -77,7 +90,7 @@ router.post("/", poolBuilderValidator, async (req, res) => {
     }
 });
 
-router.put("/:id", poolBuilderValidator, async (req, res) => {
+router.put("/items/:id", poolBuilderValidator, async (req, res) => {
     const id = req.params.id || null;
     const data = req.body || false;
     if (!id) return res.status(400).json({error: "No id specified"});
@@ -95,7 +108,7 @@ router.put("/:id", poolBuilderValidator, async (req, res) => {
     }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/items/:id", async (req, res) => {
     const id = req.params.id || false;
     if (!id) return res.status(400).json({error: "No id specified"});
     try {
@@ -108,7 +121,7 @@ router.delete("/:id", async (req, res) => {
     }
 });
 
-router.post("/sort", async (req, res) => {
+router.post("/items/sort", async (req, res) => {
     const sortMap = req.body || false;
     if(!sortMap || !sortMap.length) return res.status(400).json({error: "No sort map specified"});
     for (const sortMapElement of sortMap) {

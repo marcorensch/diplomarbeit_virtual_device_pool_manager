@@ -1,69 +1,76 @@
 <template>
   <div>
+    <h2>Locations</h2>
     <div
-      id="locations"
-      uk-sortable="handle: .uk-card-header; animation: 150; group: location"
-      uk-scrollspy="target: > div.location-element; cls: uk-animation-fade; delay: 100"
+      uk-scrollspy="target: > div .animate ; cls: uk-animation-fade; delay: 100"
     >
-      <template v-for="location of locations" :key="location.id">
-        <div class="location-element uk-margin" :data-id="location.id">
-          <div class="uk-card uk-card-default">
-            <div class="uk-card-header uk-position-relative uk-drag">
-              <h3 v-if="location.name">{{ location.name }}</h3>
-              <h3 v-else class="uk-text-muted uk-text-italic">
-                Location Name...
-              </h3>
-              <div class="uk-position-top-right">
-                <div
-                  class="uk-padding-small edit-div"
-                  @click="handleEditLocationClicked(location)"
-                >
-                  <font-awesome-icon
-                    class="uk-preserve-width"
-                    :icon="['fas', 'cog']"
-                  />
-                </div>
-              </div>
-              <hr />
-            </div>
-            <div class="uk-card-body">
-              <div class="uk-grid-small" uk-grid>
-                <div class="uk-width-expand">
-                  <div class="uk-child-width-1-2 uk-grid-small" uk-grid>
-                    <div>
-                      <p>{{ location.description }}</p>
-                    </div>
-                    <div>
-                      <p>{{ location.hidden }}</p>
-                    </div>
+      <div
+        id="locations"
+        uk-sortable="handle: .uk-card-header; animation: 150; group: location"
+      >
+        <template v-for="location of locations" :key="location.id">
+          <div
+            class="location-element uk-margin animate"
+            :data-id="location.id"
+          >
+            <div class="uk-card uk-card-default">
+              <div class="uk-card-header uk-position-relative uk-drag">
+                <h3 v-if="location.name">{{ location.name }}</h3>
+                <h3 v-else class="uk-text-muted uk-text-italic">
+                  Location Name...
+                </h3>
+                <div class="uk-position-top-right">
+                  <div
+                    class="uk-padding-small edit-div"
+                    @click="handleEditLocationClicked(location)"
+                  >
+                    <font-awesome-icon
+                      class="uk-preserve-width"
+                      :icon="['fas', 'cog']"
+                    />
                   </div>
                 </div>
-                <div
-                  class="uk-width-1-4 uk-flex uk-flex-middle uk-flex-right select-location-div"
-                  @click="handleSwitchToLocation(location.id)"
-                >
-                  <div class="uk-padding-small">
-                    <span class="uk-text-large"
-                      ><font-awesome-icon
-                        class="uk-preserve-width"
-                        :icon="['fas', 'chevron-right']"
-                    /></span>
+                <hr />
+              </div>
+              <div class="uk-card-body">
+                <div class="uk-grid-small" uk-grid>
+                  <div class="uk-width-expand">
+                    <div class="uk-child-width-1-2 uk-grid-small" uk-grid>
+                      <div>
+                        <p>{{ location.description }}</p>
+                      </div>
+                      <div>
+                        <p>{{ location.hidden }}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="uk-width-1-4 uk-flex uk-flex-middle uk-flex-right select-location-div"
+                    @click="handleSwitchToLocation(location.id)"
+                  >
+                    <div class="uk-padding-small">
+                      <span class="uk-text-large"
+                        ><font-awesome-icon
+                          class="uk-preserve-width"
+                          :icon="['fas', 'chevron-right']"
+                      /></span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </template>
-    </div>
+        </template>
+      </div>
 
-    <div class="uk-margin nxd-no-select">
-      <div
-        class="uk-card uk-card-body nx-card-add uk-card-hover uk-flex uk-flex-center"
-        @click="handleAddLocationClicked"
-      >
-        <div class="uk-text-large uk-width-auto">
-          <font-awesome-icon :icon="['fas', 'plus']" /> Add Location
+      <div class="uk-margin nxd-no-select animate">
+        <div
+          class="uk-card uk-card-body nx-card-add uk-card-hover uk-flex uk-flex-center"
+          @click="handleAddLocationClicked"
+        >
+          <div class="uk-text-large uk-width-auto">
+            <font-awesome-icon :icon="['fas', 'plus']" /> Add Location
+          </div>
         </div>
       </div>
     </div>
@@ -196,9 +203,10 @@
 
 <script>
 import axios from "axios";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { useToast } from "vue-toastification";
+import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
+import {useToast} from "vue-toastification";
 import UIkit from "uikit";
+import BuilderItem from "@/models/BuilderItem.mjs";
 
 const toast = useToast();
 
@@ -226,14 +234,9 @@ export default {
   },
   methods: {
     handleAddLocationClicked() {
-      this.currentLocation = {
-        name: "",
-        description: "",
-        hidden: "",
-        params: {
-          cabinetsOrientation: "horizontal",
-        },
-      };
+      this.currentLocation = new BuilderItem();
+      this.currentLocation.categoryId = this.locationCategoryId;
+      this.currentLocation.sorting = this.locations.length + 1;
       this.modalSaveCLicked = false;
       UIkit.modal("#location-config-modal").show();
     },
@@ -287,7 +290,9 @@ export default {
 
     async deleteLocation() {
       try {
-        await axios.delete(`/api/admin/poolbuilder/${this.currentLocation.id}`);
+        await axios.delete(
+          `/api/admin/poolbuilder/items/${this.currentLocation.id}`
+        );
         this.locations = this.getLocations();
         toast.success("Location deleted");
       } catch (error) {
@@ -299,7 +304,7 @@ export default {
       console.log(this.currentLocation);
       try {
         await axios.put(
-          `/api/admin/poolbuilder/${this.currentLocation.id}`,
+          `/api/admin/poolbuilder/items/${this.currentLocation.id}`,
           this.currentLocation
         );
         toast.success("Location updated");
@@ -310,7 +315,7 @@ export default {
     },
     async addLocation() {
       try {
-        await axios.post("/api/admin/poolbuilder", {
+        await axios.post("/api/admin/poolbuilder/items", {
           ...this.currentLocation,
           category_id: this.locationCategoryId,
         });
@@ -340,7 +345,7 @@ export default {
         return { id: location.id, sorting: location.sorting };
       });
       axios
-        .post("/api/admin/poolbuilder/sort", sortingMap)
+        .post("/api/admin/poolbuilder/items/sort", sortingMap)
         .then(() => {
           toast.success("Sorting updated");
         })
@@ -363,15 +368,12 @@ export default {
     async getLocations() {
       try {
         const result = await axios.get(
-          `/api/admin/poolbuilder?category_id=${this.locationCategoryId}`
+          `/api/admin/poolbuilder/items?category_id=${this.locationCategoryId}`
         );
         this.locations = result.data.map((location) => {
-          try {
-            location.params = JSON.parse(location.params);
-          } catch (e) {
-            location.params = {};
-          }
-          return location;
+          const builderItem = new BuilderItem();
+          builderItem.setData(location);
+          return builderItem;
         });
       } catch (e) {
         console.log(e);

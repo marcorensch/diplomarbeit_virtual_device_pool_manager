@@ -17,6 +17,15 @@ export default class PoolBuilderHelper {
         return poolBuilderItems;
     }
 
+    static async getItem(id) {
+        if(!id) throw new Error("No id specified");
+        const database = new DatabaseModel();
+        const query = "SELECT * FROM builder_items WHERE id = ? LIMIT 1";
+        const poolBuilderItem = await database.query(query, [id]);
+        if(poolBuilderItem.length === 0) throw new Error("No item found");
+        return poolBuilderItem[0];
+    }
+
     static async storeItem(builderItem) {
         const database = new DatabaseModel();
         const query = "INSERT INTO builder_items (name, category_id, description, hidden, sorting, parent_id, params) VALUES (?,?,?,?,?,?,?)";
