@@ -158,10 +158,6 @@ const routes = [
         component: () => import("../views/admin/DashboardView.vue"),
         beforeEnter: () => {
           const authStore = useAuthStore();
-          if (!authStore.isLoggedIn) {
-            toast.error("You must be logged in to access this page");
-            return { name: "login" };
-          }
           if (authStore.hasPermission("canAccessAdmin")) {
             return true;
           } else {
@@ -176,11 +172,7 @@ const routes = [
         component: () => import("../views/admin/msisdn/MsisdnManagerView.vue"),
         beforeEnter: () => {
           const authStore = useAuthStore();
-          if (!authStore.isLoggedIn) {
-            toast.error("You must be logged in to access this page");
-            return { name: "login" };
-          }
-          if (authStore.hasPermission("canAccessAdmin")) {
+          if (authStore.hasPermission("canAccessMsisdnManager")) {
             return true;
           } else {
             toast.error("You are not allowed to access this page");
@@ -194,10 +186,6 @@ const routes = [
         component: () => import("../views/admin/msisdn/MsisdnEditorView.vue"),
         beforeEnter: () => {
           const authStore = useAuthStore();
-          if (!authStore.isLoggedIn) {
-            toast.error("You must be logged in to access this page");
-            return { name: "login" };
-          }
           if (authStore.hasPermission("canUpdateMsisdn")) {
             return true;
           } else {
@@ -213,10 +201,6 @@ const routes = [
         component: () => import("../views/admin/msisdn/MsisdnEditorView.vue"),
         beforeEnter: () => {
           const authStore = useAuthStore();
-          if (!authStore.isLoggedIn) {
-            toast.error("You must be logged in to access this page");
-            return { name: "login" };
-          }
           if (authStore.hasPermission("canCreateMsisdn")) {
             return true;
           } else {
@@ -231,10 +215,6 @@ const routes = [
         component: () => import("../views/admin/UsersView.vue"),
         beforeEnter: () => {
           const authStore = useAuthStore();
-          if (!authStore.isLoggedIn) {
-            toast.error("You must be logged in to access this page");
-            return { name: "login" };
-          }
           if (authStore.hasPermission("canAccessAdmin")) {
             return true;
           } else {
@@ -247,6 +227,23 @@ const routes = [
         path: "pool-builder",
         name: "pool-builder",
         component: () => import("../views/admin/BuilderView.vue"),
+        children: [
+          {
+            path: "",
+            name: "locations",
+            component: () => import("../views/admin/builder/LocationsView.vue"),
+          },
+          {
+            path: "location",
+            name: "location",
+            component: () => import("../views/admin/builder/CabinetsView.vue"),
+          },
+          {
+            path: "cabinet",
+            name: "cabinet",
+            component: () => import("../views/admin/builder/RowsView.vue"),
+          },
+        ],
         beforeEnter: () => {
           const authStore = useAuthStore();
           if (!authStore.isLoggedIn) {

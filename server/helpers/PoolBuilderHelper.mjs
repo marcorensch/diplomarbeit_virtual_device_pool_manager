@@ -25,9 +25,33 @@ export default class PoolBuilderHelper {
         return poolBuilderItems;
     }
 
+    static async updateItem(id, builderItem) {
+        if(!id) throw new Error("No id specified");
+        const database = new DatabaseModel();
+        const query = "UPDATE builder_items SET name = ?, category_id = ?, description = ?, hidden = ?, sorting = ?, parent_id = ?, params = ? WHERE id = ?";
+        const data = [builderItem.name, builderItem.category_id, builderItem.description, builderItem.hidden, builderItem.sorting, builderItem.parent_id, builderItem.params, id];
+        const poolBuilderItems = await database.query(query, data);
+        return poolBuilderItems;
+    }
+
     static async getCategories() {
         const database = new DatabaseModel();
         const poolBuilderCategories = await database.query("SELECT * FROM builder_categories");
         return poolBuilderCategories;
+    }
+
+    static async sortItems(sortMap) {
+        const database = new DatabaseModel();
+        const promises = [];
+        for(const [index, data] of Object.entries(sortMap)) {
+            promises.push(database.query("UPDATE builder_items SET sorting = ? WHERE id = ?", [data.sorting, data.id]));
+        }
+        await Promise.all(promises);
+    }
+
+    static async deleteItem(id) {
+        if(!id) throw new Error("No id specified");
+        const database = new DatabaseModel();
+        return await database.query("DELETE FROM builder_items WHERE id = ?", [id])
     }
 }

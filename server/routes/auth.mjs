@@ -45,4 +45,12 @@ router.get('/logout-everywhere', await UserValidator.validateTokens, async (req,
         res.clearCookie('nxd-refresh-token');
         res.status(200).send('Logout successful');
 });
+
+router.get("/status", await UserValidator.validateTokens, async (req, res) => {
+
+        const user = req.user;
+        delete user.password;
+        res.status(200).json({user, message: 'Token valid'});
+
+});
 export default router;

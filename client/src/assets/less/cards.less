@@ -19,3 +19,17 @@
         }
     }
 }
+
+.nx-card-add {
+  cursor: pointer;
+  border: 1px dashed @color-grey;
+  border-radius: @nxd-border-radius;
+  transition: all 0.2s ease-in-out;
+    color: @color-grey;
+  &.uk-card-hover:hover{
+    border: 1px solid transparent;
+    color: @color-primary;
+    background-color: @color-horizon !important;
+    transition: all 0.2s ease-in-out;
+  }
+}

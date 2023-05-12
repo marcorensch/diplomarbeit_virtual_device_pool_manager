@@ -24,6 +24,7 @@ import {
   faCircleQuestion,
   faCloud,
   faCloudArrowUp,
+  faCog,
   faCubes,
   faDatabase,
   faFolder,
@@ -121,7 +122,7 @@ library.add(
   faCheck,
   faCloud
 );
-library.add(faBuilding);
+library.add(faBuilding, faCog);
 
 const pinia = createPinia();
 pinia.use(({ store }) => {

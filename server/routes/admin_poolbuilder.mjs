@@ -1,6 +1,7 @@
 import express from "express";
 import PoolBuilderHelper from "../helpers/PoolBuilderHelper.mjs";
 import BuilderItem from "../models/BuilderItem.mjs";
+import {poolBuilderValidator} from "../middlewares/inputValidators.mjs";
 
 const router = express.Router();
 
@@ -29,10 +30,10 @@ router.get("/categories", async (req, res) => {
     }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", poolBuilderValidator, async (req, res) => {
     let categories;
     const data = req.body || false;
-    console.log(data)
+    if (!data) return res.status(400).json({error: "No data specified"});
     if (!data.category_id) return res.status(400).json({error: "No type specified"});
 
     try {
@@ -48,6 +49,7 @@ router.post("/", async (req, res) => {
     const builderItem = new BuilderItem();
     builderItem.setData(data);
 
+    console.log(builderItem)
     switch (category.name) {
         case "Location":
             if (!builderItem.name) return res.status(400).json({error: "No name specified"});
@@ -73,7 +75,52 @@ router.post("/", async (req, res) => {
         default:
             return res.status(400).json({error: "Invalid category specified"});
     }
+});
 
+router.put("/:id", poolBuilderValidator, async (req, res) => {
+    const id = req.params.id || null;
+    const data = req.body || false;
+    if (!id) return res.status(400).json({error: "No id specified"});
+    if (!data) return res.status(400).json({error: "No data specified"});
+    if(parseInt(id) !== parseInt(data.id)) return res.status(400).json({error: "Invalid id specified"});
+    const builderItem = new BuilderItem();
+    builderItem.setData(data);
+    try {
+        const result = await PoolBuilderHelper.updateItem(id, builderItem);
+        if(!result || result.affectedRows===0) return res.status(500).json({error: "Could not update Item"});
+        return res.status(200).json({message: "Item updated successfully"});
+    }catch (e) {
+        console.log(e)
+        return res.status(500).json({error: "Could not update Item"});
+    }
+});
+
+router.delete("/:id", async (req, res) => {
+    const id = req.params.id || false;
+    if (!id) return res.status(400).json({error: "No id specified"});
+    try {
+        const result = await PoolBuilderHelper.deleteItem(id);
+        if(!result || result.affectedRows===0) return res.status(500).json({error: "Could not delete Item"});
+        return res.status(200).json({message: "Item deleted successfully"});
+    }catch (e) {
+        console.log(e)
+        return res.status(500).json({error: "Could not delete Item"});
+    }
+});
+
+router.post("/sort", async (req, res) => {
+    const sortMap = req.body || false;
+    if(!sortMap || !sortMap.length) return res.status(400).json({error: "No sort map specified"});
+    for (const sortMapElement of sortMap) {
+        if(!sortMapElement.id || !sortMapElement.sorting) return res.status(400).json({error: "Invalid sort map specified"});
+    }
+    try{
+        await PoolBuilderHelper.sortItems(sortMap);
+        return res.status(200).json({message: "Items sorted successfully"});
+    }catch (e) {
+        console.log(e)
+        return res.status(500).json({error: "Could not sort items"});
+    }
 });
 
 export default router;

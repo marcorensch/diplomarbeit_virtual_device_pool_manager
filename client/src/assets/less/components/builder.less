@@ -1,27 +1,15 @@
 @import "../variables.less";
 
-.builder-sidebar{
-  background: @color-horizon;
-
-  ul li {
-    transition: all 0.2s ease-in-out;
-    span {
-      color: @color-grey;
-      cursor: pointer;
-    }
-    &:hover {
-      transition: all 0.2s ease-in-out;
-      color: @color-navy;
-      span {
-        color: @color-navy;
-      }
-    }
-    &.selected {
-      color: @color-navy;
-      span {
-        color: @color-navy;
-        font-weight: 600;
-      }
-    }
+.select-location-div {
+  cursor: pointer;
+  &:hover{
+    color: @color-navy;
   }
+}
+
+.edit-div{
+    cursor: pointer;
+    &:hover{
+        color: @color-navy;
+    }
 }

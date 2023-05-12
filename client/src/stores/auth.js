@@ -94,6 +94,7 @@ export const useAuthStore = defineStore("auth", {
     resetUser() {
       this.user = null;
       localStorage.removeItem("user");
+      this.router.push({ name: "login" });
     },
     async logout(withMsg = true) {
       this.resetUser();
