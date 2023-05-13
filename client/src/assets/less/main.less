@@ -142,6 +142,13 @@ li.multidevice-item{
   opacity: .2;
 }
 
+.go-back-link, .go-back-link > *{
+    color: @color-link-default;
+    &:hover{
+        color: @color-link-default-hover;
+    }
+}
+
 .skeleton{
   background: linear-gradient(-90deg, @color-grey-light, @color-grey-lighter, @color-grey-light, @color-grey-lighter);
   background-size: 400% 400%;

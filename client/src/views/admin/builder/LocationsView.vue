@@ -246,8 +246,10 @@ export default {
   methods: {
     handleAddLocationClicked() {
       this.currentLocation = new BuilderItem();
-      this.currentLocation.categoryId = this.locationCategoryId;
+      this.currentLocation.category_id = this.locationCategoryId;
       this.currentLocation.sorting = this.locations.length + 1;
+      this.currentLocation.initLocationParams();
+      console.log(this.currentLocation);
       this.modalSaveOrDeleteClicked = false;
       UIkit.modal("#location-config-modal").show();
     },
@@ -278,7 +280,6 @@ export default {
       this.modalSaveOrDeleteClicked = false;
       this.locationDataFallback = { ...location };
       this.currentLocation = location;
-      this.modalSaveCLicked = false;
       UIkit.modal("#location-config-modal").show();
     },
     async handleModalSaveClicked() {

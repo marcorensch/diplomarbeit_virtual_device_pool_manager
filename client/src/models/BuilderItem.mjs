@@ -1,10 +1,10 @@
 export default class BuilderItem {
-    constructor(params = null) {
+    constructor() {
         this.id = null;
         this.name = null;
         this.description = "";
         this.hidden = "";
-        this.params = this.initParams(params);
+        this.params = {};
         this.sorting = 0;
         this.category_id = null;
         this.parent_id = null;
@@ -25,7 +25,7 @@ export default class BuilderItem {
         }
     }
 
-    initParams(params){
-        return {cabinetsOrientation: "horizontal", ...params};
+    initLocationParams(params){
+        this.params = {cabinetsOrientation: "horizontal", ...params};
     }
 }

@@ -50,7 +50,11 @@ export const useBuilderItemStore = defineStore("builderItem", {
             parent_id: this.item.id,
           },
         });
-        return response.data;
+        return response.data.map((item) => {
+          const builderItem = new BuilderItem();
+          builderItem.setData(item);
+          return builderItem;
+        });
       } catch (e) {
         console.log(e);
         return false;
@@ -60,7 +64,7 @@ export const useBuilderItemStore = defineStore("builderItem", {
       if (!item) item = this.item;
       try {
         await axios.post("/api/admin/poolbuilder/items", item);
-        toast.success("Location added");
+        toast.success("Item added");
         return true;
       } catch (e) {
         toast.error("Something went wrong while adding location");
@@ -72,7 +76,7 @@ export const useBuilderItemStore = defineStore("builderItem", {
       if (!item) item = this.item;
       try {
         await axios.put(`/api/admin/poolbuilder/items/${item.id}`, item);
-        toast.success("Location updated");
+        toast.success("Item updated");
         return true;
       } catch (error) {
         toast.error("Something went wrong while updating location");
@@ -84,10 +88,10 @@ export const useBuilderItemStore = defineStore("builderItem", {
       if (!id) id = this.item.id;
       try {
         await axios.delete(`/api/admin/poolbuilder/items/${id}`);
-        toast.success("Location deleted");
+        toast.success("Item deleted");
         return true;
       } catch (error) {
-        toast.error("Something went wrong while deleting location");
+        toast.error("Something went wrong while deleting the item");
         console.log(error);
         return false;
       }
