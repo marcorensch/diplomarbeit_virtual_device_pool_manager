@@ -80,7 +80,7 @@ router.post("/items", poolBuilderValidator, async (req, res) => {
             if (!builderItem.name) return res.status(400).json({error: "No name specified"});
             try {
                 const result = await PoolBuilderHelper.storeItem(builderItem);
-                if(!result || result.affectedRows===0) return res.status(500).json({error: "Could not create Location"});
+                if(!result || result.affectedRows===0) return res.status(500).json({error: "Could not create Cabinet"});
                 builderItem.id = result.insertId;
                 return res.status(200).json(builderItem);
             }catch (e) {
@@ -89,7 +89,16 @@ router.post("/items", poolBuilderValidator, async (req, res) => {
             }
             break;
         case "Row":
-            //
+            if (!builderItem.name) return res.status(400).json({error: "No name specified"});
+            try {
+                const result = await PoolBuilderHelper.storeItem(builderItem);
+                if(!result || result.affectedRows===0) return res.status(500).json({error: "Could not create Row"});
+                builderItem.id = result.insertId;
+                return res.status(200).json(builderItem);
+            }catch (e) {
+                if(e.code==="ER_DUP_ENTRY") return res.status(400).json({error: "Row already exists"});
+                return res.status(500).json({error: "Could not create Row"});
+            }
             break;
         case "Slot":
             //

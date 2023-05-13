@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Locations</h1>
+    <h1><font-awesome-icon :icon="['fas', 'city']" /> Locations</h1>
     <div
       uk-scrollspy="target: > div .animate ; cls: uk-animation-fade; delay: 60"
     >
@@ -13,7 +13,10 @@
             >
               <div class="uk-card uk-card-default">
                 <div class="uk-card-header uk-position-relative uk-drag">
-                  <h3 v-if="location.name">{{ location.name }}</h3>
+                  <h3 v-if="location.name">
+                    <font-awesome-icon :icon="['fas', 'building']" />
+                    {{ location.name }}
+                  </h3>
                   <h3 v-else class="uk-text-muted uk-text-italic">
                     Location Name...
                   </h3>

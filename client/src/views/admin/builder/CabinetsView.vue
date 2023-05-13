@@ -21,7 +21,10 @@
         <div class="cabinet-element uk-margin animate" :data-id="cabinet.id">
           <div class="uk-card uk-card-default">
             <div class="uk-card-header uk-position-relative uk-drag">
-              <h3 v-if="cabinet.name">{{ cabinet.name }}</h3>
+              <h3 v-if="cabinet.name">
+                <font-awesome-icon :icon="['fas', 'cubes']" />
+                {{ cabinet.name }}
+              </h3>
               <h3 v-else class="uk-text-muted uk-text-italic">
                 Location Name...
               </h3>
@@ -183,9 +186,11 @@ import {useBuilderItemStore} from "@/stores/builderItemStore";
 import {useBuilderCategoriesStore} from "@/stores/builderCategoriesStore";
 import UIkit from "uikit";
 import BuilderItem from "@/models/BuilderItem.mjs";
+import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 
 export default {
   name: "CabinetsView",
+  components: { FontAwesomeIcon },
   setup() {
     return {
       builderItemStore: useBuilderItemStore(),
@@ -294,6 +299,10 @@ export default {
         }
         this.builderItemStore.updateSorting(this.cabinets);
       });
+    },
+
+    handleSwitchToCabinet(id) {
+      this.$router.push({ name: "cabinet", params: { id } });
     },
   },
 };

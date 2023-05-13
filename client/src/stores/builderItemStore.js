@@ -61,13 +61,14 @@ export const useBuilderItemStore = defineStore("builderItem", {
       }
     },
     async saveItem(item = null) {
+      console.log(item);
       if (!item) item = this.item;
       try {
         await axios.post("/api/admin/poolbuilder/items", item);
         toast.success("Item added");
         return true;
       } catch (e) {
-        toast.error("Something went wrong while adding location");
+        toast.error("Something went wrong while adding item");
         console.log(e);
         return false;
       }
@@ -79,7 +80,7 @@ export const useBuilderItemStore = defineStore("builderItem", {
         toast.success("Item updated");
         return true;
       } catch (error) {
-        toast.error("Something went wrong while updating location");
+        toast.error("Something went wrong while updating item");
         console.log(error);
         return false;
       }
@@ -112,6 +113,13 @@ export const useBuilderItemStore = defineStore("builderItem", {
           console.log(error);
           return false;
         });
+    },
+    async createItem(categoryId, parentId, name) {
+      const item = new BuilderItem();
+      item.category_id = categoryId;
+      item.parent_id = parentId;
+      item.name = name;
+      return await this.saveItem(item);
     },
   },
 });

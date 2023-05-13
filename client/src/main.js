@@ -23,6 +23,7 @@ import {
   faChevronRight,
   faChevronUp,
   faCircleQuestion,
+  faCity,
   faCloud,
   faCloudArrowUp,
   faCog,
@@ -123,7 +124,7 @@ library.add(
   faCheck,
   faCloud
 );
-library.add(faBuilding, faCog, faArrowLeft);
+library.add(faBuilding, faCog, faArrowLeft, faCity);
 
 const pinia = createPinia();
 pinia.use(({ store }) => {

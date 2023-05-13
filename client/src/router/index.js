@@ -240,7 +240,7 @@ const routes = [
             component: () => import("../views/admin/builder/CabinetsView.vue"),
           },
           {
-            path: "cabinet",
+            path: "cabinet/:id",
             name: "cabinet",
             component: () => import("../views/admin/builder/CabinetView.vue"),
           },
