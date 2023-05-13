@@ -93,7 +93,6 @@ export const useBuilderItemStore = defineStore("builderItem", {
       }
     },
     async updateSorting(items) {
-      console.log(items);
       if (!items) return false;
       const sortingMap = items.map((item) => {
         return { id: item.id, sorting: item.sorting };

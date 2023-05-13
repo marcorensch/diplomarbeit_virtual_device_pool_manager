@@ -4,63 +4,61 @@
     <div
       uk-scrollspy="target: > div .animate ; cls: uk-animation-fade; delay: 60"
     >
-      <div
-        v-if="locations.length"
-        id="locations"
-        uk-sortable="target: > div; animation: 150;"
-      >
-        <template v-for="location of locations" :key="location.id">
-          <div
-            class="location-element uk-margin animate"
-            :data-id="location.id"
-          >
-            <div class="uk-card uk-card-default">
-              <div class="uk-card-header uk-position-relative uk-drag">
-                <h3 v-if="location.name">{{ location.name }}</h3>
-                <h3 v-else class="uk-text-muted uk-text-italic">
-                  Location Name...
-                </h3>
-              </div>
-              <div class="uk-card-body">
-                <div
-                  class="uk-width-expand uk-padding uk-padding-remove-left uk-padding-remove-vertical"
-                >
-                  <div class="uk-child-width-1-2 uk-grid-small" uk-grid>
-                    <div>
-                      <p>{{ location.description }}</p>
-                    </div>
-                    <div>
-                      <p>{{ location.hidden }}</p>
+      <div id="locations" uk-sortable="target: > div; animation: 150;">
+        <template v-if="locations">
+          <template v-for="location of locations" :key="location.id">
+            <div
+              class="location-element uk-margin animate"
+              :data-id="location.id"
+            >
+              <div class="uk-card uk-card-default">
+                <div class="uk-card-header uk-position-relative uk-drag">
+                  <h3 v-if="location.name">{{ location.name }}</h3>
+                  <h3 v-else class="uk-text-muted uk-text-italic">
+                    Location Name...
+                  </h3>
+                </div>
+                <div class="uk-card-body">
+                  <div
+                    class="uk-width-expand uk-padding uk-padding-remove-left uk-padding-remove-vertical"
+                  >
+                    <div class="uk-child-width-1-2 uk-grid-small" uk-grid>
+                      <div>
+                        <p>{{ location.description }}</p>
+                      </div>
+                      <div>
+                        <p>{{ location.hidden }}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div
-                  class="uk-position-cover select-location-div"
-                  @click="handleSwitchToLocation(location.id)"
-                >
-                  <div class="uk-position-center-right uk-padding">
-                    <span class="uk-text-large"
-                      ><font-awesome-icon
-                        class="uk-preserve-width"
-                        :icon="['fas', 'chevron-right']"
-                    /></span>
+                  <div
+                    class="uk-position-cover select-location-div"
+                    @click="handleSwitchToLocation(location.id)"
+                  >
+                    <div class="uk-position-center-right uk-padding">
+                      <span class="uk-text-large"
+                        ><font-awesome-icon
+                          class="uk-preserve-width"
+                          :icon="['fas', 'chevron-right']"
+                      /></span>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div class="uk-position-top-right">
-                <div
-                  class="uk-padding-small edit-div"
-                  @click="handleEditLocationClicked(location)"
-                >
-                  <font-awesome-icon
-                    class="uk-preserve-width"
-                    :icon="['fas', 'cog']"
-                  />
+                <div class="uk-position-top-right">
+                  <div
+                    class="uk-padding-small edit-div"
+                    @click="handleEditLocationClicked(location)"
+                  >
+                    <font-awesome-icon
+                      class="uk-preserve-width"
+                      :icon="['fas', 'cog']"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          </template>
         </template>
       </div>
 
@@ -235,8 +233,8 @@ export default {
     };
   },
   async mounted() {
-    this.handleSortable();
-    this.handleModalHidden();
+    this.handleSortable("#locations");
+    this.handleModalFeatures();
     this.categories = await this.categoriesStore.loadCategories();
     this.locationCategoryId =
       this.categoriesStore.findCategoryIdByName("Location");
@@ -253,7 +251,12 @@ export default {
       this.modalSaveOrDeleteClicked = false;
       UIkit.modal("#location-config-modal").show();
     },
-    handleModalHidden() {
+    handleModalFeatures() {
+      UIkit.util.on("#location-config-modal", "shown", () => {
+        this.$nextTick(() => {
+          document.getElementById("name").focus();
+        });
+      });
       UIkit.util.on("#location-config-modal", "hide", () => {
         if (!this.modalSaveOrDeleteClicked) {
           if (this.currentLocation?.id) {
@@ -273,7 +276,6 @@ export default {
     },
     handleEditLocationClicked(location) {
       this.modalSaveOrDeleteClicked = false;
-
       this.locationDataFallback = { ...location };
       this.currentLocation = location;
       this.modalSaveCLicked = false;
@@ -319,10 +321,9 @@ export default {
         });
     },
 
-    handleSortable() {
+    handleSortable(container) {
       console.log("handle sortable");
-      UIkit.util.on("#locations", "moved", (e) => {
-        console.log("location moved");
+      UIkit.util.on(container, "moved", (e) => {
         const children = e.target.children;
         for (let i = 0; i < children.length; i++) {
           this.locations.find((location) => {
@@ -331,6 +332,7 @@ export default {
             }
           });
         }
+        this.builderItemStore.updateSorting(this.locations);
       });
     },
     handleSwitchToLocation(id) {
