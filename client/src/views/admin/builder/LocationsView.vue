@@ -2,9 +2,10 @@
   <div>
     <h2>Locations</h2>
     <div
-      uk-scrollspy="target: > div .animate ; cls: uk-animation-fade; delay: 100"
+      uk-scrollspy="target: > div .animate ; cls: uk-animation-fade; delay: 60"
     >
       <div
+        v-if="locations.length"
         id="locations"
         uk-sortable="handle: .uk-card-header; animation: 150; group: location"
       >
@@ -63,7 +64,10 @@
         </template>
       </div>
 
-      <div class="uk-margin nxd-no-select animate">
+      <div
+        class="uk-margin nxd-no-select"
+        uk-scrollspy="cls:uk-animation-fade;delay:200"
+      >
         <div
           class="uk-card uk-card-body nx-card-add uk-card-hover uk-flex uk-flex-center"
           @click="handleAddLocationClicked"
@@ -165,7 +169,7 @@
           </div>
           <div class="uk-modal-footer">
             <div class="uk-grid-small" uk-grid>
-              <div>
+              <div v-if="currentLocation.id">
                 <button
                   class="uk-button uk-button-danger"
                   @click="handleModalDeleteClicked"
