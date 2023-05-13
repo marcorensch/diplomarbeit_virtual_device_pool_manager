@@ -1,13 +1,13 @@
 <template>
   <div>
-    <h2>Locations</h2>
+    <h1>Locations</h1>
     <div
       uk-scrollspy="target: > div .animate ; cls: uk-animation-fade; delay: 60"
     >
       <div
         v-if="locations.length"
         id="locations"
-        uk-sortable="handle: .uk-card-header; animation: 150; group: location"
+        uk-sortable="target: > div; animation: 150;"
       >
         <template v-for="location of locations" :key="location.id">
           <div
@@ -20,43 +20,43 @@
                 <h3 v-else class="uk-text-muted uk-text-italic">
                   Location Name...
                 </h3>
-                <div class="uk-position-top-right">
-                  <div
-                    class="uk-padding-small edit-div"
-                    @click="handleEditLocationClicked(location)"
-                  >
-                    <font-awesome-icon
-                      class="uk-preserve-width"
-                      :icon="['fas', 'cog']"
-                    />
-                  </div>
-                </div>
-                <hr />
               </div>
               <div class="uk-card-body">
-                <div class="uk-grid-small" uk-grid>
-                  <div class="uk-width-expand">
-                    <div class="uk-child-width-1-2 uk-grid-small" uk-grid>
-                      <div>
-                        <p>{{ location.description }}</p>
-                      </div>
-                      <div>
-                        <p>{{ location.hidden }}</p>
-                      </div>
+                <div
+                  class="uk-width-expand uk-padding uk-padding-remove-left uk-padding-remove-vertical"
+                >
+                  <div class="uk-child-width-1-2 uk-grid-small" uk-grid>
+                    <div>
+                      <p>{{ location.description }}</p>
+                    </div>
+                    <div>
+                      <p>{{ location.hidden }}</p>
                     </div>
                   </div>
-                  <div
-                    class="uk-width-1-4 uk-flex uk-flex-middle uk-flex-right select-location-div"
-                    @click="handleSwitchToLocation(location.id)"
-                  >
-                    <div class="uk-padding-small">
-                      <span class="uk-text-large"
-                        ><font-awesome-icon
-                          class="uk-preserve-width"
-                          :icon="['fas', 'chevron-right']"
-                      /></span>
-                    </div>
+                </div>
+
+                <div
+                  class="uk-position-cover select-location-div"
+                  @click="handleSwitchToLocation(location.id)"
+                >
+                  <div class="uk-position-center-right uk-padding">
+                    <span class="uk-text-large"
+                      ><font-awesome-icon
+                        class="uk-preserve-width"
+                        :icon="['fas', 'chevron-right']"
+                    /></span>
                   </div>
+                </div>
+              </div>
+              <div class="uk-position-top-right">
+                <div
+                  class="uk-padding-small edit-div"
+                  @click="handleEditLocationClicked(location)"
+                >
+                  <font-awesome-icon
+                    class="uk-preserve-width"
+                    :icon="['fas', 'cog']"
+                  />
                 </div>
               </div>
             </div>
@@ -206,17 +206,24 @@
 </template>
 
 <script>
-import axios from "axios";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
-import {useToast} from "vue-toastification";
 import UIkit from "uikit";
 import BuilderItem from "@/models/BuilderItem.mjs";
-
-const toast = useToast();
+import {useBuilderItemStore} from "@/stores/builderItemStore";
+import {useBuilderCategoriesStore} from "@/stores/builderCategoriesStore";
 
 export default {
   name: "LocationsView",
   components: { FontAwesomeIcon },
+  setup() {
+    const categoriesStore = useBuilderCategoriesStore();
+    const builderItemStore = useBuilderItemStore();
+
+    return {
+      categoriesStore,
+      builderItemStore,
+    };
+  },
   data() {
     return {
       categories: [],
@@ -230,23 +237,25 @@ export default {
   async mounted() {
     this.handleSortable();
     this.handleModalHidden();
-    this.categories = await this.getCategories();
-    this.locationCategoryId = this.categories.find(
-      (category) => category.name === "Location"
-    ).id;
-    this.locations = this.getLocations();
+    this.categories = await this.categoriesStore.loadCategories();
+    this.locationCategoryId =
+      this.categoriesStore.findCategoryIdByName("Location");
+
+    this.locations = await this.builderItemStore.loadItems(
+      this.locationCategoryId
+    );
   },
   methods: {
     handleAddLocationClicked() {
       this.currentLocation = new BuilderItem();
       this.currentLocation.categoryId = this.locationCategoryId;
       this.currentLocation.sorting = this.locations.length + 1;
-      this.modalSaveCLicked = false;
+      this.modalSaveOrDeleteClicked = false;
       UIkit.modal("#location-config-modal").show();
     },
     handleModalHidden() {
       UIkit.util.on("#location-config-modal", "hide", () => {
-        if (!this.modalSaveCLicked) {
+        if (!this.modalSaveOrDeleteClicked) {
           if (this.currentLocation?.id) {
             const location = this.locations.find((loc) => {
               if (loc.id === this.currentLocation.id) return loc;
@@ -263,19 +272,29 @@ export default {
       });
     },
     handleEditLocationClicked(location) {
+      this.modalSaveOrDeleteClicked = false;
+
       this.locationDataFallback = { ...location };
       this.currentLocation = location;
       this.modalSaveCLicked = false;
       UIkit.modal("#location-config-modal").show();
     },
-    handleModalSaveClicked() {
-      this.modalSaveCLicked = true;
+    async handleModalSaveClicked() {
+      this.modalSaveOrDeleteClicked = true;
+      this.currentLocation.category_id = this.locationCategoryId;
       const params = { ...this.currentLocation.params };
       this.currentLocation.params = JSON.stringify(this.currentLocation.params);
       if (this.currentLocation.id) {
-        this.updateLocation();
+        await this.builderItemStore.updateItem(this.currentLocation);
       } else {
-        this.addLocation();
+        const status = await this.builderItemStore.saveItem(
+          this.currentLocation
+        );
+        if (status) {
+          this.locations = await this.builderItemStore.loadItems(
+            this.locationCategoryId
+          );
+        }
       }
       this.currentLocation.params = params;
       UIkit.modal("#location-config-modal").hide();
@@ -287,52 +306,23 @@ export default {
           { stack: true }
         )
         .then(() => {
-          this.deleteLocation();
+          const status = this.builderItemStore.deleteItem(
+            this.currentLocation.id
+          );
+          if (status) {
+            this.locations = this.locations.filter(
+              (location) => location.id !== this.currentLocation.id
+            );
+          }
+          this.modalSaveOrDeleteClicked = true;
           UIkit.modal("#location-config-modal").hide();
         });
     },
 
-    async deleteLocation() {
-      try {
-        await axios.delete(
-          `/api/admin/poolbuilder/items/${this.currentLocation.id}`
-        );
-        this.locations = this.getLocations();
-        toast.success("Location deleted");
-      } catch (error) {
-        toast.error("Something went wrong while deleting location");
-        console.log(error);
-      }
-    },
-    async updateLocation() {
-      console.log(this.currentLocation);
-      try {
-        await axios.put(
-          `/api/admin/poolbuilder/items/${this.currentLocation.id}`,
-          this.currentLocation
-        );
-        toast.success("Location updated");
-      } catch (error) {
-        toast.error("Something went wrong while updating location");
-        console.log(error);
-      }
-    },
-    async addLocation() {
-      try {
-        await axios.post("/api/admin/poolbuilder/items", {
-          ...this.currentLocation,
-          category_id: this.locationCategoryId,
-        });
-        toast.success("Location added");
-        this.locations = this.getLocations();
-      } catch (e) {
-        toast.error("Something went wrong while adding location");
-        console.log(e);
-      }
-    },
-
     handleSortable() {
+      console.log("handle sortable");
       UIkit.util.on("#locations", "moved", (e) => {
+        console.log("location moved");
         const children = e.target.children;
         for (let i = 0; i < children.length; i++) {
           this.locations.find((location) => {
@@ -341,47 +331,10 @@ export default {
             }
           });
         }
-        this.saveNewSorting();
       });
-    },
-    saveNewSorting() {
-      const sortingMap = this.locations.map((location) => {
-        return { id: location.id, sorting: location.sorting };
-      });
-      axios
-        .post("/api/admin/poolbuilder/items/sort", sortingMap)
-        .then(() => {
-          toast.success("Sorting updated");
-        })
-        .catch((error) => {
-          toast.error("Something went wrong while storing new sorting");
-          console.log(error);
-        });
     },
     handleSwitchToLocation(id) {
       this.$router.push({ path: `/admin/pool-builder/location/${id}` });
-    },
-    async getCategories() {
-      try {
-        const result = await axios.get("/api/admin/poolbuilder/categories");
-        return result.data;
-      } catch (e) {
-        console.log(e);
-      }
-    },
-    async getLocations() {
-      try {
-        const result = await axios.get(
-          `/api/admin/poolbuilder/items?category_id=${this.locationCategoryId}`
-        );
-        this.locations = result.data.map((location) => {
-          const builderItem = new BuilderItem();
-          builderItem.setData(location);
-          return builderItem;
-        });
-      } catch (e) {
-        console.log(e);
-      }
     },
   },
 };

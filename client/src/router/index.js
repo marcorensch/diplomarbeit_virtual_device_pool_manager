@@ -242,7 +242,7 @@ const routes = [
           {
             path: "cabinet",
             name: "cabinet",
-            component: () => import("../views/admin/builder/RowsView.vue"),
+            component: () => import("../views/admin/builder/CabinetView.vue"),
           },
         ],
         beforeEnter: () => {

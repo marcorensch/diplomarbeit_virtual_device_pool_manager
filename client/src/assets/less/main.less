@@ -141,3 +141,39 @@ li.multidevice-item{
 .nxd-disabled-section{
   opacity: .2;
 }
+
+.skeleton{
+  background: linear-gradient(-90deg, @color-grey-light, @color-grey-lighter, @color-grey-light, @color-grey-lighter);
+  background-size: 400% 400%;
+  animation: skeleton-gradient 2s ease infinite;
+    border-radius: 2px;
+    display: inline-block;
+    height: 1em;
+    position: relative;
+    vertical-align: middle;
+    width: 100px;
+  &.skeleton-xlarge {
+    width: 600px;
+  }
+  &.skeleton-large {
+    width: 400px;
+  }
+  &.skeleton-small {
+    width: 200px;
+  }
+  &.skeleton-medium {
+    width: 300px;
+  }
+}
+
+@keyframes skeleton-gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}

@@ -4,7 +4,7 @@
       <BuilderNotAvailableMobile />
       <div class="uk-visible@m">
         <div>
-          <h1>Pool Builder</h1>
+          <h4 class="uk-margin-remove-bottom">Pool Builder</h4>
         </div>
         <div>
           <router-view v-slot="{ Component, route }">
