@@ -28,7 +28,21 @@
           this cabinet.
         </h3>
         <div class="uk-text-muted uk-text-light uk-text-center">
-          Hint: you can use shift & click to add two rows in one go.
+          Hint: you can use
+          <span
+            style="
+              border: 1px solid grey;
+              display: inline-block;
+              padding: 3px;
+              border-radius: 3px;
+              line-height: 13px;
+              font-size: 13px;
+              position: relative;
+              top: -2px;
+            "
+            >shift</span
+          >
+          + click to add two rows in one go.
         </div>
       </div>
       <template v-else>
@@ -38,7 +52,13 @@
             :key="index"
             class="uk-margin-bottom"
           >
-            <BuilderRow :builderRow="row" :builderCabinet="cabinet" />
+            <BuilderRow
+              :builderRow="row"
+              :builderCabinet="cabinet"
+              :slotCategoryId="slotCategoryId"
+              @editRow="handleEditRowClicked"
+              @editSlot="handleEditSlotClicked"
+            />
           </div>
         </div>
         <div class="uk-margin">
@@ -59,6 +79,101 @@
         </div>
       </template>
     </div>
+    <div id="config-modal" class="uk-flex-top" uk-modal="">
+      <div class="uk-modal-dialog uk-margin-auto-vertical">
+        <template v-if="currentSelectedItem">
+          <button
+            class="uk-modal-close uk-modal-close-default"
+            uk-close
+            type="button"
+          ></button>
+          <div class="uk-modal-header">
+            <h2 class="uk-modal-title">
+              <font-awesome-icon
+                :icon="['fas', 'cubes']"
+                class="uk-margin-right"
+              />
+              <template v-if="currentSelectedItem && currentSelectedItem.id"
+                >Edit {{ currentSelectedItem.categoryName }}
+                {{ currentSelectedItem.name }}
+              </template>
+              <template v-else>Edit</template>
+            </h2>
+          </div>
+          <div class="uk-modal-body">
+            <div class="uk-form" v-if="currentSelectedItem">
+              <div class="uk-margin">
+                <label for="name" class="uk-form-label">Name</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  class="uk-input"
+                  v-model="currentSelectedItem.name"
+                  placeholder="Cabinet Name"
+                />
+              </div>
+              <div class="uk-margin">
+                <label for="description" class="uk-form-label"
+                  >Description</label
+                >
+                <textarea
+                  id="description"
+                  name="description"
+                  type="textarea"
+                  class="uk-textarea"
+                  v-model="currentSelectedItem.description"
+                  placeholder="Location Description"
+                ></textarea>
+              </div>
+              <div class="uk-margin">
+                <label for="hidden" class="uk-form-label">Description</label>
+                <textarea
+                  type="textarea"
+                  id="hidden"
+                  name="hidden"
+                  class="uk-textarea"
+                  v-model="currentSelectedItem.hidden"
+                  placeholder="Hidden Information"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="uk-modal-footer">
+            <div class="uk-grid-small" uk-grid>
+              <div v-if="currentSelectedItem.id">
+                <button
+                  class="uk-button uk-button-danger"
+                  @click="handleModalDeleteClicked"
+                >
+                  Delete
+                </button>
+              </div>
+              <div class="uk-width-expand">
+                <div class="uk-grid-small uk-flex uk-flex-right" uk-grid>
+                  <div>
+                    <button
+                      class="uk-button uk-button-secondary uk-modal-close"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                  <div>
+                    <button
+                      class="uk-button uk-button-primary"
+                      :class="{ 'uk-disabled': !currentSelectedItem.name }"
+                      @click="handleModalSaveClicked"
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -66,6 +181,7 @@
 import { useBuilderItemStore } from "@/stores/builderItemStore";
 import { useBuilderCategoriesStore } from "@/stores/builderCategoriesStore";
 import BuilderRow from "@/components/builder/BuilderRow.vue";
+import UIkit from "uikit";
 
 export default {
   name: "CabinetView",
@@ -84,6 +200,7 @@ export default {
       rowCategoryId: null,
       slotCategoryId: null,
       rows: [],
+      currentSelectedItem: null,
     };
   },
   async mounted() {
@@ -94,6 +211,16 @@ export default {
     this.rows = await this.builderItemStore.getChildItems(this.rowCategoryId);
   },
   methods: {
+    handleEditRowClicked(builderRowElement) {
+      this.currentSelectedItem = builderRowElement;
+      this.currentSelectedItem.categoryName = "Row";
+      UIkit.modal("#config-modal").show();
+    },
+    handleEditSlotClicked(builderSlotElement) {
+      this.currentSelectedItem = builderSlotElement;
+      this.currentSelectedItem.categoryName = "Slot";
+      UIkit.modal("#config-modal").show();
+    },
     async handleAddRowClicked(times) {
       if (isNaN(times)) {
         times = 1;
@@ -113,6 +240,16 @@ export default {
         this.cabinet.id,
         name
       );
+    },
+    async handleModalSaveClicked() {
+      await this.builderItemStore.updateItem(this.currentSelectedItem);
+      UIkit.modal("#config-modal").hide();
+      this.currentSelectedItem = null;
+    },
+    async handleModalDeleteClicked() {
+      await this.builderItemStore.deleteItem(this.currentSelectedItem);
+      UIkit.modal("#config-modal").hide();
+      this.currentSelectedItem = null;
     },
   },
 };

@@ -45,6 +45,7 @@ router.get("/categories", async (req, res) => {
 
 router.post("/items", poolBuilderValidator, async (req, res) => {
     let categories;
+    let builderItem;
     const data = req.body || false;
     if (!data) return res.status(400).json({error: "No data specified"});
     if (!data.category_id) return res.status(400).json({error: "No type specified"});
@@ -59,52 +60,17 @@ router.post("/items", poolBuilderValidator, async (req, res) => {
     const category = categories.find(category => category.id === data.category_id);
     if (!category) return res.status(400).json({error: "Invalid category specified"});
 
-    const builderItem = new BuilderItem();
+    builderItem = new BuilderItem();
     builderItem.setData(data);
 
-    console.log(builderItem)
-    switch (category.name) {
-        case "Location":
-            if (!builderItem.name) return res.status(400).json({error: "No name specified"});
-            try {
-                const result = await PoolBuilderHelper.storeItem(builderItem);
-                if(!result || result.affectedRows===0) return res.status(500).json({error: "Could not create Location"});
-                builderItem.id = result.insertId;
-                return res.status(200).json(builderItem);
-            }catch (e) {
-                if(e.code==="ER_DUP_ENTRY") return res.status(400).json({error: "Location already exists"});
-                return res.status(500).json({error: "Could not create Location"});
-            }
-            break;
-        case "Cabinet":
-            if (!builderItem.name) return res.status(400).json({error: "No name specified"});
-            try {
-                const result = await PoolBuilderHelper.storeItem(builderItem);
-                if(!result || result.affectedRows===0) return res.status(500).json({error: "Could not create Cabinet"});
-                builderItem.id = result.insertId;
-                return res.status(200).json(builderItem);
-            }catch (e) {
-                if(e.code==="ER_DUP_ENTRY") return res.status(400).json({error: "Location already exists"});
-                return res.status(500).json({error: "Could not create Location"});
-            }
-            break;
-        case "Row":
-            if (!builderItem.name) return res.status(400).json({error: "No name specified"});
-            try {
-                const result = await PoolBuilderHelper.storeItem(builderItem);
-                if(!result || result.affectedRows===0) return res.status(500).json({error: "Could not create Row"});
-                builderItem.id = result.insertId;
-                return res.status(200).json(builderItem);
-            }catch (e) {
-                if(e.code==="ER_DUP_ENTRY") return res.status(400).json({error: "Row already exists"});
-                return res.status(500).json({error: "Could not create Row"});
-            }
-            break;
-        case "Slot":
-            //
-            break;
-        default:
-            return res.status(400).json({error: "Invalid category specified"});
+    if (!builderItem.name) return res.status(400).json({error: "No name specified"});
+    try {
+        const result = await PoolBuilderHelper.storeItem(builderItem);
+        if(!result || result.affectedRows===0) return res.status(500).json({error: `Could not create ${category.name}`});
+        builderItem.id = result.insertId;
+        return res.status(200).json(builderItem);
+    }catch (e) {
+        return res.status(500).json({error: `Could not create ${category.name}`});
     }
 });
 

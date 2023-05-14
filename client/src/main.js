@@ -1,16 +1,16 @@
-import {createApp, markRaw} from "vue";
+import { createApp, markRaw } from "vue";
 import App from "./App.vue";
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
 import "./registerServiceWorker";
 import router from "./router";
 
-import {createPinia} from "pinia";
+import { createPinia } from "pinia";
 
 // add interceptor through side effects
 import "./api/axios";
 
-import {library} from "@fortawesome/fontawesome-svg-core";
+import { library } from "@fortawesome/fontawesome-svg-core";
 import {
   faArrowLeft,
   faBars,
@@ -38,6 +38,7 @@ import {
   faHome,
   faKey,
   faLaptop,
+  faLock,
   faMicrochip,
   faMobileRetro,
   faMobileScreenButton,
@@ -65,8 +66,8 @@ import {
   faWarehouse,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
-import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
-import {faCircle} from "@fortawesome/free-regular-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { faCircle } from "@fortawesome/free-regular-svg-icons";
 
 library.add(
   faUser,
@@ -124,7 +125,7 @@ library.add(
   faCheck,
   faCloud
 );
-library.add(faBuilding, faCog, faArrowLeft, faCity);
+library.add(faBuilding, faCog, faArrowLeft, faCity, faLock);
 
 const pinia = createPinia();
 pinia.use(({ store }) => {

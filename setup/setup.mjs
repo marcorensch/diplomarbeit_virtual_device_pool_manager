@@ -170,9 +170,7 @@ const questions = [
         type: 'input',
         name: 'adminPassword',
         message: 'Admin password?',
-        default() {
-            return false
-        }
+        suffix: ' Generated if empty',
     }
 
 ]
@@ -180,7 +178,7 @@ let answers = await inquirer.prompt(questions).then((answers) => {
     return answers;
 });
 
-// add generated values
+// add generated & fixed values
 answers.DATABASE_NAME = "virtual_device_pool_manager";
 answers.DATABASE_NAME_TEST = "virtual_device_pool_manager_test";
 answers.API_URI = `http${answers.USE_SSL ? 's' : ''}://${answers.API_HOST}:${answers.API_PORT}`;
@@ -188,6 +186,8 @@ answers.JWT_SECRET = crypto.randomBytes(64).toString('hex');
 answers.JWT_REFRESH_SECRET = crypto.randomBytes(64).toString('hex');
 answers.USER_PWD_MIN_LENGTH = 8;
 answers.USER_NAME_MIN_LENGTH = 7;
+answers.MAX_SLOTS_PER_ROW = 10;
+answers.MAX_ROWS_PER_CABINET = 20;
 
 const envConfigurations = [
     {
@@ -263,5 +263,5 @@ try {
 
 
 console.log('\n-----------------------------------------------------------------------------');
-console.log("You can now using " + chalk.bold("npm run devStart") + " to start your server locally.");
+console.log("You can now using " + chalk.bold.yellow("npm run devStart") + " to start your server locally.");
 console.log('-----------------------------------------------------------------------------\n');

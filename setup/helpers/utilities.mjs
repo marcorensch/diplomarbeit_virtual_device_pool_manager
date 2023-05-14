@@ -41,7 +41,6 @@ export async function createAccount(dbName, username, pwd, role, connectionData)
         console.log(chalk.bold.green("\n********************* Admin user created! *********************\n"));
         console.log(chalk.bold.yellow("Username: " + username));
         console.log(chalk.bold.yellow("Password: " + password));
-        console.log(chalk.bold("Please change the password after login!"));
         console.log(chalk.bold.green("\n***************************************************************"));
     } else {
         console.log(chalk.bold.red("Failed to create admin user!"));
