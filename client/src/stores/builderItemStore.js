@@ -1,7 +1,7 @@
-import {defineStore} from "pinia";
-import {useToast} from "vue-toastification";
+import { defineStore } from "pinia";
+import { useToast } from "vue-toastification";
 import BuilderItem from "@/models/BuilderItem";
-import {useBuilderCategoriesStore} from "@/stores/builderCategoriesStore";
+import { useBuilderCategoriesStore } from "@/stores/builderCategoriesStore";
 import axios from "axios";
 
 const toast = useToast();

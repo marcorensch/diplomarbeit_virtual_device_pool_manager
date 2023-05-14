@@ -1,9 +1,9 @@
-import {createRouter, createWebHistory} from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
 import DevicesView from "../views/DevicesView.vue";
 
-import {useAuthStore} from "@/stores/auth";
+import { useAuthStore } from "@/stores/auth";
 
-import {useToast} from "vue-toastification";
+import { useToast } from "vue-toastification";
 
 const toast = useToast();
 

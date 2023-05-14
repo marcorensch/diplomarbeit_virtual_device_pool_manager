@@ -61,8 +61,8 @@
 </template>
 
 <script>
-import {useBuilderItemStore} from "@/stores/builderItemStore";
-import {useBuilderCategoriesStore} from "@/stores/builderCategoriesStore";
+import { useBuilderItemStore } from "@/stores/builderItemStore";
+import { useBuilderCategoriesStore } from "@/stores/builderCategoriesStore";
 import BuilderRow from "@/components/builder/BuilderRow.vue";
 
 export default {

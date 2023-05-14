@@ -182,10 +182,10 @@
 </template>
 
 <script>
-import {useBuilderItemStore} from "@/stores/builderItemStore";
-import {useBuilderCategoriesStore} from "@/stores/builderCategoriesStore";
+import { useBuilderItemStore } from "@/stores/builderItemStore";
+import { useBuilderCategoriesStore } from "@/stores/builderCategoriesStore";
 import UIkit from "uikit";
-import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 export default {
   name: "CabinetsView",
