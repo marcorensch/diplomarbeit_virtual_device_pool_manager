@@ -54,17 +54,21 @@
             <BuilderSlot
               :builderSlot="slot"
               :builderRow="builderRow"
-              @editSlot="handleEditSlotClicked(slot)"
+              :builderCabinet="builderCabinet"
+              @editSlot="handleEditSlotClicked(slot, locationIdentificator)"
             />
           </template>
-          <div>
+          <div v-if="slots.length < maxSlots">
             <div
               class="nxd-no-select"
               uk-scrollspy="cls:uk-animation-fade;delay:200"
             >
               <div
                 class="uk-card uk-card-body uk-padding-small nx-card-add uk-card-hover uk-flex uk-flex-center"
-                @click="handleAddSlotClicked"
+                @click.exact="handleAddSlotClicked"
+                v-on:click.shift="
+                  handleAddSlotClicked(Math.floor(maxSlots / 2))
+                "
               >
                 <div class="uk-text-small uk-width-auto uk-text-truncate">
                   <font-awesome-icon :icon="['fas', 'plus']" /> Add Slot
@@ -75,6 +79,101 @@
         </div>
       </div>
     </div>
+    <div
+      :id="'slot-config-modal-' + builderRow.id"
+      class="uk-flex-top"
+      uk-modal
+    >
+      <div class="uk-modal-dialog uk-margin-auto-vertical">
+        <template v-if="currentSelectedItem">
+          <button
+            class="uk-modal-close uk-modal-close-default"
+            uk-close
+            type="button"
+          ></button>
+          <div class="uk-modal-header">
+            <h2 class="uk-modal-title">
+              <font-awesome-icon
+                :icon="['fas', 'cubes']"
+                class="uk-margin-right"
+              />
+              Edit Slot {{ currentSelectedItem.name }}
+            </h2>
+          </div>
+          <div class="uk-modal-body">
+            <div class="uk-form" v-if="currentSelectedItem">
+              <div class="uk-margin">
+                <label for="name" class="uk-form-label">Name</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  class="uk-input"
+                  v-model="currentSelectedItem.name"
+                  placeholder="Cabinet Name"
+                />
+              </div>
+              <div class="uk-margin">
+                <label for="description" class="uk-form-label"
+                  >Description</label
+                >
+                <textarea
+                  id="description"
+                  name="description"
+                  type="textarea"
+                  class="uk-textarea"
+                  v-model="currentSelectedItem.description"
+                  placeholder="Location Description"
+                ></textarea>
+              </div>
+              <div class="uk-margin">
+                <label for="hidden" class="uk-form-label">Description</label>
+                <textarea
+                  type="textarea"
+                  id="hidden"
+                  name="hidden"
+                  class="uk-textarea"
+                  v-model="currentSelectedItem.hidden"
+                  placeholder="Hidden Information"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="uk-modal-footer">
+            <div class="uk-grid-small" uk-grid>
+              <div v-if="currentSelectedItem.id">
+                <button
+                  class="uk-button uk-button-danger"
+                  @click="handleModalDeleteClicked"
+                >
+                  Delete
+                </button>
+              </div>
+              <div class="uk-width-expand">
+                <div class="uk-grid-small uk-flex uk-flex-right" uk-grid>
+                  <div>
+                    <button
+                      class="uk-button uk-button-secondary uk-modal-close"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                  <div>
+                    <button
+                      class="uk-button uk-button-primary"
+                      :class="{ 'uk-disabled': !currentSelectedItem.name }"
+                      @click="handleModalSaveClicked"
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -82,14 +181,17 @@
 import BuilderSlot from "@/components/builder/BuilderSlot.vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { useBuilderItemStore } from "@/stores/builderItemStore";
+import { useToast } from "vue-toastification";
+import UIkit from "uikit";
 
 export default {
   name: "BuilderRow",
   components: { FontAwesomeIcon, BuilderSlot },
-  emits: ["edit-row", "edit-slot"],
+  emits: ["edit-row"],
   setup() {
     const builderItemStore = useBuilderItemStore();
-    return { builderItemStore };
+    const toast = useToast();
+    return { builderItemStore, toast };
   },
   props: {
     builderRow: {
@@ -108,6 +210,8 @@ export default {
   data() {
     return {
       slots: [],
+      maxSlots: parseInt(process.env.VUE_APP_MAX_SLOTS_PER_ROW),
+      currentSelectedItem: null,
     };
   },
   mounted() {
@@ -126,8 +230,7 @@ export default {
         times = 1;
       }
       for (let i = 0; i < times; ) {
-        console.log("addSlot", i);
-        await this.addSlot(i);
+        if (!(await this.addSlot(i))) break;
         i++;
       }
 
@@ -137,18 +240,39 @@ export default {
       );
     },
     async addSlot(loopIndex) {
+      const counter = this.slots.length + 1 + loopIndex;
+      if (counter > this.maxSlots) {
+        this.toast.warning("Max slots count reached for this row");
+        return false;
+      }
       const name = this.slots.length + 1 + loopIndex;
       await this.builderItemStore.createItem(
         this.slotCategoryId,
         this.builderRow.id,
         name
       );
+      return true;
     },
     handleEditRowClicked() {
       this.$emit("edit-row", this.builderRow);
     },
     handleEditSlotClicked(slot) {
-      this.$emit("edit-slot", slot);
+      this.currentSelectedItem = slot;
+      this.$nextTick(() => {
+        UIkit.modal("#slot-config-modal-" + this.builderRow.id).show();
+      });
+    },
+    async handleModalSaveClicked() {
+      await this.builderItemStore.updateItem(this.currentSelectedItem);
+      this.currentSelectedItem = null;
+      UIkit.modal("#slot-config-modal-" + this.builderRow.id).hide();
+      await this.getSlots();
+    },
+    async handleModalDeleteClicked() {
+      await this.builderItemStore.deleteItem(this.currentSelectedItem);
+      this.currentSelectedItem = null;
+      UIkit.modal("#slot-config-modal-" + this.builderRow.id).hide();
+      await this.getSlots();
     },
   },
 };

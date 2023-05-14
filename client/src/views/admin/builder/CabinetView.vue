@@ -1,5 +1,5 @@
 <template>
-  <div v-if="cabinet && categories">
+  <div v-if="cabinet && categories" class="nxd-no-select">
     <div class="uk-grid-small" uk-grid>
       <div>
         <router-link
@@ -57,7 +57,6 @@
               :builderCabinet="cabinet"
               :slotCategoryId="slotCategoryId"
               @editRow="handleEditRowClicked"
-              @editSlot="handleEditSlotClicked"
             />
           </div>
         </div>
@@ -216,9 +215,10 @@ export default {
       this.currentSelectedItem.categoryName = "Row";
       UIkit.modal("#config-modal").show();
     },
-    handleEditSlotClicked(builderSlotElement) {
+    handleEditSlotClicked(builderSlotElement, callback) {
       this.currentSelectedItem = builderSlotElement;
       this.currentSelectedItem.categoryName = "Slot";
+      this.currentSelectedItem.callback = callback;
       UIkit.modal("#config-modal").show();
     },
     async handleAddRowClicked(times) {

@@ -110,6 +110,7 @@
                   class="uk-input"
                   v-model="currentLocation.name"
                   placeholder="Location Name"
+                  @keydown.enter="handleModalSaveClicked"
                 />
               </div>
               <div class="uk-margin">
@@ -286,6 +287,8 @@ export default {
       UIkit.modal("#location-config-modal").show();
     },
     async handleModalSaveClicked() {
+      if (!this.currentLocation.name)
+        return UIkit.notification("Name is required", { status: "danger" });
       this.modalSaveOrDeleteClicked = true;
       this.currentLocation.category_id = this.locationCategoryId;
       const params = { ...this.currentLocation.params };
