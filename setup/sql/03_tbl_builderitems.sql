@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS `builder_items`
 (
     id          int(11)      NOT NULL AUTO_INCREMENT,
-    name        varchar(255) NOT NULL UNIQUE KEY,
+    name        varchar(255) NOT NULL,
     category_id int(11)      NOT NULL,
     description text         NOT NULL,
     hidden      text         NOT NULL,
