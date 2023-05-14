@@ -129,6 +129,7 @@ export const useBuilderItemStore = defineStore("builderItem", {
       const item = new BuilderItem();
       item.category_id = categoryId;
       item.parent_id = parentId;
+      item.sorting = 999;
       item.name = name;
       return await this.saveItem(item);
     },

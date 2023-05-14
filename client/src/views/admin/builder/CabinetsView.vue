@@ -185,7 +185,6 @@
 import {useBuilderItemStore} from "@/stores/builderItemStore";
 import {useBuilderCategoriesStore} from "@/stores/builderCategoriesStore";
 import UIkit from "uikit";
-import BuilderItem from "@/models/BuilderItem.mjs";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 
 export default {
@@ -225,13 +224,15 @@ export default {
         this.locationId
       );
     },
-    handleAddCabinetClicked() {
-      this.currentCabinet = new BuilderItem();
-      this.currentCabinet.category_id = this.cabinetsCategoryId;
-      this.currentCabinet.sorting = this.cabinets.length + 1;
-      this.currentCabinet.parent_id = this.locationId;
+    async handleAddCabinetClicked() {
       this.modalSaveOrDeleteClicked = false;
-      UIkit.modal("#cabinet-config-modal").show();
+      const name = this.cabinets.length + 1;
+      await this.builderItemStore.createItem(
+        this.cabinetsCategoryId,
+        this.locationId,
+        name
+      );
+      await this.updateCabinetsList();
     },
     handleEditCabinetClicked(cabinet) {
       this.modalSaveOrDeleteClicked = false;

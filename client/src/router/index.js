@@ -36,6 +36,7 @@ const routes = [
           }
         },
       },
+
       {
         path: "edit/:id",
         name: "edit-device",
