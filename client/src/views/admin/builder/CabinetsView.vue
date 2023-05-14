@@ -214,13 +214,17 @@ export default {
       this.categoriesStore.findCategoryIdByName("Cabinet");
     this.locationId = this.$route.params.id;
     this.location = await this.builderItemStore.loadItem(this.locationId);
-    this.cabinets = await this.builderItemStore.getChildItems(
-      this.cabinetsCategoryId
-    );
+    await this.updateCabinetsList();
     this.handleSortable("#cabinets");
     this.handleModalFeatures();
   },
   methods: {
+    async updateCabinetsList() {
+      this.cabinets = await this.builderItemStore.getChildItems(
+        this.cabinetsCategoryId,
+        this.locationId
+      );
+    },
     handleAddCabinetClicked() {
       this.currentCabinet = new BuilderItem();
       this.currentCabinet.category_id = this.cabinetsCategoryId;
@@ -237,10 +241,9 @@ export default {
     },
 
     async handleModalDeleteClicked() {
-      await this.builderItemStore.deleteItem(this.currentCabinet.id);
-      this.cabinets = await this.builderItemStore.getChildItems(
-        this.cabinetsCategoryId
-      );
+      this.modalSaveOrDeleteClicked = true;
+      await this.builderItemStore.deleteItem(this.currentCabinet);
+      await this.updateCabinetsList();
       UIkit.modal("#cabinet-config-modal").hide();
     },
     handleModalFeatures() {
@@ -274,15 +277,9 @@ export default {
       if (this.currentCabinet.id) {
         await this.builderItemStore.updateItem(this.currentCabinet);
       } else {
-        const status = await this.builderItemStore.saveItem(
-          this.currentCabinet
-        );
-        if (status) {
-          this.cabinets = await this.builderItemStore.loadItems(
-            this.cabinetsCategoryId
-          );
-        }
+        await this.builderItemStore.saveItem(this.currentCabinet);
       }
+      await this.updateCabinetsList();
       this.currentCabinet.params = params;
       UIkit.modal("#cabinet-config-modal").hide();
     },

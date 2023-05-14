@@ -312,9 +312,7 @@ export default {
           { stack: true }
         )
         .then(() => {
-          const status = this.builderItemStore.deleteItem(
-            this.currentLocation.id
-          );
+          const status = this.builderItemStore.deleteItem(this.currentLocation);
           if (status) {
             this.locations = this.locations.filter(
               (location) => location.id !== this.currentLocation.id

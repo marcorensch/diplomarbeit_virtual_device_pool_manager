@@ -1,9 +1,11 @@
 import {defineStore} from "pinia";
 import {useToast} from "vue-toastification";
 import BuilderItem from "@/models/BuilderItem";
+import {useBuilderCategoriesStore} from "@/stores/builderCategoriesStore";
 import axios from "axios";
 
 const toast = useToast();
+const builderCategoriesStore = useBuilderCategoriesStore();
 
 export const useBuilderItemStore = defineStore("builderItem", {
   state: () => ({
@@ -42,12 +44,12 @@ export const useBuilderItemStore = defineStore("builderItem", {
       }
     },
 
-    async getChildItems(category_id) {
+    async getChildItems(category_id, parent_id = null) {
       try {
         const response = await axios.get("/api/admin/poolbuilder/items", {
           params: {
             category_id,
-            parent_id: this.item.id,
+            parent_id: parent_id || this.item.id,
           },
         });
         return response.data.map((item) => {
@@ -63,40 +65,49 @@ export const useBuilderItemStore = defineStore("builderItem", {
     async saveItem(item = null) {
       console.log(item);
       if (!item) item = this.item;
+      const itemCategoryName =
+        builderCategoriesStore.findCategoryNameById(item.category_id) || "item";
       try {
         await axios.post("/api/admin/poolbuilder/items", item);
-        toast.success("Item added");
+        toast.success(`${itemCategoryName} added`);
         return true;
       } catch (e) {
-        toast.error("Something went wrong while adding item");
+        toast.error(`Something went wrong while adding ${itemCategoryName}`);
         console.log(e);
         return false;
       }
     },
     async updateItem(item = null) {
       if (!item) item = this.item;
+      const itemCategoryName =
+        builderCategoriesStore.findCategoryNameById(item.category_id) || "item";
       try {
         await axios.put(`/api/admin/poolbuilder/items/${item.id}`, item);
-        toast.success("Item updated");
+        toast.success(`${itemCategoryName} updated`);
         return true;
       } catch (error) {
-        toast.error("Something went wrong while updating item");
+        toast.error(`Something went wrong while updating ${itemCategoryName}`);
         console.log(error);
         return false;
       }
     },
-    async deleteItem(id = null) {
-      if (!id) id = this.item.id;
+    async deleteItem(item = null) {
+      if (!item) item = this.item.id;
+      const itemCategoryName =
+        builderCategoriesStore.findCategoryNameById(item.category_id) || "item";
       try {
-        await axios.delete(`/api/admin/poolbuilder/items/${id}`);
-        toast.success("Item deleted");
+        await axios.delete(`/api/admin/poolbuilder/items/${item.id}`);
+        toast.success(`${itemCategoryName} deleted`);
         return true;
       } catch (error) {
-        toast.error("Something went wrong while deleting the item");
+        toast.error(
+          `Something went wrong while deleting the ${itemCategoryName}`
+        );
         console.log(error);
         return false;
       }
     },
+
     async updateSorting(items) {
       if (!items) return false;
       const sortingMap = items.map((item) => {

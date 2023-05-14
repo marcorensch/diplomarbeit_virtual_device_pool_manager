@@ -33,22 +33,11 @@
       <template v-else>
         <div id="cabinet-rows">
           <div
-            v-for="(index, row) in rows"
+            v-for="(row, index) in rows"
             :key="index"
             class="uk-margin-bottom"
           >
-            <div class="uk-width-1-1">
-              <div class="uk-card uk-card-default">
-                <div class="uk-card-header">
-                  <span class="uk-text-large nxd-text-navy uk-text-light">{{
-                    row.name ? row.name : "Row"
-                  }}</span>
-                </div>
-                <div class="uk-card-body">
-                  <div class="slot-container"></div>
-                </div>
-              </div>
-            </div>
+            <BuilderRow :row="row" :cabinet="cabinet" />
           </div>
         </div>
         <div class="uk-margin">
@@ -74,9 +63,13 @@
 <script>
 import {useBuilderItemStore} from "@/stores/builderItemStore";
 import {useBuilderCategoriesStore} from "@/stores/builderCategoriesStore";
+import BuilderRow from "@/components/builder/BuilderRow.vue";
 
 export default {
   name: "CabinetView",
+  components: {
+    BuilderRow,
+  },
   setup() {
     const builderItemStore = useBuilderItemStore();
     const categoriesStore = useBuilderCategoriesStore();
@@ -100,7 +93,7 @@ export default {
   },
   methods: {
     async handleAddRowClicked() {
-      const name = "Row " + (this.rows.length + 1);
+      const name = this.rows.length + 1;
       await this.builderItemStore.createItem(
         this.rowCategoryId,
         this.cabinet.id,

@@ -29,5 +29,10 @@ export const useBuilderCategoriesStore = defineStore("builderCategories", {
       if (!category) return false;
       return category.id;
     },
+    findCategoryNameById(id) {
+      const category = this.categories.find((category) => category.id === id);
+      if (!category) return false;
+      return category.name;
+    },
   },
 });
