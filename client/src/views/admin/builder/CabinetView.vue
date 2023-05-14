@@ -37,7 +37,7 @@
             :key="index"
             class="uk-margin-bottom"
           >
-            <BuilderRow :row="row" :cabinet="cabinet" />
+            <BuilderRow :builderRow="row" :builderCabinet="cabinet" />
           </div>
         </div>
         <div class="uk-margin">
@@ -105,23 +105,4 @@ export default {
 };
 </script>
 
-<style lang="less" scoped>
-@import "@/assets/less/variables.less";
-#cabinet {
-  position: relative;
-  width: 100%;
-  background-color: @color-white;
-  border: 2px dashed @color-grey-lighter;
-  border-radius: @nxd-border-radius;
-  padding: 10px;
-  margin: 10px;
-}
-#nxd-cabinet-placeholder {
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  &:hover > * {
-    color: @color-primary !important;
-    transition: all 0.2s ease-in-out;
-  }
-}
-</style>
+<style lang="less" scoped></style>
