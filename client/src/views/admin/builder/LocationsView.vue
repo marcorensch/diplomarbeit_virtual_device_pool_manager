@@ -207,11 +207,11 @@
 </template>
 
 <script>
-import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import UIkit from "uikit";
 import BuilderItem from "@/models/BuilderItem.mjs";
-import {useBuilderItemStore} from "@/stores/builderItemStore";
-import {useBuilderCategoriesStore} from "@/stores/builderCategoriesStore";
+import { useBuilderItemStore } from "@/stores/builderItemStore";
+import { useBuilderCategoriesStore } from "@/stores/builderCategoriesStore";
 
 export default {
   name: "LocationsView",
@@ -324,7 +324,6 @@ export default {
     },
 
     handleSortable(container) {
-      console.log("handle sortable");
       UIkit.util.on(container, "moved", (e) => {
         const children = e.target.children;
         for (let i = 0; i < children.length; i++) {

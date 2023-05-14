@@ -20,7 +20,8 @@
         id="nxd-cabinet-placeholder"
         v-if="!rows.length"
         class="uk-position-center"
-        @click="handleAddRowClicked"
+        @click.exact="handleAddRowClicked"
+        v-on:click.shift="handleAddRowClicked(2)"
       >
         <h3 class="uk-margin-remove uk-text-muted uk-text-light uk-text-center">
           It looks a bit empty here...<br />Click here to add your first row to
@@ -47,7 +48,8 @@
           >
             <div
               class="uk-card uk-card-body nx-card-add uk-card-hover uk-flex uk-flex-center"
-              @click="handleAddRowClicked"
+              @click.exact="handleAddRowClicked"
+              v-on:click.shift="handleAddRowClicked(2)"
             >
               <div class="uk-text-large uk-width-auto">
                 <font-awesome-icon :icon="['fas', 'plus']" /> Add Row
@@ -92,14 +94,25 @@ export default {
     this.rows = await this.builderItemStore.getChildItems(this.rowCategoryId);
   },
   methods: {
-    async handleAddRowClicked() {
-      const name = this.rows.length + 1;
+    async handleAddRowClicked(times) {
+      if (isNaN(times)) {
+        times = 1;
+      }
+      for (let i = 0; i < times; ) {
+        console.log("addRow", i);
+        await this.addRow(i);
+        i++;
+      }
+
+      this.rows = await this.builderItemStore.getChildItems(this.rowCategoryId);
+    },
+    async addRow(loopIndex) {
+      const name = this.rows.length + 1 + loopIndex;
       await this.builderItemStore.createItem(
         this.rowCategoryId,
         this.cabinet.id,
         name
       );
-      this.rows = await this.builderItemStore.getChildItems(this.rowCategoryId);
     },
   },
 };
