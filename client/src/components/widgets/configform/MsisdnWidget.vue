@@ -53,7 +53,7 @@
       <div class="uk-flex uk-flex-right@m">
         <button
           @click="showMsisdnModal"
-          class="uk-button uk-button-primary uk-width-1-1 uk-width-auto@m"
+          class="uk-button uk-button-secondary uk-button-small uk-width-1-1 uk-width-auto@m"
         >
           Select
         </button>

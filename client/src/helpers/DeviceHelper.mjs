@@ -58,7 +58,7 @@ export default class DeviceHelper {
             device.added = device.added.split("T")[0];
             device.imei = JSON.parse(device.imei) || [];
             device.msisdns = response.data.linked_msisdns?.split(",").map((el) => parseInt(el)) || [];
-            device.slot = await DeviceHelper.getSlot(device.slot_id);
+            device.slot = device.slot_id ? await DeviceHelper.getSlot(device.slot_id) : null;
         } catch (e) {
             console.log(error);
         }

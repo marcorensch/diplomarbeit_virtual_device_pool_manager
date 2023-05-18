@@ -193,14 +193,28 @@
                     <div class="uk-margin">
                       <label for="pool-location">Pool Location</label>
                       <div>
-                        {{ device.slot?.label ? device.slot.label : "Not set" }}
+                        <span>{{
+                          device.slot_id && device.slot?.label
+                            ? device.slot.label
+                            : "Not set"
+                        }}</span>
+
+                        <button
+                          class="uk-button uk-button-danger uk-button-small uk-width-auto"
+                          v-if="device.slot_id"
+                          @click="handleRemoveLocationLinkClicked"
+                        >
+                          <font-awesome-icon icon="fas fa-trash" />
+                        </button>
                       </div>
-                      <button
-                        class="uk-margin-small-top uk-button uk-button-small uk-button-secondary"
-                        @click="handleSetLocationClicked"
-                      >
-                        Set Location
-                      </button>
+                      <div class="uk-flex uk-flex-right">
+                        <button
+                          class="uk-margin-small-top uk-button uk-button-small uk-button-secondary uk-width-1-1"
+                          @click="handleSetLocationClicked"
+                        >
+                          Set Location
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -216,6 +230,9 @@
         </div>
         <div class="uk-width-1-1 uk-width-1-3@s">
           <NotesWidget />
+        </div>
+        <div class="uk-width-1-1 uk-width-2-3@s">
+          <WeblinksWidget :in-card="true" :links="device.links" />
         </div>
       </div>
     </div>
@@ -236,12 +253,16 @@ import { useVuelidate } from "@vuelidate/core";
 import { required, numeric, helpers } from "@vuelidate/validators";
 import DeviceHelper from "@/helpers/DeviceHelper.mjs";
 import PoolSelector from "@/components/PoolSelector.vue";
+import WeblinksWidget from "@/components/widgets/configform/weblinksWidget.vue";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 const exactLength = (length) => (value) => value.toString().length === length;
 
 export default {
   name: "DeviceConfigView",
   components: {
+    FontAwesomeIcon,
+    WeblinksWidget,
     PoolSelector,
     NotesWidget,
     ImageWidget,
@@ -334,6 +355,10 @@ export default {
     },
     handleSetLocationClicked() {
       this.$refs.poolSelector.showModal();
+    },
+    handleRemoveLocationLinkClicked() {
+      this.device.slot_id = null;
+      this.device.slot = null;
     },
   },
 };

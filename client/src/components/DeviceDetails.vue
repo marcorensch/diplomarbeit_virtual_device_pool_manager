@@ -23,7 +23,7 @@
               {{ device.name }}
             </div>
             <table
-              class="uk-table uk-table-divider uk-table-small uk-table-middle uk-table-justify"
+              class="uk-table uk-table-divider uk-table-small uk-table-middle uk-table-justify uk-table-align-top"
             >
               <tbody>
                 <tr>
@@ -33,15 +33,24 @@
                     >
                   </th>
                   <td>
-                    <span>{{ device.slot.label }}</span>
+                    <span v-if="device.slot">{{ device.slot.label }}</span>
+                    <span v-else>Virtual Device</span>
                   </td>
                 </tr>
                 <tr>
                   <th>
-                    <span class="nxd-text-navy uk-width-small">Since: </span>
+                    <span class="nxd-text-navy">Since: </span>
                   </th>
                   <td>
                     <span>{{ createDateString(device.added) }}</span>
+                  </td>
+                </tr>
+                <tr v-if="imeis.length">
+                  <th><span class="nxd-text-navy">IMEI</span></th>
+                  <td>
+                    <div v-for="(imei, index) of imeis" :key="index">
+                      {{ imei.imei }}
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -65,7 +74,7 @@
                 target="_blank"
                 :title="'Search ' + device.name + ' on kimovil'"
                 :href="buildKimovilLink(device)"
-                >Search Device on kimovil</a
+                >Search Device on kimovil (Technical Details)</a
               >
             </li>
           </ul>
@@ -97,6 +106,7 @@ export default {
   data() {
     return {
       device: null,
+      imeis: [],
     };
   },
   methods: {
@@ -108,7 +118,13 @@ export default {
       });
     },
     show(device) {
+      this.imeis = [];
       this.device = device;
+      try {
+        this.imeis = JSON.parse(this.device.imei) || [];
+      } catch (e) {
+        console.log(e);
+      }
       console.log(device);
       this.$nextTick(() => {
         UIkit.offcanvas("#device-details").show();
