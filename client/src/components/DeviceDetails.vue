@@ -22,7 +22,6 @@
             <div class="uk-h2 nxd-text-navy uk-margin-remove uk-text-light">
               {{ device.name }}
             </div>
-            <hr />
             <table
               class="uk-table uk-table-divider uk-table-small uk-table-middle uk-table-justify"
             >
@@ -54,6 +53,22 @@
         </div>
         <div class="uk-margin">
           <h3>Links</h3>
+          <ul class="uk-list uk-list-divider">
+            <li
+              v-if="
+                ['Smartphone', 'Simple Phone', 'Tablet'].includes(
+                  device.device_type_name
+                )
+              "
+            >
+              <a
+                target="_blank"
+                :title="'Search ' + device.name + ' on kimovil'"
+                :href="buildKimovilLink(device)"
+                >Search Device on kimovil</a
+              >
+            </li>
+          </ul>
         </div>
         <div class="uk-margin">
           <h3>GuideMe</h3>
@@ -101,6 +116,21 @@ export default {
     },
     showDeviceEdit(id) {
       this.$router.push({ name: "edit-device", params: { id: id } });
+    },
+    buildKimovilLink(device) {
+      let url = "https://www.kimovil.com/en/";
+      if (
+        device.device_type_name === "Smartphone" ||
+        device.device_type_name === "Simple Phone"
+      ) {
+        url += "compare-smartphones/";
+      } else if (device.device_type_name === "Tablet") {
+        url += "tablets/";
+      }
+      url += `name.${device.name.toLowerCase()}`;
+      if (device.manufacturer_name)
+        url += `,i_b+slug.${device.manufacturer_name.toLowerCase()}`;
+      return url;
     },
   },
 };
