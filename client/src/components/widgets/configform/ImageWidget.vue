@@ -7,7 +7,7 @@
         v-if="image"
       >
         <div class="configurator-main-image-container uk-border-rounded">
-          <img :src="image" :title="title" uk-cover class="uk-animation-fade" />
+          <img :src="image" :title="title" class="uk-animation-fade" />
         </div>
 
         <div class="uk-position-top-right">
@@ -41,7 +41,7 @@
               :updateTriggerCounter="updateTriggerCounter"
               :baseDir="baseDir"
               @file-selected="handleFileSelected"
-              :allowedFiletypes="'image/jpeg, image/png, image/gif'"
+              :allowedFiletypes="'image/jpeg, image/png, image/gif, image/webp'"
             />
           </div>
         </div>
@@ -135,18 +135,7 @@ export default {
 .configurator-main-image-container {
   display: block;
   position: relative;
-  background: linear-gradient(
-    90deg,
-    rgba(0, 0, 0, 0.02),
-    rgba(0, 0, 0, 0.05),
-    rgba(0, 0, 0, 0.02)
-  );
-  background-size: 200% 200%;
-  padding-bottom: 100%;
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  animation: gradient 1s ease infinite;
+  text-align: center;
 }
 @keyframes gradient {
   0% {

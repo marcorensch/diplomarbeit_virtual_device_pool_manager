@@ -30,6 +30,22 @@ export default class DeviceHelper {
         }
     }
 
+    static async getDevices(limit, offset) {
+        if (!limit) {
+            limit = 20;
+        }
+        if (!offset) {
+            offset = 0;
+        }
+
+        try{
+            const response = await axios.get(`/api/devices?limit=${limit}&offset=${offset}`);
+            return response.data;
+        }catch (e) {
+            toast.error("Error getting devices");
+            return [];
+        }
+    }
     static async loadDevice(id) {
         const device = new Device();
         if (!id) {

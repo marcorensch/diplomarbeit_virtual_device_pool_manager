@@ -272,16 +272,12 @@
                 class="file-media uk-position-relative uk-card uk-card-default uk-card-small uk-card-body"
                 :class="{ choosen: file.choosen }"
               >
-                <div class="uk-card-media" style="min-height: 50px">
-                  <img
-                    v-if="checkIsImage(file)"
-                    :src="buildUrl(file)"
-                    alt=""
-                    width="50"
-                    class="uk-preserve-width"
-                  />
+                <div
+                  class="uk-card-media uk-background-contain uk-background-center-center nxd-height-xxsmall"
+                  :style="'background-image: url(' + buildUrl(file) + ')'"
+                >
                   <font-awesome-icon
-                    v-else
+                    v-if="!checkIsImage(file)"
                     :icon="['fas', 'file']"
                     style="font-size: 50px"
                   />
@@ -469,7 +465,7 @@ export default {
     },
     allowedFiletypes: {
       type: String,
-      default: () => "image/jpeg, image/png, image/gif",
+      default: () => "image/jpeg, image/png, image/gif, image/webp",
     },
   },
   watch: {
@@ -648,7 +644,7 @@ export default {
     checkIsImage(file) {
       return (
         file.data.mimeType.startsWith("image") &&
-        ["jpg", "jpeg", "png", "gif", "svg"].includes(
+        ["jpg", "jpeg", "png", "gif", "svg", "webp"].includes(
           file.data.type.toLowerCase()
         )
       );

@@ -1,0 +1,71 @@
+@import "../variables.less";
+
+#device-details {
+  color: @color-grey;
+
+  h1, h2, h3, h4, h5, h6 {
+    color: @color-navy;
+  }
+  p,
+  span {
+    color: @color-grey;
+  }
+
+  .uk-offcanvas-bar{
+    background: @color-white;
+    color: @color-grey-dark;
+    width: 45vw;
+    max-width: 100%;
+    .uk-offcanvas-close {
+      color: @color-grey-dark;
+    }
+
+    box-shadow: -6px 0 12px rgba(0,0,0,.175);
+
+    #device-image {
+      text-align: center;
+      img {
+        max-width: 100%;
+        max-height: 100%;
+      }
+      svg {
+        font-size: 12rem;
+        color: @color-grey;
+      }
+    }
+
+    .device-controls {
+      background: @color-horizon;
+    }
+  }
+
+  button.uk-button.uk-button-primary{
+    background-color: @color-primary;
+    color: @color-white;
+    border-color: @color-primary;
+
+    &:hover {
+      background-color: @color-primary-hover;
+      border-color: @color-primary-hover;
+    }
+  }
+
+  #offcanvas-content{
+    margin-top: 20px;
+    padding-bottom: 80px;
+  }
+
+  .uk-table.uk-table-striped tbody tr:nth-child(odd) {
+    background-color: @color-cloud;
+  }
+
+    .uk-table.uk-table-hover tbody tr:hover {
+        background-color: @color-grey-light;
+        color: @color-grey-dark;
+    }
+
+  .uk-table.uk-table-divider tbody tr {
+    border-color: @color-grey-lighter;
+  }
+
+}

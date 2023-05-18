@@ -78,7 +78,6 @@ export default class PoolHelper {
             if (i === 1) label += ".";
 
         }
-        console.log(label)
         return label;
     }
 

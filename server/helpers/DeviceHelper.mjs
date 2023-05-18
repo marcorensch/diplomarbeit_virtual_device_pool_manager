@@ -1,4 +1,5 @@
 import DatabaseModel from "../models/DatabaseModel.mjs";
+import PoolHelper from "./PoolHelper.mjs";
 
 export default class DeviceHelper {
 
@@ -21,10 +22,18 @@ export default class DeviceHelper {
             console.log(e.message);
         }
 
+        for (const device of devices) {
+            try{
+            device.slot = await PoolHelper.getItem(device.slot_id, false);
+            }catch (e) {
+                console.log(e.message);
+            }
+        }
+
         return devices;
     }
 
-    static async getDevicesBySearch(search, limit, offset) {
+    static async getDevicesBySearch(searchString, limit, offset) {
 
     }
 
