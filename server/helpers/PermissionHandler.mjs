@@ -38,15 +38,10 @@ export const permissions = {
     ACCESS_SIM_TYPES: 'canAccessSimTypes',
     // PoolBuilder Management
     ACCESS_POOL_BUILDER: 'canAccessPoolBuilder',
-    CREATE_LOCATION: 'canCreateLocation',
-    DELETE_LOCATION: 'canDeleteLocation',
-    UPDATE_LOCATION: 'canUpdateLocation',
-    CREATE_CABINET: 'canCreateCabinet',
-    DELETE_CABINET: 'canDeleteCabinet',
-    UPDATE_CABINET: 'canUpdateCabinet',
-    CREATE_SLOT: 'canCreateSlot',
-    DELETE_SLOT: 'canDeleteSlot',
-    UPDATE_SLOT: 'canUpdateSlot',
+    CREATE_ITEM: 'canCreateItem',
+    DELETE_ITEM: 'canDeleteItem',
+    UPDATE_ITEM: 'canUpdateItem',
+
     // Documents
     CREATE_DOCUMENTS: 'canCreateDocuments',
     DELETE_DOCUMENTS: 'canDeleteDocuments',

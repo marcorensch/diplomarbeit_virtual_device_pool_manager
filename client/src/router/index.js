@@ -14,7 +14,7 @@ const routes = [
     children: [
       {
         path: "",
-        name: "widgets",
+        name: "deviceslist",
         component: () => import("../views/devices/ListView.vue"),
         meta: { transition: "fade" },
       },

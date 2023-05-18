@@ -18,11 +18,11 @@ export default class PoolBuilderHelper {
     }
 
     static async getItem(id) {
-        if(!id) throw new Error("No id specified");
+        if(!id) throw {type: "NO_ID_SPECIFIED"}
         const database = new DatabaseModel();
         const query = "SELECT * FROM builder_items WHERE id = ? LIMIT 1";
         const poolBuilderItem = await database.query(query, [id]);
-        if(poolBuilderItem.length === 0) throw new Error("No item found");
+        if(poolBuilderItem.length === 0) throw {type: "ITEM_NOT_FOUND"};
         return poolBuilderItem[0];
     }
 

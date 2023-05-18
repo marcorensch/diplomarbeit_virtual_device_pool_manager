@@ -65,9 +65,9 @@ import {
   faUserShield,
   faWarehouse,
   faXmark,
+  faCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { faCircle } from "@fortawesome/free-regular-svg-icons";
 
 library.add(
   faUser,
@@ -125,7 +125,7 @@ library.add(
   faCheck,
   faCloud
 );
-library.add(faBuilding, faCog, faArrowLeft, faCity, faLock);
+library.add(faBuilding, faCog, faArrowLeft, faCity, faLock, faCircle);
 
 const pinia = createPinia();
 pinia.use(({ store }) => {

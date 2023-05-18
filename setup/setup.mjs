@@ -186,7 +186,7 @@ answers.JWT_SECRET = crypto.randomBytes(64).toString('hex');
 answers.JWT_REFRESH_SECRET = crypto.randomBytes(64).toString('hex');
 answers.USER_PWD_MIN_LENGTH = 8;
 answers.USER_NAME_MIN_LENGTH = 7;
-answers.MAX_SLOTS_PER_ROW = 10;
+answers.MAX_SLOTS_PER_ROW = 12;
 answers.MAX_ROWS_PER_CABINET = 20;
 
 const envConfigurations = [

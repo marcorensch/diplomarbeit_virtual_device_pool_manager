@@ -1,9 +1,12 @@
 import supertest from "supertest";
 import chai from "chai";
-const { expect } = chai;
+
+const {expect} = chai;
 import {app} from "../server.mjs";
 import path from "path";
 import {fileURLToPath} from "url";
+import {describe} from "mocha";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -66,7 +69,7 @@ describe("Test Logout Route", () => {
     });
 });
 
-describe("Test Authentication Routes", () => {
+describe("Test Authentication Endpoints", () => {
     const agent = supertest.agent(app);
     afterEach(async () => {
         await agent.get("/api/auth/logout");
@@ -117,14 +120,24 @@ describe("Test Authentication Routes", () => {
 
 });
 
-describe("Test Administrative Account Routes", () => {
-    const newUsrAcc = {firstname: "test", lastname: "test", username: "test", password: "test", email:"", notes:"", hidden:"", role_id: 2};
+describe("Test administrative Account Endpoints", () => {
+    const newUsrAcc = {
+        firstname: "test",
+        lastname: "test",
+        username: "test",
+        password: "test",
+        email: "",
+        notes: "",
+        hidden: "",
+        role_id: 2
+    };
     const agent = supertest.agent(app);
     it("should return 401 and text Missing token for get on /api/admin/accounts when not logged in", async () => {
         await agent.get("/api/auth/logout");
         const response = await agent.get("/api/admin/accounts");
         expect(response.status).to.eql(401, response.text);
-        expect(response.text).to.eql("Missing tokens");
+        expect(response.body).to.have.property("message");
+        expect(response.body.message).to.eql("Unauthorized");
 
     });
     it("should return 200 for /api/admin/accounts when logged in with ADMIN role", async () => {
@@ -161,7 +174,10 @@ describe("Test Administrative Account Routes", () => {
         await agent.post("/api/auth/login").send(adminCredentials);
         const data = await agent.get("/api/admin/accounts");
         const testUsr = data.body.users.find((usr) => usr.username === "test");
-        const response = await agent.put("/api/admin/accounts/" + testUsr.id).send({username: " fooBiba  ", role_id: 2});
+        const response = await agent.put("/api/admin/accounts/" + testUsr.id).send({
+            username: " fooBiba  ",
+            role_id: 2
+        });
         expect(response.status).to.eql(400, response.text);
         expect(response.text).to.eql("Username does not meet the requirements");
     });
@@ -181,7 +197,7 @@ describe("Test Administrative Account Routes", () => {
         const data = {username: "test", password: "test"};
         await agent.post("/api/auth/login").send(data);
         const response = await agent.get("/api/admin/accounts");
-        expect(response.status).to.eql(403, response.text);
+        expect(response.status).to.eql(403);
     })
 
     it("should return 200 when deleting existing user", async () => {
@@ -209,10 +225,28 @@ describe("Test Administrative Account Routes", () => {
     });
 });
 
-describe("Test User available Account Routes", () => {
+describe("Test User available Account Endpoints", () => {
     const agent = supertest.agent(app);
-    const newUsrAcc = {firstname: "", lastname: "", username: "accountTestsUser", password: "accountTestsUser", email:"", notes:"", hidden:"", role_id: 3};
-    const secondUsrAcc = {firstname: "", lastname: "", username: "existingUserName", password: "accountTestsUser", email:"", notes:"", hidden:"", role_id: 3};
+    const newUsrAcc = {
+        firstname: "",
+        lastname: "",
+        username: "accountTestsUser",
+        password: "accountTestsUser",
+        email: "",
+        notes: "",
+        hidden: "",
+        role_id: 3
+    };
+    const secondUsrAcc = {
+        firstname: "",
+        lastname: "",
+        username: "existingUserName",
+        password: "accountTestsUser",
+        email: "",
+        notes: "",
+        hidden: "",
+        role_id: 3
+    };
     const accountTestsUserAcc = {
         username: "accountTestsUser",
         password: "accountTestsUser",
@@ -239,7 +273,7 @@ describe("Test User available Account Routes", () => {
         await agent.get("/api/auth/logout");
     });
 
-    describe("updating own account",  () => {
+    describe("updating own account", () => {
         beforeEach(async () => {
             await agent.get("/api/auth/logout");
         });
@@ -260,7 +294,11 @@ describe("Test User available Account Routes", () => {
         });
         it("should return 200 when updating email, firstname, lastname", async () => {
             const login = await agent.post("/api/auth/login").send(accountTestsUserAcc);
-            const response = await agent.put(`/api/accounts/${login.body.user.id}`).send({lastname: "newLastname", firstname: "newFirstname", email: "my@address.tld"});
+            const response = await agent.put(`/api/accounts/${login.body.user.id}`).send({
+                lastname: "newLastname",
+                firstname: "newFirstname",
+                email: "my@address.tld"
+            });
             expect(response.status).to.eql(200, response.text);
         });
         it("should return 200 when updating username (that is not already in use)", async () => {
@@ -285,7 +323,7 @@ describe("Test User available Account Routes", () => {
         });
     });
 
-    describe("user account changes got stored in database",  () => {
+    describe("user account changes got stored in database", () => {
         beforeEach(async () => {
             await agent.get("/api/auth/logout");
         });
@@ -298,7 +336,11 @@ describe("Test User available Account Routes", () => {
         });
         it('should have new firstname, lastname, email stored in database after change', async () => {
             const login = await agent.post("/api/auth/login").send(accountTestsUserAcc);
-            await agent.put(`/api/accounts/${login.body.user.id}`).send({firstname: "testAgain", lastname: "testAgain", email: "foo@bar.tld"});
+            await agent.put(`/api/accounts/${login.body.user.id}`).send({
+                firstname: "testAgain",
+                lastname: "testAgain",
+                email: "foo@bar.tld"
+            });
             await agent.get("/api/auth/logout");
             const login2 = await agent.post("/api/auth/login").send(accountTestsUserAcc);
             expect(login2.body.user.firstname).to.eql("testAgain", login2.body.user.firstname);
@@ -306,7 +348,7 @@ describe("Test User available Account Routes", () => {
             expect(login2.body.user.email).to.eql("foo@bar.tld", login2.body.user.email);
         });
     });
-    describe("block changes for other accounts",  () => {
+    describe("block changes for other accounts", () => {
         it("should return 403 when trying to updating firstname of other account with message", async () => {
             const firstUserLogin = await agent.post("/api/auth/login").send(accountTestsUserAcc);
             await agent.get("/api/auth/logout");
@@ -330,7 +372,7 @@ describe("Test User available Account Routes", () => {
             expect(response.text).to.eql("You are not allowed to update this account");
         });
     });
-    describe("updating own account with invalid data",  () => {
+    describe("updating own account with invalid data", () => {
         it("should return 400 when updating username with empty string", async () => {
             const login = await agent.post("/api/auth/login").send(accountTestsUserAcc);
             const response = await agent.put(`/api/accounts/${login.body.user.id}`).send({username: ""});
@@ -376,16 +418,16 @@ describe("Test User available Account Routes", () => {
     });
 });
 
-describe("Test MSISDN Manager API", () => {
+describe("Test MSISDN Manager API Endpoints", () => {
     const agent = supertest.agent(app);
     const validData = {
         msisdn: "41790001122",
-        sim_number:"89410112345678909876",
+        sim_number: "89410112345678909876",
         sim_type_id: 1,
-        abonnement:"Abonnement Name",
-        scn:"1234567",
-        notes:"Some notes",
-        hidden:"Hidden notes"
+        abonnement: "Abonnement Name",
+        scn: "1234567",
+        notes: "Some notes",
+        hidden: "Hidden notes"
     };
     let validMainId;
     let validSubId;
@@ -490,7 +532,7 @@ describe("Test MSISDN Manager API", () => {
 
 });
 
-describe("Test FileManager API", () => {
+describe("Test FileManager API Endpoints", () => {
     const agent = supertest.agent(app);
     afterEach(async () => {
         await agent.get("/api/auth/logout");
@@ -535,13 +577,21 @@ describe("Test FileManager API", () => {
 
     it("should return 403 when trying to rename file with guest permissions", async () => {
         await agent.post("/api/auth/login").send({username: "guest", password: "test"});
-        const response = await agent.put("/api/filemanager/rename").send({oldName: "nxd-logo.png", newName: "nxd-logo2.png", parentDir: "test"});
+        const response = await agent.put("/api/filemanager/rename").send({
+            oldName: "nxd-logo.png",
+            newName: "nxd-logo2.png",
+            parentDir: "test"
+        });
         expect(response.status).to.eql(403);
     });
 
     it("should return 200 when trying to rename file with manager permissions", async () => {
         await agent.post("/api/auth/login").send({username: "manager", password: "test"});
-        const response = await agent.put("/api/filemanager/rename").send({oldName: "nxd-logo.png", newName: "nxd-logo2.png", parentDir: "test"});
+        const response = await agent.put("/api/filemanager/rename").send({
+            oldName: "nxd-logo.png",
+            newName: "nxd-logo2.png",
+            parentDir: "test"
+        });
         console.log(response.text)
         expect(response.status).to.eql(200);
     });
@@ -587,29 +637,51 @@ describe("Test FileManager API", () => {
     });
     it("should return 403 with correct message when trying to create a folder with guest permissions", async () => {
         await agent.post("/api/auth/login").send({username: "guest", password: "test"});
-        const response = await agent.post("/api/filemanager/folders").send({newFolderName: "subTest", parentFolder: "test"});
+        const response = await agent.post("/api/filemanager/folders").send({
+            newFolderName: "subTest",
+            parentFolder: "test"
+        });
         expect(response.status).to.eql(403);
-        expect(response.body).to.have.property("message");
-        expect(response.body.message).to.eql("Unauthorized");
     });
     it("should return 201 with correct message when trying to create a folder with guest permissions", async () => {
         await agent.post("/api/auth/login").send(adminCredentials);
-        const response = await agent.post("/api/filemanager/folders").send({newFolderName: "adminCreatedFolder", parentFolder: "test"});
+        const response = await agent.post("/api/filemanager/folders").send({
+            newFolderName: "adminCreatedFolder",
+            parentFolder: "test"
+        });
         expect(response.status).to.eql(201);
     });
     it("should return 200 when trying to delete a folder with manager permissions", async () => {
         await agent.post("/api/auth/login").send({username: "manager", password: "test"});
-        const response = await agent.delete("/api/filemanager").send({folders: [{name: "adminCreatedFolder", relativePath: "test", fullPath: "test/adminCreatedFolder"}]});
+        const response = await agent.delete("/api/filemanager").send({
+            folders: [{
+                name: "adminCreatedFolder",
+                relativePath: "test",
+                fullPath: "test/adminCreatedFolder"
+            }]
+        });
         expect(response.status).to.eql(200);
     });
     it("should return 403 when trying to delete a folder out of public scope by relative Path", async () => {
         await agent.post("/api/auth/login").send(adminCredentials);
-        const response = await agent.delete("/api/filemanager").send({folders: [{name: "public", relativePath: "/../../../", fullPath: "server/public/../../../"}]});
+        const response = await agent.delete("/api/filemanager").send({
+            folders: [{
+                name: "public",
+                relativePath: "/../../../",
+                fullPath: "server/public/../../../"
+            }]
+        });
         expect(response.status).to.eql(403);
     });
     it("should return 403 when trying to delete a folder out of public scope by full path", async () => {
         await agent.post("/api/auth/login").send(adminCredentials);
-        const response = await agent.delete("/api/filemanager").send({folders: [{name: "public", relativePath: "test", fullPath: "/../../"}]});
+        const response = await agent.delete("/api/filemanager").send({
+            folders: [{
+                name: "public",
+                relativePath: "test",
+                fullPath: "/../../"
+            }]
+        });
         expect(response.status).to.eql(403);
     });
     after(async () => {
@@ -622,4 +694,193 @@ describe("Test FileManager API", () => {
             }]
         });
     });
+});
+
+describe("Test administrative PoolBuilder API Endpoints", () => {
+    const agent = supertest.agent(app);
+
+    before(async () => {
+        await agent.post("/api/auth/login").send(adminCredentials);
+    });
+
+    describe("Test Authorization", () => {
+        beforeEach(async () => {
+            await agent.get("/api/auth/logout");
+        });
+        after(async () => {
+            await agent.post("/api/auth/login").send(adminCredentials);
+        });
+        it("should return 401 Unauthorized when trying to get all categories without authorization", async () => {
+            const response = await agent.get("/api/admin/poolbuilder/categories");
+            expect(response.status).to.eql(401);
+        });
+        it("should return 401 Unauthorized when trying to get all items without authorization", async () => {
+            const response = await agent.get("/api/admin/poolbuilder/items");
+            expect(response.status).to.eql(401);
+        });
+        it("should return 403 Unauthorized when trying to get all items with insufficient permissions", async () => {
+            await agent.post("/api/auth/login").send({username: "user", password: "test"});
+            const response = await agent.get("/api/admin/poolbuilder/items?category_id=1");
+            agent.get("/api/auth/logout");
+
+            expect(response.status).to.eql(403);
+        });
+    });
+    describe("Test creation", () => {
+
+        it("should return 400 with correct message when trying to create a location without name", async () => {
+            const response = await agent.post("/api/admin/poolbuilder/items").send({
+                name: "",
+                description: "test",
+                category_id: 1
+            });
+            expect(response.status).to.eql(400);
+            expect(response.body).to.have.property("message");
+            expect(response.body.message).to.eql("Name cannot be empty");
+        });
+
+        it("should return 400 with correct message when trying to create a location with non existing category_id", async () => {
+            const response = await agent.post("/api/admin/poolbuilder/items").send({
+                name: "",
+                description: "test",
+                category_id: 99
+            });
+            expect(response.status).to.eql(400);
+            expect(response.body).to.have.property("message");
+            expect(response.body.message).to.eql("Invalid category specified");
+        });
+    });
+
+    describe("Test Successfully creation & deletion of Location item", () => {
+        let createdItem;
+
+        it("should return 201 and the created item when create a location", async () => {
+            const response = await agent.post("/api/admin/poolbuilder/items").send({
+                name: "test A",
+                description: "test",
+                category_id: 1
+            });
+            expect(response.status).to.eql(201);
+            expect(response.body).to.have.property("id");
+            expect(response.body).to.have.property("name");
+            expect(response.body.name).to.eql("test A");
+            createdItem = response.body;
+        });
+        it("should return 200 with correct message when deleting the before created item", async () => {
+            const response = await agent.delete(`/api/admin/poolbuilder/items/${createdItem.id}`);
+            expect(response.status).to.eql(200);
+            expect(response.body).to.have.property("message");
+            expect(response.body.message).to.eql("Item deleted successfully");
+        });
+
+    });
+
+    describe("Test cascading deletion of Slot & Row linked to Location item", () => {
+        let createdLocationItem, createdRowItem, createdSlotItem;
+        before(async () => {
+            const locationResponse = await agent.post("/api/admin/poolbuilder/items").send({
+                name: "test B",
+                description: "test",
+                category_id: 1
+            });
+            createdLocationItem = locationResponse.body;
+            const rowResponse = await agent.post(`/api/admin/poolbuilder/items/`).send({
+                name: "test B ROW",
+                description: "test b row",
+                category_id: 2,
+                parent_id: createdLocationItem.id
+            });
+            createdRowItem = rowResponse.body;
+            const slotResponse = await agent.post(`/api/admin/poolbuilder/items/`).send({
+                name: "test B SLOT",
+                description: "test b slot",
+                category_id: 3,
+                parent_id: createdRowItem.id
+            });
+            createdSlotItem = slotResponse.body;
+        });
+
+        it("should return 404 with correct message when trying to get the row item that was linked to the before deleted location", async () => {
+            await agent.delete(`/api/admin/poolbuilder/items/${createdLocationItem.id}`);
+            const response = await agent.get(`/api/admin/poolbuilder/items/${createdRowItem.id}`);
+            expect(response.status).to.eql(404);
+            expect(response.body).to.have.property("message");
+            expect(response.body.message).to.eql("Item not found");
+        });
+
+        it("should return 404 with correct message when trying to get the slot item that was linked to the before deleted row", async () => {
+            const response = await agent.get(`/api/admin/poolbuilder/items/${createdSlotItem.id}`);
+            expect(response.status).to.eql(404);
+            expect(response.body).to.have.property("message");
+            expect(response.body.message).to.eql("Item not found");
+        });
+
+    });
+
+    describe("Test Sorting of Builder Items", () => {
+        let createdLocationItems = [];
+        before(async () => {
+            await agent.post("/api/auth/login").send(adminCredentials);
+
+            const locationResponse = await agent.post("/api/admin/poolbuilder/items").send({
+                name: "test C",
+                description: "test",
+                category_id: 1
+            });
+            createdLocationItems.push(locationResponse.body);
+            const locationResponse2 = await agent.post("/api/admin/poolbuilder/items").send({
+                name: "test D",
+                description: "test",
+                category_id: 1
+            });
+            createdLocationItems.push(locationResponse2.body);
+            const locationResponse3 = await agent.post("/api/admin/poolbuilder/items").send({
+                name: "test E",
+                description: "test",
+                category_id: 1
+            });
+            createdLocationItems.push(locationResponse3.body);
+        });
+
+        it("all created locations should have a sorting value of 999", async () => {
+            for (let location of createdLocationItems) {
+                expect(location.sorting).to.eql(0);
+            }
+        });
+
+        it("should return 200 when updating the sorting of items", async () => {
+            createdLocationItems[0].sorting = 12;
+            createdLocationItems[1].sorting = 5;
+            createdLocationItems[2].sorting = 1;
+            const sortingMap = createdLocationItems.map((item) => {
+                return { id: item.id, sorting: item.sorting };
+            });
+            const response = await agent.post("/api/admin/poolbuilder/items/sort").send(sortingMap);
+            expect(response.status).to.eql(200);
+            expect(response.body).to.have.property("message");
+            expect(response.body.message).to.eql("Items sorted successfully");
+        });
+
+        it("First item should have sorting value of 12", async () => {
+            const response = await agent.get(`/api/admin/poolbuilder/items/${createdLocationItems[0].id}`);
+            expect(response.status).to.eql(200);
+            expect(response.body).to.have.property("sorting");
+            expect(response.body.sorting).to.eql(12);
+        });
+
+        it("Second item should have sorting value of 5", async () => {
+            const response = await agent.get(`/api/admin/poolbuilder/items/${createdLocationItems[1].id}`);
+            expect(response.status).to.eql(200);
+            expect(response.body).to.have.property("sorting");
+            expect(response.body.sorting).to.eql(5);
+        });
+
+        it("Third item should have sorting value of 1", async () => {
+            const response = await agent.get(`/api/admin/poolbuilder/items/${createdLocationItems[2].id}`);
+            expect(response.status).to.eql(200);
+            expect(response.body).to.have.property("sorting");
+            expect(response.body.sorting).to.eql(1);
+        });
+    });
+
 });

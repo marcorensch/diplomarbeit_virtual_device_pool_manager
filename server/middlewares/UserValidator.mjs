@@ -50,7 +50,7 @@ export default class UserValidator {
         if (!currentToken && !currentRefreshToken) {
             res.clearCookie('nxd-token');
             res.clearCookie('nxd-refresh-token');
-            return res.status(401).send("Missing tokens");
+            return res.status(401).send({message: "Unauthorized"});
         }
 
         try{
@@ -58,11 +58,11 @@ export default class UserValidator {
             if(!result || !result.length) {
                 res.clearCookie('nxd-token');
                 res.clearCookie('nxd-refresh-token');
-                return res.status(401).send("Invalid refresh token");
+                return res.status(401).send({message: "Unauthorized"});
             }
         } catch (e) {
             console.log(e)
-            return res.status(500).send("Error while validating tokens");
+            return res.status(500).send({message: "Error while validating"});
         }
 
         if(currentToken){
@@ -71,21 +71,20 @@ export default class UserValidator {
             } catch (e) {
                 res.clearCookie('nxd-token');
                 res.clearCookie('nxd-refresh-token');
-                return res.status(401).send("Invalid token");
+                return res.status(401).send({message: "Unauthorized"});
             }
         }else{
             req.updateTokens = true;
         }
 
         if(!decoded && currentRefreshToken){
-            console.log("refresh token used")
             try {
                 decoded = jwt.verify(currentRefreshToken, process.env.JWT_REFRESH_SECRET);
                 req.updateTokens = true;
             } catch (e) {
                 res.clearCookie('nxd-token');
                 res.clearCookie('nxd-refresh-token');
-                return res.status(401).send("Invalid refresh token");
+                return res.status(401).send({message: "Unauthorized"});
             }
         }
 
@@ -94,7 +93,7 @@ export default class UserValidator {
         }catch (e) {
             res.clearCookie('nxd-token');
             res.clearCookie('nxd-refresh-token');
-            return res.status(404).send("User not found");
+            return res.status(404).send({message: "User not found"});
         }
 
         if(req.updateTokens){
@@ -102,14 +101,14 @@ export default class UserValidator {
                 user = await TokenHelper.generateTokens(user);
             }catch (e) {
                 console.log(e)
-                return res.status(500).send("Error while generating tokens");
+                return res.status(500).send({message: "Error while generating tokens"});
             }
 
             try {
                 await TokenHelper.updateTokens(user, currentRefreshToken);
             }catch (e) {
                 console.log(e)
-                return res.status(500).send("Error while saving updated tokens");
+                return res.status(500).send({message: "Error while saving updated tokens"});
             }
         }
 
@@ -143,7 +142,7 @@ export default class UserValidator {
             if (!req.user?.role) return res.status(403).send({message: "Unauthorized"});
             const permissionHandler = new PermissionHandler();
             const permissionsMap = permissionHandler.getPermissions(req.user.role);
-            if (!permissionsMap.has(action)) return res.status(403).send({message: "Unauthorized"});
+            if (!permissionsMap.has(action)) return res.status(403).send({message: "Forbidden"});
 
             next();
         }
@@ -152,11 +151,11 @@ export default class UserValidator {
     static async hasPermissions(actions) {
         if (!Array.isArray(actions)) actions = [actions];
         return function (req, res, next) {
-            if (!req.user?.role) return res.status(403).send({message: "Unauthorized"});
+            if (!req.user?.role) return res.status(403).send({message: "Forbidden"});
             const permissionHandler = new PermissionHandler();
             const permissionsMap = permissionHandler.getPermissions(req.user.role);
             for (let action of actions) {
-                if (!permissionsMap.has(action)) return res.status(403).send({message: "Unauthorized"});
+                if (!permissionsMap.has(action)) return res.status(403).send({message: "Forbidden"});
             }
             next();
         }

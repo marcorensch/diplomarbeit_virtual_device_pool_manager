@@ -10,26 +10,23 @@ export default class DeviceHelper {
         storageDevice.msisdns = device.msisdns.map((m) => m.id);
         storageDevice.imei = JSON.stringify(device.imei);
         if (storageDevice.id) {
-            return axios
-                .put(`/api/devices/${storageDevice.id}`, storageDevice)
-                .then((response) => {
-                    console.log(response.data);
-                })
-                .catch((error) => {
-                    console.log(error);
-                    return [];
-                });
+            try{
+                await axios.put(`/api/devices/${storageDevice.id}`, storageDevice);
+                toast.success("Device saved");
+            }catch (e) {
+                toast.error("Device could not be saved");
+                return [];
+            }
         } else {
-            return axios
-                .post(`/api/devices`, storageDevice)
-                .then((response) => {
-                    device.id = response.data.id;
-                    return device;
-                })
-                .catch((error) => {
-                    console.log(error);
-                    return [];
-                });
+            try{
+                const response = await axios.post(`/api/devices`, storageDevice);
+                toast.success("Device saved");
+                device.id = response.data.id;
+                return device;
+            }catch(e){
+                toast.error("Device could not be saved");
+                return [];
+            }
         }
     }
 
@@ -39,19 +36,30 @@ export default class DeviceHelper {
             return device;
         }
 
-        return axios
-            .get(`/api/devices/${id}`)
-            .then((response) => {
-                device.setData(response.data);
-                device.added = device.added.split("T")[0];
-                device.imei = JSON.parse(device.imei) || [];
-                device.msisdns = response.data.linked_msisdns?.split(",").map((el) => parseInt(el)) || [];
-                return device;
-            })
-            .catch((error) => {
-                console.log(error);
-                return device;
-            });
+        try {
+            const response = await axios.get(`/api/devices/${id}`);
+            device.setData(response.data);
+            device.added = device.added.split("T")[0];
+            device.imei = JSON.parse(device.imei) || [];
+            device.msisdns = response.data.linked_msisdns?.split(",").map((el) => parseInt(el)) || [];
+            device.slot = await DeviceHelper.getSlot(device.slot_id);
+        } catch (e) {
+            console.log(error);
+        }
+
+        return device;
+    }
+
+    static async getSlot(id) {
+        try {
+            const response = await axios.get(`/api/devicepool/items/${id}`);
+            console.log(response.data)
+            return response.data;
+        }catch (e) {
+            console.log(e.message);
+            toast.error("Error while loading slot label");
+            return "";
+        }
     }
 
     static async getAvailableMSISDNs() {

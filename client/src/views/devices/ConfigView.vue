@@ -192,9 +192,12 @@
                   <div>
                     <div class="uk-margin">
                       <label for="pool-location">Pool Location</label>
-                      <div>Chur, 1.304</div>
+                      <div>
+                        {{ device.slot?.label ? device.slot.label : "Not set" }}
+                      </div>
                       <button
                         class="uk-margin-small-top uk-button uk-button-small uk-button-secondary"
+                        @click="handleSetLocationClicked"
                       >
                         Set Location
                       </button>
@@ -220,6 +223,7 @@
       @cancel="handleCancelClicked"
       @save="handleSaveClicked"
     />
+    <PoolSelector ref="poolSelector" @selected="handleSlotSelected($event)" />
   </div>
 </template>
 
@@ -231,12 +235,14 @@ import MsisdnWidget from "@/components/widgets/configform/MsisdnWidget.vue";
 import { useVuelidate } from "@vuelidate/core";
 import { required, numeric, helpers } from "@vuelidate/validators";
 import DeviceHelper from "@/helpers/DeviceHelper.mjs";
+import PoolSelector from "@/components/PoolSelector.vue";
 
 const exactLength = (length) => (value) => value.toString().length === length;
 
 export default {
   name: "DeviceConfigView",
   components: {
+    PoolSelector,
     NotesWidget,
     ImageWidget,
     ControlsFooterWidget,
@@ -279,6 +285,7 @@ export default {
       device: null,
       deviceTypes: [],
       manufacturers: [],
+      slot: null,
     };
   },
   async mounted() {
@@ -287,6 +294,10 @@ export default {
     this.manufacturers = await DeviceHelper.getManufacturers();
   },
   methods: {
+    handleSlotSelected(slot) {
+      this.device.slot_id = slot.id;
+      this.device.slot = slot;
+    },
     handleUpdateSelectedMsisdns(msisdns) {
       this.device.msisdns = msisdns;
       console.log(this.device);
@@ -296,7 +307,7 @@ export default {
       this.device.image = path;
     },
     handleCancelClicked() {
-      this.$router.push({ name: "widgets" });
+      this.$router.push({ name: "deviceslist" });
     },
 
     handleAddImeiClicked() {
@@ -315,9 +326,14 @@ export default {
       const formIsValid = await this.v$.$validate();
       if (!formIsValid) return;
       await DeviceHelper.store(this.device);
+      this.$router.push({ name: "deviceslist" });
     },
+
     handleDeviceTypeClicked(deviceTypeId) {
       this.device.device_type_id = deviceTypeId;
+    },
+    handleSetLocationClicked() {
+      this.$refs.poolSelector.showModal();
     },
   },
 };
