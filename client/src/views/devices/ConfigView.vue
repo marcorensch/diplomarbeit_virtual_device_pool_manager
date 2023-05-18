@@ -232,7 +232,11 @@
           <NotesWidget />
         </div>
         <div class="uk-width-1-1 uk-width-2-3@s">
-          <WeblinksWidget :in-card="true" :links="device.links" />
+          <WeblinksWidget
+            :in-card="true"
+            :links="device.links"
+            @link-added="handleLinkAdded($event)"
+          />
         </div>
       </div>
     </div>
@@ -359,6 +363,9 @@ export default {
     handleRemoveLocationLinkClicked() {
       this.device.slot_id = null;
       this.device.slot = null;
+    },
+    handleLinkAdded(link) {
+      this.device.links.push(link);
     },
   },
 };
