@@ -25,7 +25,10 @@
             </td>
             <td class="uk-width-small">
               <div class="uk-button-group">
-                <button class="uk-button uk-button-default">
+                <button
+                  class="uk-button uk-button-default"
+                  @click="handleEditClicked(link)"
+                >
                   <font-awesome-icon
                     :icon="['fas', 'pencil']"
                     class="uk-preserve-width"
@@ -152,7 +155,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 export default {
   name: "weblinksWidget",
   components: { FontAwesomeIcon },
-  emits: ["link-added", "link-deleted"],
+  emits: ["link-added-edited", "link-deleted"],
   setup() {
     const v$ = useVuelidate();
     return { v$ };
@@ -170,6 +173,7 @@ export default {
   data() {
     return {
       form: {
+        id: 0,
         name: "",
         uri: "",
         description: "",
@@ -203,13 +207,21 @@ export default {
         name: this.form.name,
         uri: this.form.uri,
         description: this.form.description,
-        id: 0,
+        id: this.form.id,
       };
-      this.$emit("link-added", linkItem);
+      this.$emit("link-added-edited", linkItem);
       UIkit.modal("#weblink-add-modal").hide();
     },
     handleDeleteClicked(link) {
       this.$emit("link-deleted", link);
+    },
+    handleEditClicked(link) {
+      this.form.id = link.id;
+      this.form.name = link.name;
+      this.form.uri = link.uri;
+      this.form.description = link.description;
+      this.v$.$reset();
+      UIkit.modal("#weblink-add-modal").show();
     },
   },
 };

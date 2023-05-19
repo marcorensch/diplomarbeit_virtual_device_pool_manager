@@ -235,7 +235,7 @@
           <WeblinksWidget
             :in-card="true"
             :weblinks="device.weblinks"
-            @link-added="handleLinkAdded($event)"
+            @link-added-edited="handleLinkAddedOrEdited($event)"
             @link-deleted="handleLinkDeleted($event)"
           />
         </div>
@@ -366,8 +366,17 @@ export default {
       this.device.slot_id = null;
       this.device.slot = null;
     },
-    handleLinkAdded(link) {
-      this.device.weblinks.push(link);
+    handleLinkAddedOrEdited(link) {
+      if (link.id) {
+        this.device.weblinks = this.device.weblinks.map((l) => {
+          if (l.id === link.id) {
+            l = link;
+          }
+          return l;
+        });
+      } else {
+        this.device.weblinks.push(link);
+      }
     },
     handleLinkDeleted(link) {
       this.device.weblinks = this.device.weblinks.map((l) => {
