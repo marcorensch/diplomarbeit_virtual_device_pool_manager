@@ -15,6 +15,7 @@ export default class Device {
         this.created_at = null;
         this.updated_at = null;
         this.added = null;
+        this.weblinks = [];
     }
 
     setData(props) {

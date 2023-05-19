@@ -16,6 +16,7 @@ export default class Device{
         this.similar_devices = [];
         this.created_at = null;
         this.modified_at = null;
+        this.weblinks = [];
     }
 
     setData(data){

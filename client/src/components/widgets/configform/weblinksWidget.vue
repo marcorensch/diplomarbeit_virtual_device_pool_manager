@@ -4,17 +4,44 @@
       <h3 class="uk-card-title">Weblinks</h3>
     </div>
     <div :class="{ 'uk-card-body': inCard }">
-      <table class="uk-table uk-table-divider uk-table-small">
+      <table class="uk-table uk-table-divider uk-table-small uk-table-middle">
         <thead>
           <th>Label</th>
           <th>URL</th>
           <th></th>
         </thead>
         <tbody>
-          <tr v-for="link of weblinks" :key="link.id">
-            <td>{{ link.label }}</td>
-            <td>{{ link.uri }}</td>
-            <td></td>
+          <tr
+            v-for="link of weblinks"
+            :key="link.id"
+            :class="{
+              'uk-text-italic': link.id === 0,
+              'uk-hidden': link.toDelete,
+            }"
+          >
+            <td class="uk-width-small">{{ link.name }}</td>
+            <td class="uk-table-expand" :uk-tooltip="link.description">
+              <span class="uk-display-inline-block">{{ link.uri }}</span>
+            </td>
+            <td class="uk-width-small">
+              <div class="uk-button-group">
+                <button class="uk-button uk-button-default">
+                  <font-awesome-icon
+                    :icon="['fas', 'pencil']"
+                    class="uk-preserve-width"
+                  />
+                </button>
+                <button
+                  class="uk-button uk-button-danger"
+                  @click="handleDeleteClicked(link)"
+                >
+                  <font-awesome-icon
+                    :icon="['fas', 'trash']"
+                    class="uk-preserve-width"
+                  />
+                </button>
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -36,20 +63,20 @@
         <div class="uk-modal-body">
           <div class="uk-form">
             <div class="uk-margin">
-              <label for="label" class="uk-form-label"
+              <label for="name" class="uk-form-label"
                 >Label
                 <input
                   type="text"
                   ref="labelInput"
-                  name="label"
-                  id="label"
+                  name="name"
+                  id="name"
                   class="uk-input"
                   placeholder="Label"
-                  v-model="form.label"
+                  v-model="form.name"
                 />
               </label>
               <div
-                v-for="error of v$.form.label.$errors"
+                v-for="error of v$.form.name.$errors"
                 :key="error"
                 class="uk-text-danger"
               >
@@ -120,10 +147,12 @@
 import UIkit from "uikit";
 import { useVuelidate } from "@vuelidate/core";
 import { required, url } from "@vuelidate/validators";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 export default {
   name: "weblinksWidget",
-  emits: ["link-added"],
+  components: { FontAwesomeIcon },
+  emits: ["link-added", "link-deleted"],
   setup() {
     const v$ = useVuelidate();
     return { v$ };
@@ -133,16 +162,15 @@ export default {
       type: Boolean,
       default: true,
     },
-    links: {
+    weblinks: {
       type: Array,
       default: () => [],
     },
   },
   data() {
     return {
-      weblinks: [],
       form: {
-        label: "",
+        name: "",
         uri: "",
         description: "",
       },
@@ -151,7 +179,7 @@ export default {
   validations() {
     return {
       form: {
-        label: { required },
+        name: { required },
         uri: { required, url },
       },
     };
@@ -163,7 +191,7 @@ export default {
   },
   methods: {
     handleAddLinkClicked() {
-      this.form.label = "";
+      this.form.name = "";
       this.form.uri = "";
       this.v$.$reset();
       UIkit.modal("#weblink-add-modal").show();
@@ -172,13 +200,16 @@ export default {
       const formIsValid = await this.v$.$validate();
       if (!formIsValid) return;
       const linkItem = {
-        label: this.form.label,
+        name: this.form.name,
         uri: this.form.uri,
         description: this.form.description,
         id: 0,
       };
       this.$emit("link-added", linkItem);
       UIkit.modal("#weblink-add-modal").hide();
+    },
+    handleDeleteClicked(link) {
+      this.$emit("link-deleted", link);
     },
   },
 };

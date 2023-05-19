@@ -3,6 +3,7 @@ import UserValidator from "../middlewares/UserValidator.mjs";
 import DeviceHelper from "../helpers/DeviceHelper.mjs";
 import Device from "../models/Device.mjs";
 import {deviceDataValidator} from "../middlewares/inputValidators.mjs";
+import WeblinksHelper from "../helpers/WeblinksHelper.mjs";
 
 const router = express.Router();
 
@@ -12,7 +13,6 @@ router.get("/", async (req, res) => {
 
     try{
         const devices = await DeviceHelper.getDevices(limit, offset);
-        console.log(devices)
         res.send(devices);
     }catch (e) {
         console.log(e.message);
@@ -26,16 +26,26 @@ router.get("/search", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
     const id = req.params.id;
+    const device = new Device();
     if(!id) return res.status(400).send({success: false, message: "ID is required"});
     try{
-        const device = await DeviceHelper.getDeviceById(id);
-        console.log(device)
-        if(!device.length) return res.status(404).send({success: false, message: "Device not found"});
-        res.send(device[0]);
+        const deviceData = await DeviceHelper.getDeviceById(id);
+        if(!deviceData) return res.status(404).send({success: false, message: "Device not found"});
+        device.setData(deviceData);
     }catch (e) {
         console.log(e.message);
-        res.status(500).send({success: false, message: e.message});
+        return res.status(500).send({success: false, message: e.message});
     }
+
+    try{
+        const weblinks = await WeblinksHelper.getWeblinksByDeviceId(id);
+        device.setData({weblinks});
+    }catch (e) {
+        console.log(e.message);
+        return res.status(500).send({success: false, message: "Error getting weblinks"});
+    }
+
+    res.send(device);
 });
 
 router.post("/", UserValidator.validateTokens, UserValidator.setCookies, async (req, res) => {
@@ -62,6 +72,21 @@ router.post("/", UserValidator.validateTokens, UserValidator.setCookies, async (
     }catch (e){
         console.log(e.message);
         return res.status(500).send({success: false, message: e.message});
+    }
+
+    if(device.weblinks.length) {
+        try {
+            for (const weblink of device.weblinks) {
+                const result = await WeblinksHelper.setOrUpdateWeblink(device.id, weblink);
+                if (!result.affectedRows) return res.status(500).send({
+                    success: false,
+                    message: "Device weblink could not be set"
+                });
+            }
+        }catch (e){
+            console.log(e.message);
+            return res.status(500).send({success: false, message: e.message});
+        }
     }
 
     if(device.msisdns.length) {
@@ -124,6 +149,21 @@ router.put("/:id", UserValidator.validateTokens, UserValidator.setCookies, devic
     }catch (e) {
         console.log(e.message);
         return res.status(500).send({success: false, message: e.message});
+    }
+
+    if(device.weblinks.length) {
+        try {
+            for (const weblink of device.weblinks) {
+                const result = await WeblinksHelper.setOrUpdateWeblink(device.id, weblink);
+                if (!result.affectedRows) return res.status(500).send({
+                    success: false,
+                    message: "Device weblink could not be updated"
+                });
+            }
+        }catch (e){
+            console.log(e.message);
+            return res.status(500).send({success: false, message: e.message});
+        }
     }
 
     try{

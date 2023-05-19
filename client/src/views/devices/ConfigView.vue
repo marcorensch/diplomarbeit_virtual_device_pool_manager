@@ -234,8 +234,9 @@
         <div class="uk-width-1-1 uk-width-2-3@s">
           <WeblinksWidget
             :in-card="true"
-            :links="device.links"
+            :weblinks="device.weblinks"
             @link-added="handleLinkAdded($event)"
+            @link-deleted="handleLinkDeleted($event)"
           />
         </div>
       </div>
@@ -317,6 +318,7 @@ export default {
     this.device = await DeviceHelper.loadDevice(this.id);
     this.deviceTypes = await DeviceHelper.getDeviceTypes();
     this.manufacturers = await DeviceHelper.getManufacturers();
+    console.log(this.device);
   },
   methods: {
     handleSlotSelected(slot) {
@@ -348,7 +350,7 @@ export default {
       this.device.imei.splice(index, 1);
     },
     async handleSaveClicked() {
-      const formIsValid = await this.v$.$validate();
+      const formIsValid = await this.v$.device.$validate();
       if (!formIsValid) return;
       await DeviceHelper.store(this.device);
       this.$router.push({ name: "deviceslist" });
@@ -365,7 +367,15 @@ export default {
       this.device.slot = null;
     },
     handleLinkAdded(link) {
-      this.device.links.push(link);
+      this.device.weblinks.push(link);
+    },
+    handleLinkDeleted(link) {
+      this.device.weblinks = this.device.weblinks.map((l) => {
+        if (l.id === link.id) {
+          l.toDelete = true;
+        }
+        return l;
+      });
     },
   },
 };
