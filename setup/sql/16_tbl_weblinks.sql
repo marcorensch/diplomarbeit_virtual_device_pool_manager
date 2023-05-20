@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS `weblinks`
     description text         NOT NULL,
     created_at  datetime DEFAULT NOW(),
     device_id   int(11)  DEFAULT NULL,
+    sorting     int(11)  DEFAULT 0,
     PRIMARY KEY (id),
     CONSTRAINT `fk_device_id` FOREIGN KEY (device_id) REFERENCES devices (id) ON DELETE SET NULL ON UPDATE CASCADE
 )

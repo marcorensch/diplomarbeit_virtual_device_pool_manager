@@ -1,5 +1,6 @@
 import DatabaseModel from "../models/DatabaseModel.mjs";
 import PoolHelper from "./PoolHelper.mjs";
+import WeblinksHelper from "./WeblinksHelper.mjs";
 
 export default class DeviceHelper {
 
@@ -26,6 +27,12 @@ export default class DeviceHelper {
             try {
                 device.slot = await PoolHelper.getItem(device.slot_id, false);
             } catch (e) {
+                console.log(e.message);
+            }
+
+            try {
+                device.weblinks = await WeblinksHelper.getWeblinksByDeviceId(device.id);
+            }catch (e) {
                 console.log(e.message);
             }
         }

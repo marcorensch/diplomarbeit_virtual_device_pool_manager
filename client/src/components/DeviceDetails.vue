@@ -77,6 +77,9 @@
                 >Search Device on kimovil (Technical Details)</a
               >
             </li>
+            <li v-for="link of device.weblinks" :key="link.id">
+              <a :href="link.uri" target="_blank">{{ link.name }}</a>
+            </li>
           </ul>
         </div>
         <div class="uk-margin">
