@@ -38,6 +38,7 @@
               <td class="uk-width-small">
                 <div class="uk-button-group">
                   <button
+                    v-if="authStore.hasPermission('canUpdateLinks')"
                     class="uk-button uk-button-default"
                     @click="handleEditClicked(link)"
                   >
@@ -47,6 +48,7 @@
                     />
                   </button>
                   <button
+                    v-if="authStore.hasPermission('canDeleteLinks')"
                     class="uk-button uk-button-danger"
                     @click="handleDeleteClicked(link)"
                   >
@@ -64,6 +66,7 @@
     </div>
     <div class="uk-card-footer uk-flex uk-flex-right">
       <button
+        v-if="authStore.hasPermission('canCreateLinks')"
         class="uk-button uk-button-secondary uk-button-small uk-width-1-1 uk-width-auto@m"
         @click="handleAddLinkClicked"
       >
@@ -164,6 +167,8 @@ import UIkit from "uikit";
 import { useVuelidate } from "@vuelidate/core";
 import { required, url, helpers } from "@vuelidate/validators";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { useAuthStore } from "@/stores/auth";
+import { useToast } from "vue-toastification";
 
 class WeblinkItem {
   constructor() {
@@ -196,7 +201,9 @@ export default {
   emits: ["link-added-edited", "link-deleted", "sorting-changed"],
   setup() {
     const v$ = useVuelidate();
-    return { v$ };
+    const authStore = useAuthStore();
+    const toast = useToast();
+    return { v$, authStore, toast };
   },
   props: {
     inCard: {
@@ -237,11 +244,16 @@ export default {
       this.v$.$reset();
     });
     UIkit.util.on("#weblinks-sortable-table", "moved", (e, sortable) => {
-      const sortingMap = [];
-      sortable.items.forEach(function (item) {
-        sortingMap.push({ uri: UIkit.util.data(item, "uri") });
-      });
-      this.$emit("sorting-changed", sortingMap);
+      if (this.authStore.hasPermission("canUpdateLinks")) {
+        const sortingMap = [];
+        sortable.items.forEach(function (item) {
+          sortingMap.push({ uri: UIkit.util.data(item, "uri") });
+        });
+        this.$emit("sorting-changed", sortingMap);
+      } else {
+        sortable.cancel();
+        this.toast.error("You are not allowed to change the sorting.");
+      }
     });
   },
   methods: {
