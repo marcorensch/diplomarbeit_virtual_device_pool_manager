@@ -2,7 +2,7 @@ import express from "express";
 import UserValidator from "../middlewares/UserValidator.mjs";
 import DeviceHelper from "../helpers/DeviceHelper.mjs";
 import Device from "../models/Device.mjs";
-import {deviceDataValidator} from "../middlewares/inputValidators.mjs";
+import {deviceDataValidator, weblinkValidator } from "../middlewares/inputValidators.mjs";
 import WeblinksHelper from "../helpers/WeblinksHelper.mjs";
 
 const router = express.Router();
@@ -177,4 +177,14 @@ router.put("/:id", UserValidator.validateTokens, UserValidator.setCookies, devic
 
 });
 
+router.post("/:id/weblinks", UserValidator.validateTokens, UserValidator.setCookies, UserValidator.hasPermission("canCreateLinks"), weblinkValidator, async (req, res) => {
+    const weblink = req.body;
+    const id = req.params.id;
+    const result = await WeblinksHelper.setOrUpdateWeblink(id, weblink);
+    if (!result.affectedRows) return res.status(500).send({
+        success: false,
+        message: "New weblink could not be stored"
+    });
+    res.status(201).send({success: true, message: "Weblink stored"});
+});
 export default router;

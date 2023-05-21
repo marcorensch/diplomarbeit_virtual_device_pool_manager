@@ -95,6 +95,14 @@
               >
             </li>
           </ul>
+          <div
+            class="uk-margin-small-top uk-flex uk-flex-right"
+            v-if="authStore.hasPermission('canCreateLinks')"
+          >
+            <a href="#" @click="showAddWeblinkModal(device)"
+              ><font-awesome-icon :icon="['fas', 'plus']" /> Add Weblink</a
+            >
+          </div>
         </div>
         <div class="uk-margin">
           <h3>GuideMe</h3>
@@ -114,6 +122,98 @@
         </div>
       </div>
     </div>
+    <template v-if="authStore.hasPermission('canCreateLinks')">
+      <div id="add-weblink-modal" class="uk-flex-top" uk-modal="stack:true">
+        <div class="uk-modal-dialog uk-margin-auto-vertical">
+          <button
+            class="uk-modal-close-default"
+            type="button"
+            uk-close
+          ></button>
+          <div class="uk-modal-header">
+            <h3 class="uk-modal-title">Add Weblink</h3>
+          </div>
+          <div class="uk-modal-body">
+            <div class="uk-form">
+              <div class="uk-margin">
+                <label for="name" class="uk-form-label"
+                  >Label
+                  <input
+                    type="text"
+                    ref="labelInput"
+                    name="name"
+                    id="name"
+                    class="uk-input"
+                    placeholder="Label"
+                    v-model="linkForm.name"
+                  />
+                </label>
+                <div
+                  v-for="error of v$.linkForm.name.$errors"
+                  :key="error"
+                  class="uk-text-danger"
+                >
+                  {{ error.$message }}
+                </div>
+              </div>
+              <div class="uk-margin">
+                <label for="uri" class="uk-form-label"
+                  >URI
+                  <input
+                    type="url"
+                    name="uri"
+                    id="uri"
+                    class="uk-input"
+                    placeholder="https://www.website.tld"
+                    v-model="linkForm.uri"
+                  />
+                </label>
+                <div
+                  v-for="error of v$.linkForm.uri.$errors"
+                  :key="error"
+                  class="uk-text-danger"
+                >
+                  {{ error.$message }}
+                </div>
+              </div>
+              <div class="uk-margin">
+                <label for="description"
+                  >Description
+                  <textarea
+                    name="description"
+                    id="description"
+                    class="uk-textarea"
+                    placeholder="What can we find on this website?"
+                    v-model="linkForm.description"
+                  ></textarea>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="uk-modal-footer">
+            <div class="uk-flex uk-flex-right@m uk-grid-small" uk-grid>
+              <div class="uk-width-1-1 uk-width-auto@m">
+                <button
+                  class="uk-width-1-1 uk-button uk-button-secondary uk-modal-close"
+                  type="button"
+                >
+                  Cancel
+                </button>
+              </div>
+              <div class="uk-width-1-1 uk-width-auto@m">
+                <button
+                  class="uk-width-1-1 uk-button uk-button-primary"
+                  type="button"
+                  @click="handleSaveLinkClicked"
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -121,19 +221,36 @@
 import UIkit from "uikit";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { useAuthStore } from "@/stores/auth";
+import { useVuelidate } from "@vuelidate/core";
+import { required, url } from "@vuelidate/validators";
+import axios from "axios";
 
 export default {
   name: "DeviceDetails",
   components: { FontAwesomeIcon },
   setup() {
     const authStore = useAuthStore();
-    return { authStore };
+    const v$ = useVuelidate();
+    return { authStore, v$ };
   },
   data() {
     return {
       device: null,
       imeis: [],
       showEditBtn: false,
+      linkForm: {
+        name: "",
+        uri: "",
+        description: "",
+      },
+    };
+  },
+  validations() {
+    return {
+      linkForm: {
+        name: { required },
+        uri: { required, url },
+      },
     };
   },
   mounted() {},
@@ -184,6 +301,26 @@ export default {
       if (device.manufacturer_name)
         url += `,i_b+slug.${device.manufacturer_name.toLowerCase()}`;
       return url;
+    },
+    showAddWeblinkModal() {
+      UIkit.modal("#add-weblink-modal").show();
+    },
+    async handleSaveLinkClicked() {
+      this.v$.$touch();
+      if (this.v$.$invalid) return;
+      const storeWeblink = await axios.post(
+        `/api/devices/${this.device.id}/weblinks`,
+        this.linkForm
+      );
+      if (storeWeblink.data.success) {
+        this.device.weblinks.push(this.linkForm);
+        this.linkForm = {
+          name: "",
+          uri: "",
+          description: "",
+        };
+        UIkit.modal("#add-weblink-modal").hide();
+      }
     },
   },
 };

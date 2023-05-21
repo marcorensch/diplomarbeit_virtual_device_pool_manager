@@ -24,6 +24,17 @@ const poolBuilderValidator = [
     }
 ];
 
+const weblinkValidator = [
+    body('name').exists().withMessage("Name is required for Weblinks").escape().trim(),
+    body('uri').exists().withMessage("URL is required").isURL().withMessage("URL must be a valid URL"),
+    body('description').optional().escape().trim(),
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) return res.status(400).send({success: false, message: errors.array()[0].msg});
+        next()
+    }
+];
+
 const msisdnValidator = [];
 
-export {deviceDataValidator, poolBuilderValidator, msisdnValidator};
+export {deviceDataValidator, poolBuilderValidator, msisdnValidator, weblinkValidator};
