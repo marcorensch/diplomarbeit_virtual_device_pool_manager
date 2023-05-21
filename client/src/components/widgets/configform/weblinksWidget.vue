@@ -6,46 +6,59 @@
     <div :class="{ 'uk-card-body': inCard }">
       <table class="uk-table uk-table-divider uk-table-small uk-table-middle">
         <thead>
+          <th></th>
           <th>Label</th>
           <th>URL</th>
           <th></th>
         </thead>
-        <tbody>
-          <tr
-            v-for="link of weblinks"
-            :key="link.id"
-            :class="{
-              'uk-text-italic': link.id === 0,
-              'uk-hidden': link.toDelete,
-            }"
-          >
-            <td class="uk-width-small">{{ link.name }}</td>
-            <td class="uk-table-expand" :uk-tooltip="link.description">
-              <span class="uk-display-inline-block">{{ link.uri }}</span>
-            </td>
-            <td class="uk-width-small">
-              <div class="uk-button-group">
-                <button
-                  class="uk-button uk-button-default"
-                  @click="handleEditClicked(link)"
-                >
+        <tbody
+          id="weblinks-sortable-table"
+          uk-sortable="target: > tr; handler: .weblinks-sort-handler"
+        >
+          <template v-for="link of weblinks" :key="link.id">
+            <tr
+              :data-uri="link.uri"
+              :class="{
+                'uk-text-italic': link.id === 0,
+                'uk-hidden': link.toDelete,
+              }"
+            >
+              <td>
+                <div class="weblinks-sort-handler uk-drag">
                   <font-awesome-icon
-                    :icon="['fas', 'pencil']"
+                    :icon="['fas', 'grip-lines-vertical']"
                     class="uk-preserve-width"
                   />
-                </button>
-                <button
-                  class="uk-button uk-button-danger"
-                  @click="handleDeleteClicked(link)"
-                >
-                  <font-awesome-icon
-                    :icon="['fas', 'trash']"
-                    class="uk-preserve-width"
-                  />
-                </button>
-              </div>
-            </td>
-          </tr>
+                </div>
+              </td>
+              <td class="uk-width-small">{{ link.name }}</td>
+              <td class="uk-table-expand" :uk-tooltip="link.description">
+                <span class="uk-display-inline-block">{{ link.uri }}</span>
+              </td>
+              <td class="uk-width-small">
+                <div class="uk-button-group">
+                  <button
+                    class="uk-button uk-button-default"
+                    @click="handleEditClicked(link)"
+                  >
+                    <font-awesome-icon
+                      :icon="['fas', 'pencil']"
+                      class="uk-preserve-width"
+                    />
+                  </button>
+                  <button
+                    class="uk-button uk-button-danger"
+                    @click="handleDeleteClicked(link)"
+                  >
+                    <font-awesome-icon
+                      :icon="['fas', 'trash']"
+                      class="uk-preserve-width"
+                    />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </template>
         </tbody>
       </table>
     </div>
@@ -149,13 +162,38 @@
 <script>
 import UIkit from "uikit";
 import { useVuelidate } from "@vuelidate/core";
-import { required, url } from "@vuelidate/validators";
+import { required, url, helpers } from "@vuelidate/validators";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
+class WeblinkItem {
+  constructor() {
+    this.id = 0;
+    this.name = "";
+    this.uri = "";
+    this.description = "";
+    this.sorting = 999;
+    this.toDelete = false;
+  }
+
+  static fromObject(obj) {
+    const item = new WeblinkItem();
+    item.id = obj.id;
+    item.name = obj.name;
+    item.uri = obj.uri;
+    item.description = obj.description || "";
+    item.sorting = obj.sorting || 999;
+    item.toDelete = obj.toDelete || false;
+    return item;
+  }
+}
+
+function alreadySet(value) {
+  return !this.linkElementsTocompareWith.some((link) => link.uri === value);
+}
 export default {
   name: "weblinksWidget",
   components: { FontAwesomeIcon },
-  emits: ["link-added-edited", "link-deleted"],
+  emits: ["link-added-edited", "link-deleted", "sorting-changed"],
   setup() {
     const v$ = useVuelidate();
     return { v$ };
@@ -172,55 +210,64 @@ export default {
   },
   data() {
     return {
-      form: {
-        id: 0,
-        name: "",
-        uri: "",
-        description: "",
-      },
+      form: new WeblinkItem(),
+      linkElementsTocompareWith: [],
     };
   },
   validations() {
     return {
       form: {
         name: { required },
-        uri: { required, url },
+        uri: {
+          required,
+          url,
+          alreadySet: helpers.withMessage("URL already set.", alreadySet),
+        },
       },
     };
   },
   mounted() {
     UIkit.util.on("#weblink-add-modal", "shown", () => {
-      this.$refs.labelInput.focus();
+      this.$nextTick(() => {
+        this.$refs.labelInput.focus();
+      });
+    });
+    UIkit.util.on("#weblink-add-modal", "hidden", () => {
+      this.form = new WeblinkItem();
+      this.v$.$reset();
+    });
+    UIkit.util.on("#weblinks-sortable-table", "moved", (e, sortable) => {
+      const sortingMap = [];
+      sortable.items.forEach(function (item) {
+        sortingMap.push({ uri: UIkit.util.data(item, "uri") });
+      });
+      this.$emit("sorting-changed", sortingMap);
     });
   },
   methods: {
     handleAddLinkClicked() {
-      this.form.name = "";
-      this.form.uri = "";
+      this.linkElementsTocompareWith = this.weblinks;
       this.v$.$reset();
       UIkit.modal("#weblink-add-modal").show();
     },
     async handleSaveLinkClicked() {
+      this.v$.$reset();
       const formIsValid = await this.v$.$validate();
       if (!formIsValid) return;
-      const linkItem = {
-        name: this.form.name,
-        uri: this.form.uri,
-        description: this.form.description,
-        id: this.form.id,
-      };
-      this.$emit("link-added-edited", linkItem);
-      UIkit.modal("#weblink-add-modal").hide();
+      const item = { ...this.form };
+      await UIkit.modal("#weblink-add-modal").hide();
+      this.$emit("link-added-edited", item);
     },
     handleDeleteClicked(link) {
       this.$emit("link-deleted", link);
     },
     handleEditClicked(link) {
-      this.form.id = link.id;
-      this.form.name = link.name;
-      this.form.uri = link.uri;
-      this.form.description = link.description;
+      this.linkElementsTocompareWith = this.weblinks.filter(
+        (item) => item.uri !== link.uri
+      );
       this.v$.$reset();
+      this.form = link;
+
       UIkit.modal("#weblink-add-modal").show();
     },
   },

@@ -237,6 +237,7 @@
             :weblinks="device.weblinks"
             @link-added-edited="handleLinkAddedOrEdited($event)"
             @link-deleted="handleLinkDeleted($event)"
+            @sorting-changed="handleLinksSortingChanged($event)"
           />
         </div>
       </div>
@@ -369,7 +370,7 @@ export default {
     handleLinkAddedOrEdited(link) {
       if (link.id) {
         this.device.weblinks = this.device.weblinks.map((l) => {
-          if (l.id === link.id) {
+          if (l.uri === link.uri) {
             l = link;
           }
           return l;
@@ -380,11 +381,19 @@ export default {
     },
     handleLinkDeleted(link) {
       this.device.weblinks = this.device.weblinks.map((l) => {
-        if (l.id === link.id) {
+        if (l.uri === link.uri) {
           l.toDelete = true;
         }
         return l;
       });
+    },
+    handleLinksSortingChanged(sortingMap) {
+      console.log(sortingMap);
+      for (let i = 0; i < sortingMap.length; i++) {
+        this.device.weblinks.find((l) => l.uri === sortingMap[i].uri).sorting =
+          i;
+      }
+      console.log(this.device.weblinks);
     },
   },
 };

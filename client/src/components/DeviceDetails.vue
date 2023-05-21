@@ -69,16 +69,30 @@
                   device.device_type_name
                 )
               "
+              uk-tooltip="Search Device on kimovil to see technical details"
             >
               <a
                 target="_blank"
                 :title="'Search ' + device.name + ' on kimovil'"
                 :href="buildKimovilLink(device)"
-                >Search Device on kimovil (Technical Details)</a
+              >
+                <font-awesome-icon
+                  :icon="['fas', 'arrow-up-right-from-square']"
+                />
+                Search Device on kimovil</a
               >
             </li>
-            <li v-for="link of device.weblinks" :key="link.id">
-              <a :href="link.uri" target="_blank">{{ link.name }}</a>
+            <li
+              v-for="link of device.weblinks"
+              :key="link.id"
+              :uk-tooltip="link.description"
+            >
+              <a :href="link.uri" target="_blank"
+                ><font-awesome-icon
+                  :icon="['fas', 'arrow-up-right-from-square']"
+                />
+                {{ link.name }}</a
+              >
             </li>
           </ul>
         </div>

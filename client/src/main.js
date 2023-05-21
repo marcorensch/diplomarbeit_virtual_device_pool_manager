@@ -66,6 +66,9 @@ import {
   faWarehouse,
   faXmark,
   faCircle,
+  faLink,
+  faArrowUpRightFromSquare,
+  faGripLinesVertical,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
@@ -90,7 +93,10 @@ library.add(
   faChevronUp,
   faChevronRight,
   faChevronLeft,
-  faCubes
+  faCubes,
+  faLink,
+  faArrowUpRightFromSquare,
+  faGripLinesVertical
 );
 library.add(faSort, faSortUp, faSortDown, faSlash);
 library.add(
