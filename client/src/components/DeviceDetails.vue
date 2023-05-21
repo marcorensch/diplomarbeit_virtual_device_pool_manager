@@ -28,13 +28,63 @@
               <tbody>
                 <tr>
                   <th class="uk-table-shrink">
-                    <span class="nxd-text-navy uk-display-inline-block"
-                      >Location:</span
-                    >
+                    <span class="nxd-text-navy">Location:</span>
                   </th>
                   <td>
                     <span v-if="device.slot">{{ device.slot.label }}</span>
                     <span v-else>Virtual Device</span>
+                  </td>
+                </tr>
+                <tr v-if="device.slot">
+                  <th class="uk-table-middle">
+                    <span class="nxd-text-navy">Availability:</span>
+                  </th>
+                  <td>
+                    <div v-if="device.checked_out_by">
+                      <template
+                        v-if="device.checked_out_by === authStore.user.id"
+                      >
+                        <span class="uk-text-meta">Checked out by you</span>
+                        <button
+                          class="uk-button uk-button-small uk-button-secondary uk-display-inline-block uk-width-auto"
+                          @click="showCheckInConfirm"
+                        >
+                          CheckIn
+                        </button>
+                      </template>
+                      <template v-else>
+                        <font-awesome-icon
+                          :icon="['fas', 'triangle-exclamation']"
+                          class="uk-preserve-width uk-text-warning"
+                        />
+                        <span
+                          class="uk-margin-small-left uk-margin-small-right"
+                        >
+                          Checked out by
+                          {{ device.checked_out_by_name || "Unknown" }}</span
+                        >
+                        <button
+                          class="uk-button uk-button-small uk-button-secondary uk-display-inline-block uk-width-auto"
+                          @click="showCheckInConfirm"
+                        >
+                          CheckIn
+                        </button>
+                      </template>
+                    </div>
+                    <div v-else>
+                      <font-awesome-icon
+                        :icon="['fas', 'check-circle']"
+                        class="uk-preserve-width uk-text-success"
+                      /><span class="uk-margin-small-left uk-margin-small-right"
+                        >Available</span
+                      >
+                      <button
+                        class="uk-button uk-button-small uk-button-secondary uk-display-inline-block uk-width-auto"
+                        @click="showCheckoutModal"
+                      >
+                        Checkout
+                      </button>
+                    </div>
                   </td>
                 </tr>
                 <tr>
@@ -218,6 +268,24 @@
         </div>
       </div>
     </template>
+    <div id="checkout-modal" uk-modal="stack:true">
+      <div class="uk-modal-dialog">
+        <div class="uk-modal-header">
+          <h3 class="uk-modal-title">Device Checkout</h3>
+        </div>
+        <div class="uk-modal-body">
+          <p>Are you sure you want to checkout this device?</p>
+          <textarea
+            name="checkout-notes"
+            id="checkout-notes"
+            cols="30"
+            rows="10"
+            placeholder="For longer checkout periods please leave more information here"
+            class="uk-textarea"
+          ></textarea>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -277,6 +345,18 @@ export default {
   },
   mounted() {},
   methods: {
+    showCheckInConfirm() {
+      UIkit.modal
+        .confirm("Are you sure you want to check in this device?", {
+          labels: { ok: "Yes", cancel: "No" },
+        })
+        .then(() => {
+          this.checkInDevice();
+        });
+    },
+    showCheckoutModal() {
+      UIkit.modal("#checkout-modal").show();
+    },
     canEditDevice() {
       return (
         (this.authStore.hasPermission("canUpdateDevices") &&

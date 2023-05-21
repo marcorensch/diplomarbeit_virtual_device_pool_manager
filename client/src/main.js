@@ -69,6 +69,8 @@ import {
   faLink,
   faArrowUpRightFromSquare,
   faGripLinesVertical,
+  faExclamationTriangle,
+  faCheckCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
@@ -96,7 +98,9 @@ library.add(
   faCubes,
   faLink,
   faArrowUpRightFromSquare,
-  faGripLinesVertical
+  faGripLinesVertical,
+  faExclamationTriangle,
+  faCheckCircle
 );
 library.add(faSort, faSortUp, faSortDown, faSlash);
 library.add(

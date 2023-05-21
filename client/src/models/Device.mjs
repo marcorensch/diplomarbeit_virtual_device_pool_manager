@@ -17,6 +17,10 @@ export default class Device{
         this.created_at = null;
         this.modified_at = null;
         this.weblinks = [];
+        this.checked_out_by = null;
+        this.checkout_time = null;
+        this.checkout_notes = null;
+        this.checked_out_by_name = null;
     }
 
     setData(data){

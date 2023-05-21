@@ -3,7 +3,6 @@ import PoolHelper from "./PoolHelper.mjs";
 import WeblinksHelper from "./WeblinksHelper.mjs";
 
 export default class DeviceHelper {
-
     static async getDevices(limit, offset) {
         let devices = [];
         const databaseModel = new DatabaseModel();

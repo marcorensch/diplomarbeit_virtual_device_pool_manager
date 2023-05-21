@@ -20,6 +20,11 @@ const guestCredentials = {
     password: "test"
 }
 
+const userCredentials = {
+    username: "user",
+    password: "test"
+}
+
 describe("Test API Availability", () => {
     const agent = supertest.agent(app);
     it("should return 200 for get on  /", async () => {
@@ -903,6 +908,7 @@ describe("Test Devices Route", () => {
             name: "test device",
             description: "test device",
             device_type_id: 1,
+            added: new Date().toISOString(),
         }
         const response = await agent.post("/api/devices").send(deviceData);
         expect(response.status).to.eql(201);
@@ -942,6 +948,78 @@ describe("Test Devices Route", () => {
         expect(response.body.message).to.eql("Device deleted");
     });
 
+    it("should return 404 when trying to get not existing device", async () => {
+        const response = await agent.get(`/api/devices/999999999999`);
+        expect(response.status).to.eql(404);
+    });
+
+    it("should return 404 when trying to update not existing device", async () => {
+        const deviceData = {
+            name: "test device updated",
+            notes: "test device updated",
+            device_type_id: 2,
+            added: new Date().toISOString()
+        }
+        const newDataSet = { ...itemFromDb, ...deviceData };
+        const response = await agent.put(`/api/devices/999999999`).send(newDataSet);
+        expect(response.status).to.eql(404);
+    });
+
+    it("should return 404 when trying to delete not existing device", async () => {
+        const response = await agent.delete(`/api/devices/999999999`);
+        expect(response.status).to.eql(404);
+    });
+
+    it("should return 400 when trying to create a device with missing data", async () => {
+        const deviceData = {
+            name: "test device",
+            description: "test device",
+        }
+        const response = await agent.post("/api/devices").send(deviceData);
+        expect(response.status).to.eql(400);
+    });
+
+    it("should return 403 when trying to create a physical device with missing (user) permissions", async () => {
+        const userTest = supertest.agent(app);
+        await userTest.post("/api/auth/login").send(userCredentials);
+        const deviceData = {
+            name: "test device",
+            description: "test device",
+            device_type_id: 1,
+            slot_id: 1,
+            added: new Date().toISOString(),
+        }
+        const response = await userTest.post("/api/devices").send(deviceData);
+        expect(response.status).to.eql(403);
+    });
+
+    it("should return 403 when trying to create a physical device with missing (guest) permissions", async () => {
+        const userTest = supertest.agent(app);
+        await userTest.post("/api/auth/login").send(guestCredentials);
+        const deviceData = {
+            name: "test device",
+            description: "test device",
+            device_type_id: 1,
+            slot_id: 1,
+            added: new Date().toISOString(),
+        }
+        const response = await userTest.post("/api/devices").send(deviceData);
+        expect(response.status).to.eql(403);
+    });
+
+    it("should return 403 when trying to create a virtual device with missing (guest) permissions", async () => {
+        const userTest = supertest.agent(app);
+        await userTest.post("/api/auth/login").send(guestCredentials);
+        const deviceData = {
+            name: "test device",
+            description: "test device",
+            device_type_id: 1,
+            added: new Date().toISOString(),
+        }
+        const response = await userTest.post("/api/devices").send(deviceData);
+        expect(response.status).to.eql(403);
+    });
+
 });
 describe("Test Weblinks Route", () => {
     const agent = supertest.agent(app);
@@ -952,6 +1030,7 @@ describe("Test Weblinks Route", () => {
             name: "test device",
             notes: "test device",
             device_type_id: 1,
+            added: new Date().toISOString(),
         }
         const response = await agent.post("/api/devices").send(deviceData);
         createdItem = { id: response.body.id, ...deviceData };

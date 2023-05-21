@@ -4,8 +4,20 @@ import DeviceHelper from "../helpers/DeviceHelper.mjs";
 import Device from "../models/Device.mjs";
 import {deviceDataValidator, weblinkValidator } from "../middlewares/inputValidators.mjs";
 import WeblinksHelper from "../helpers/WeblinksHelper.mjs";
+import {PermissionHandler} from "../helpers/PermissionHandler.mjs";
 
 const router = express.Router();
+
+const deviceManagementValidator = async (req, res, next) => {
+    const method = req.method === "POST" ? "Create" : "Update";
+    const action = req.body.slot_id ? `can${method}Devices` : `can${method}VirtualDevices`;
+    if (!req.user?.role) return res.status(403).send({message: "Unauthorized"});
+    const permissionHandler = new PermissionHandler();
+    const permissionsMap = permissionHandler.getPermissions(req.user.role);
+    if (!permissionsMap.has(action)) return res.status(403).send({message: "Forbidden"});
+
+    next();
+};
 
 router.get("/", async (req, res) => {
     const limit = req.query.limit || 10;
@@ -48,22 +60,12 @@ router.get("/:id", async (req, res) => {
     res.send(device);
 });
 
-router.post("/", UserValidator.validateTokens, UserValidator.setCookies, async (req, res) => {
+
+
+router.post("/", UserValidator.validateTokens, UserValidator.setCookies, deviceDataValidator, deviceManagementValidator, async (req, res) => {
 
     const device = new Device();
     device.setData(req.body)
-
-    if (device.slot_id) {
-        if (!UserValidator.hasPermission("canCreateDevices")) return res.status(403).send({
-            success: false,
-            message: "You do not have permission to create devices"
-        });
-    } else {
-        if (!UserValidator.hasPermission("canCreateVirtualDevices")) return res.status(403).send({
-            success: false,
-            message: "You do not have permission to create virtual devices"
-        });
-    }
 
     try{
         const result = await DeviceHelper.store(device);
@@ -114,6 +116,13 @@ router.put("/:id", UserValidator.validateTokens, UserValidator.setCookies, devic
 
     const device = new Device();
     device.setData({ id: req.params.id, ...req.body })
+
+    try{
+        const deviceFromDb = await DeviceHelper.getDeviceById(device.id);
+        if(!deviceFromDb) return res.status(404).send({success: false, message: "Device not found"});
+    }catch (e) {
+        return res.status(500).send({success: false, message: "Error checking if device exists"});
+    }
 
     if (device.slot_id) {
         if (!UserValidator.hasPermission("canUpdateDevices")) return res.status(403).send({
@@ -181,7 +190,7 @@ router.delete("/:id", UserValidator.validateTokens, UserValidator.setCookies, Us
     if(!req.params.id) return res.status(400).send({success: false, message: "ID cannot be empty"});
     try{
         const result = await DeviceHelper.delete(req.params.id);
-        if(!result.affectedRows) return res.status(500).send({success: false, message: "Device could not be deleted"});
+        if(!result.affectedRows) return res.status(404).send({success: false, message: "Device not found"});
         return res.send({success: true, message: "Device deleted"});
     }catch (e){
         console.log(e.message);
@@ -203,5 +212,11 @@ router.post("/:id/weblinks", UserValidator.validateTokens, UserValidator.setCook
         if(e.code === 'ER_NO_REFERENCED_ROW_2') return res.status(404).send({success: false, message: "Device not found"});
         return res.status(500).send({success: false, message: e.message});
     }
+});
+
+router.post("/:id/checkin", UserValidator.validateTokens, UserValidator.setCookies, UserValidator.hasPermission("canCheckoutInDevices"), async (req, res) => {
+    const currentUserId = req.user.id;
+    const deviceId = req.params.id;
+
 });
 export default router;
