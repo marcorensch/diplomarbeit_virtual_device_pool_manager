@@ -415,10 +415,9 @@ export default {
       });
     },
     handleLinksSortingChanged(sortingMap) {
-      console.log(sortingMap);
       for (let i = 0; i < sortingMap.length; i++) {
         this.device.weblinks.find((l) => l.uri === sortingMap[i].uri).sorting =
-          i;
+          i + 1;
       }
       console.log(this.device.weblinks);
     },

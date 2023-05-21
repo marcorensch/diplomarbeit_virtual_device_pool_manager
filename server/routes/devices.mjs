@@ -152,6 +152,7 @@ router.put("/:id", UserValidator.validateTokens, UserValidator.setCookies, devic
     if(device.weblinks.length) {
         try {
             for (const weblink of device.weblinks) {
+                console.log(weblink)
                 const result = await WeblinksHelper.setOrUpdateWeblink(device.id, weblink);
                 if (!result.affectedRows) return res.status(500).send({
                     success: false,
