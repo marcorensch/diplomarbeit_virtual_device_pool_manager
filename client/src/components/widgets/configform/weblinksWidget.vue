@@ -92,6 +92,8 @@
                   class="uk-input"
                   placeholder="Label"
                   v-model="form.name"
+                  @input="v$.form.name.$touch()"
+                  @blur="v$.form.name.$touch()"
                 />
               </label>
               <div
@@ -112,6 +114,8 @@
                   class="uk-input"
                   placeholder="https://www.website.tld"
                   v-model="form.uri"
+                  @input="v$.form.uri.$touch()"
+                  @blur="v$.form.uri.$touch()"
                 />
               </label>
               <div
@@ -195,6 +199,10 @@ class WeblinkItem {
 function alreadySet(value) {
   return !this.linkElementsTocompareWith.some((link) => link.uri === value);
 }
+function nameAlreadySet(value) {
+  return !this.linkElementsTocompareWith.some((link) => link.name === value);
+}
+
 export default {
   name: "weblinksWidget",
   components: { FontAwesomeIcon },
@@ -224,7 +232,13 @@ export default {
   validations() {
     return {
       form: {
-        name: { required },
+        name: {
+          required,
+          nameAlreadySet: helpers.withMessage(
+            "Name already set.",
+            nameAlreadySet
+          ),
+        },
         uri: {
           required,
           url,
