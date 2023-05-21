@@ -146,6 +146,8 @@
                     class="uk-input"
                     placeholder="Label"
                     v-model="linkForm.name"
+                    @input="v$.linkForm.name.$touch()"
+                    @blur="v$.linkForm.name.$touch()"
                   />
                 </label>
                 <div
@@ -166,6 +168,8 @@
                     class="uk-input"
                     placeholder="https://www.website.tld"
                     v-model="linkForm.uri"
+                    @input="v$.linkForm.uri.$touch()"
+                    @blur="v$.linkForm.uri.$touch()"
                   />
                 </label>
                 <div
@@ -222,8 +226,16 @@ import UIkit from "uikit";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { useAuthStore } from "@/stores/auth";
 import { useVuelidate } from "@vuelidate/core";
-import { required, url } from "@vuelidate/validators";
+import { helpers, required, url } from "@vuelidate/validators";
 import axios from "axios";
+
+function linkAlreadySet(value) {
+  return !this.device.weblinks.some((link) => link.uri === value);
+}
+
+function nameAlreadySet(value) {
+  return !this.device.weblinks.some((link) => link.name === value);
+}
 
 export default {
   name: "DeviceDetails",
@@ -248,8 +260,18 @@ export default {
   validations() {
     return {
       linkForm: {
-        name: { required },
-        uri: { required, url },
+        name: {
+          required,
+          nameAlreadySet: helpers.withMessage(
+            "Name already set",
+            nameAlreadySet
+          ),
+        },
+        uri: {
+          required,
+          url,
+          alreadySet: helpers.withMessage("Link already set", linkAlreadySet),
+        },
       },
     };
   },
@@ -303,11 +325,13 @@ export default {
       return url;
     },
     showAddWeblinkModal() {
+      this.v$.$reset();
       UIkit.modal("#add-weblink-modal").show();
     },
     async handleSaveLinkClicked() {
-      this.v$.$touch();
-      if (this.v$.$invalid) return;
+      const formIsValid = await this.v$.$validate();
+      if (!formIsValid) return;
+      console.log(this.device.weblinks);
       const storeWeblink = await axios.post(
         `/api/devices/${this.device.id}/weblinks`,
         this.linkForm
@@ -319,6 +343,7 @@ export default {
           uri: "",
           description: "",
         };
+        this.v$.$reset();
         UIkit.modal("#add-weblink-modal").hide();
       }
     },
