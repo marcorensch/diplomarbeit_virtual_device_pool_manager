@@ -81,6 +81,7 @@
             <th>ICCID</th>
             <th>Abo</th>
             <th class="uk-text-nowrap">Multi Device</th>
+            <th></th>
           </thead>
           <tbody>
             <MsisdnMgrRow
