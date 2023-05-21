@@ -1,5 +1,5 @@
 <template>
-  <div id="device-details" uk-offcanvas="flip: true">
+  <div v-if="device" id="device-details" uk-offcanvas="flip: true">
     <div class="uk-offcanvas-bar">
       <button class="uk-offcanvas-close" type="button" uk-close></button>
       <div id="offcanvas-content" v-if="device">
@@ -100,8 +100,11 @@
           <h3>GuideMe</h3>
         </div>
       </div>
-      <div class="uk-position-bottom">
-        <div class="uk-padding-small device-controls uk-flex uk-flex-right">
+      <div class="uk-position-bottom" v-if="showEditBtn">
+        <div
+          class="uk-padding-small device-controls uk-flex uk-flex-right"
+          uk-scrollspy="cls: uk-animation-slide-bottom; delay: 200; repeat:true;"
+        >
           <button
             class="uk-button uk-button-primary"
             @click="showDeviceEdit(device.id)"
@@ -117,16 +120,32 @@
 <script>
 import UIkit from "uikit";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { useAuthStore } from "@/stores/auth";
+
 export default {
   name: "DeviceDetails",
   components: { FontAwesomeIcon },
+  setup() {
+    const authStore = useAuthStore();
+    return { authStore };
+  },
   data() {
     return {
       device: null,
       imeis: [],
+      showEditBtn: false,
     };
   },
+  mounted() {},
   methods: {
+    canEditDevice() {
+      return (
+        (this.authStore.hasPermission("canUpdateDevices") &&
+          this.device.slot_id) ||
+        (this.authStore.hasPermission("canUpdateVirtualDevices") &&
+          !this.device.slot_id)
+      );
+    },
     createDateString(date) {
       return new Date(date).toLocaleDateString({
         year: "numeric",
@@ -137,6 +156,7 @@ export default {
     show(device) {
       this.imeis = [];
       this.device = device;
+      this.showEditBtn = this.canEditDevice();
       try {
         this.imeis = JSON.parse(this.device.imei) || [];
       } catch (e) {

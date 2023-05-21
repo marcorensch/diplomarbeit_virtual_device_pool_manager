@@ -161,7 +161,7 @@
             @image-changed="handleImageChanged"
           />
         </div>
-        <div class="uk-width-1-1 uk-width-2-3@s">
+        <div class="uk-width-1-1 uk-width-2-3@s" v-if="canSetPhysicalDevices()">
           <div>
             <div class="uk-card uk-card-default">
               <div class="uk-card-header">
@@ -261,6 +261,9 @@ import DeviceHelper from "@/helpers/DeviceHelper.mjs";
 import PoolSelector from "@/components/PoolSelector.vue";
 import WeblinksWidget from "@/components/widgets/configform/weblinksWidget.vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { useAuthStore } from "@/stores/auth";
+import { useToast } from "vue-toastification";
+const toast = useToast();
 
 const exactLength = (length) => (value) => value.toString().length === length;
 
@@ -283,7 +286,8 @@ export default {
   },
   setup() {
     const v$ = useVuelidate();
-    return { v$ };
+    const authStore = useAuthStore();
+    return { v$, authStore };
   },
   validations() {
     return {
@@ -315,13 +319,36 @@ export default {
       slot: null,
     };
   },
+  async beforeMount() {
+    // Handle the case where the user has no permission to update the device
+    const deviceData = await DeviceHelper.loadDevice(this.id);
+
+    if (this.id) {
+      if (deviceData.slot_id) {
+        if (!this.authStore.hasPermission("canUpdateDevices")) {
+          toast.error("You do not have permission to update devices");
+          return this.$router.push({ name: "deviceslist" });
+        }
+      } else {
+        if (!this.authStore.hasPermission("canUpdateVirtualDevices")) {
+          toast.error("You do not have permission to update virtual devices");
+          return this.$router.push({ name: "deviceslist" });
+        }
+      }
+    }
+    this.device = deviceData;
+  },
   async mounted() {
-    this.device = await DeviceHelper.loadDevice(this.id);
     this.deviceTypes = await DeviceHelper.getDeviceTypes();
     this.manufacturers = await DeviceHelper.getManufacturers();
-    console.log(this.device);
   },
   methods: {
+    canSetPhysicalDevices() {
+      return (
+        this.authStore.hasPermission("canCreateDevices") ||
+        this.authStore.hasPermission("canUpdateDevices")
+      );
+    },
     handleSlotSelected(slot) {
       this.device.slot_id = slot.id;
       this.device.slot = slot;

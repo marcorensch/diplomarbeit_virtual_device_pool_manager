@@ -49,7 +49,10 @@ const routes = [
             toast.error("You must be logged in to access this page");
             return { name: "login" };
           }
-          if (authStore.hasPermission("canUpdateDevices")) {
+          if (
+            authStore.hasPermission("canUpdateDevices") ||
+            authStore.hasPermission("canUpdateVirtualDevices")
+          ) {
             return true;
           } else {
             return { name: "NotFound" };
@@ -268,7 +271,7 @@ const routes = [
     name: "NotFound",
     beforeEnter: () => {
       toast.error("Page not found");
-      return { name: "widgets" };
+      return { name: "devices" };
     },
   },
 ];
