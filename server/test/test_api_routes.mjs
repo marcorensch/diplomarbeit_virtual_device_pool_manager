@@ -15,6 +15,11 @@ const adminCredentials = {
     password: "test"
 }
 
+const guestCredentials = {
+    username: "guest",
+    password: "test"
+}
+
 describe("Test API Availability", () => {
     const agent = supertest.agent(app);
     it("should return 200 for get on  /", async () => {
@@ -853,7 +858,7 @@ describe("Test administrative PoolBuilder API Endpoints", () => {
             createdLocationItems[1].sorting = 5;
             createdLocationItems[2].sorting = 1;
             const sortingMap = createdLocationItems.map((item) => {
-                return { id: item.id, sorting: item.sorting };
+                return {id: item.id, sorting: item.sorting};
             });
             const response = await agent.post("/api/admin/poolbuilder/items/sort").send(sortingMap);
             expect(response.status).to.eql(200);
@@ -883,4 +888,130 @@ describe("Test administrative PoolBuilder API Endpoints", () => {
         });
     });
 
+});
+
+describe("Test Devices Route", () => {
+    const agent = supertest.agent(app);
+    let createdItem;
+    let itemFromDb;
+    before(async () => {
+        await agent.post("/api/auth/login").send(adminCredentials);
+    });
+
+    it("should return 201 when creating a virtual device", async () => {
+        const deviceData = {
+            name: "test device",
+            description: "test device",
+            device_type_id: 1,
+        }
+        const response = await agent.post("/api/devices").send(deviceData);
+        expect(response.status).to.eql(201);
+        expect(response.body).to.have.property("id");
+        createdItem = { id: response.body.id, ...deviceData };
+    });
+
+    it("should return 200 when getting the before created device", async () => {
+        const response = await agent.get(`/api/devices/${createdItem.id}`);
+        expect(response.status).to.eql(200);
+        expect(response.body).to.have.property("id");
+        expect(response.body.id).to.eql(createdItem.id);
+        itemFromDb = response.body;
+    });
+
+    it("should return 200 when updating the before created device", async () => {
+        const deviceData = {
+            name: "test device updated",
+            notes: "test device updated",
+            device_type_id: 2,
+            added: new Date().toISOString()
+        }
+        const newDataSet = { ...itemFromDb, ...deviceData };
+        const response = await agent.put(`/api/devices/${newDataSet.id}`).send(newDataSet);
+        expect(response.status).to.eql(200);
+        expect(response.body).to.have.property("id");
+        expect(response.body.id).to.eql(createdItem.id);
+        expect(response.body.name).to.eql(deviceData.name);
+        expect(response.body.notes).to.eql(deviceData.notes);
+        expect(response.body.device_type_id).to.eql(deviceData.device_type_id);
+    });
+
+    it("should return 200 with correct message when deleting the before created device", async () => {
+        const response = await agent.delete(`/api/devices/${createdItem.id}`);
+        expect(response.status).to.eql(200);
+        expect(response.body).to.have.property("message");
+        expect(response.body.message).to.eql("Device deleted");
+    });
+
+});
+describe("Test Weblinks Route", () => {
+    const agent = supertest.agent(app);
+    let createdItem;
+    before(async () => {
+        await agent.post("/api/auth/login").send(adminCredentials);
+        const deviceData = {
+            name: "test device",
+            notes: "test device",
+            device_type_id: 1,
+        }
+        const response = await agent.post("/api/devices").send(deviceData);
+        createdItem = { id: response.body.id, ...deviceData };
+    });
+    it("should return 201 when creating a weblink for an existing device", async () => {
+        const weblinkData = {
+            name: "test weblink for existing device",
+            description: "test weblink",
+            uri: "https://example.com"
+        }
+        const response = await agent.post(`/api/devices/${createdItem.id}/weblinks`).send(weblinkData);
+        expect(response.status).to.eql(201);
+        expect(response.body).to.have.property("id");
+    });
+
+    it("should return 404 when creating a weblink for a non existing device", async () => {
+        const weblinkData = {
+            name: "test weblink for non existing device",
+            description: "test weblink",
+            uri: "https://example.com"
+        }
+        const response = await agent.post(`/api/devices/999999/weblinks`).send(weblinkData);
+        expect(response.status).to.eql(404);
+        expect(response.body).to.have.property("message");
+        expect(response.body.message).to.eql("Device not found");
+    });
+
+    it("should return 403 when trying to create a weblink using an account with insufficient permissions", async () => {
+        const guestSession = supertest.agent(app);
+        await guestSession.post("/api/auth/login").send(guestCredentials);
+        const weblinkData = {
+            name: "test weblink in guest session",
+            description: "test weblink",
+            uri: "https://example.com"
+        }
+        const response = await guestSession.post(`/api/devices/${createdItem.id}/weblinks`).send(weblinkData);
+        expect(response.status).to.eql(403);
+        expect(response.body).to.have.property("message");
+        expect(response.body.message).to.eql("Forbidden");
+    });
+
+    it("should return 401 when trying to create a weblink without login", async () => {
+        const noAuthSession = supertest.agent(app);
+        const weblinkData = {
+            name: "test weblink in no auth session",
+            description: "test weblink",
+            uri: "https://example.com"
+        }
+        const response = await noAuthSession.post(`/api/devices/${createdItem.id}/weblinks`).send(weblinkData);
+        expect(response.status).to.eql(401);
+        expect(response.body).to.have.property("message");
+        expect(response.body.message).to.eql("Unauthorized");
+    });
+
+    it("should delete linked weblinks when deleting a device", async () => {
+        const response = await agent.delete(`/api/devices/${createdItem.id}`);
+        expect(response.status).to.eql(200);
+        expect(response.body).to.have.property("message");
+        expect(response.body.message).to.eql("Device deleted");
+        const response2 = await agent.get(`/api/devices/${createdItem.id}/weblinks`);
+        expect(response2.status).to.eql(404);
+    });
 });

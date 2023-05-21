@@ -113,8 +113,7 @@ router.put("/:id", UserValidator.validateTokens, UserValidator.setCookies, devic
     if (!req.params.id) return res.status(400).send({success: false, message: "ID cannot be empty"});
 
     const device = new Device();
-    device.setData(req.body)
-    device.setData({id: req.params.id})
+    device.setData({ id: req.params.id, ...req.body })
 
     if (device.slot_id) {
         if (!UserValidator.hasPermission("canUpdateDevices")) return res.status(403).send({
@@ -144,8 +143,7 @@ router.put("/:id", UserValidator.validateTokens, UserValidator.setCookies, devic
     }
 
     try{
-        const result = await DeviceHelper.deleteInactiveMsisdnLinks(device.id, device.msisdns);
-        console.log(result)
+         await DeviceHelper.deleteInactiveMsisdnLinks(device.id, device.msisdns);
     }catch (e) {
         console.log(e.message);
         return res.status(500).send({success: false, message: e.message});
@@ -168,8 +166,9 @@ router.put("/:id", UserValidator.validateTokens, UserValidator.setCookies, devic
 
     try{
         const result = await DeviceHelper.update(device);
-        console.log(result)
-        return res.status(201).send(result);
+        if(!result.affectedRows) return res.status(500).send({success: false, message: "Device could not be updated"});
+        const dbData = await DeviceHelper.getDeviceById(req.params.id);
+        return res.status(200).send(dbData);
     }catch (e){
         console.log(e.message);
         return res.status(500).send({success: false, message: e.message});
@@ -177,14 +176,31 @@ router.put("/:id", UserValidator.validateTokens, UserValidator.setCookies, devic
 
 });
 
+router.delete("/:id", UserValidator.validateTokens, UserValidator.setCookies, UserValidator.hasPermission("canDeleteDevices"), async (req, res) => {
+    if(!req.params.id) return res.status(400).send({success: false, message: "ID cannot be empty"});
+    try{
+        const result = await DeviceHelper.delete(req.params.id);
+        if(!result.affectedRows) return res.status(500).send({success: false, message: "Device could not be deleted"});
+        return res.send({success: true, message: "Device deleted"});
+    }catch (e){
+        console.log(e.message);
+        return res.status(500).send({success: false, message: e.message});
+    }
+});
+
 router.post("/:id/weblinks", UserValidator.validateTokens, UserValidator.setCookies, UserValidator.hasPermission("canCreateLinks"), weblinkValidator, async (req, res) => {
     const weblink = req.body;
     const id = req.params.id;
-    const result = await WeblinksHelper.setOrUpdateWeblink(id, weblink);
-    if (!result.affectedRows) return res.status(500).send({
-        success: false,
-        message: "New weblink could not be stored"
-    });
-    res.status(201).send({success: true, message: "Weblink stored"});
+    try {
+        const result = await WeblinksHelper.setOrUpdateWeblink(id, weblink);
+        if (!result.affectedRows) return res.status(500).send({
+            success: false,
+            message: "New weblink could not be stored"
+        });
+        res.status(201).send({success: true, message: "Weblink stored", id: result.insertId});
+    }catch (e){
+        if(e.code === 'ER_NO_REFERENCED_ROW_2') return res.status(404).send({success: false, message: "Device not found"});
+        return res.status(500).send({success: false, message: e.message});
+    }
 });
 export default router;

@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS `weblinks`
     device_id   int(11)  DEFAULT NULL,
     sorting     int(11)  DEFAULT 0,
     PRIMARY KEY (id),
-    CONSTRAINT `fk_device_id` FOREIGN KEY (device_id) REFERENCES devices (id) ON DELETE SET NULL ON UPDATE CASCADE
+    CONSTRAINT `fk_device_id` FOREIGN KEY (device_id) REFERENCES devices (id) ON DELETE CASCADE ON UPDATE CASCADE
 )
     ENGINE = InnoDB
     DEFAULT CHARACTER SET = utf8
