@@ -913,7 +913,7 @@ describe("Test Devices Route", () => {
         const response = await agent.post("/api/devices").send(deviceData);
         expect(response.status).to.eql(201);
         expect(response.body).to.have.property("id");
-        createdItem = { id: response.body.id, ...deviceData };
+        createdItem = {id: response.body.id, ...deviceData};
     });
 
     it("should return 200 when getting the before created device", async () => {
@@ -931,7 +931,7 @@ describe("Test Devices Route", () => {
             device_type_id: 2,
             added: new Date().toISOString()
         }
-        const newDataSet = { ...itemFromDb, ...deviceData };
+        const newDataSet = {...itemFromDb, ...deviceData};
         const response = await agent.put(`/api/devices/${newDataSet.id}`).send(newDataSet);
         expect(response.status).to.eql(200);
         expect(response.body).to.have.property("id");
@@ -960,7 +960,7 @@ describe("Test Devices Route", () => {
             device_type_id: 2,
             added: new Date().toISOString()
         }
-        const newDataSet = { ...itemFromDb, ...deviceData };
+        const newDataSet = {...itemFromDb, ...deviceData};
         const response = await agent.put(`/api/devices/999999999`).send(newDataSet);
         expect(response.status).to.eql(404);
     });
@@ -1033,7 +1033,7 @@ describe("Test Weblinks Route", () => {
             added: new Date().toISOString(),
         }
         const response = await agent.post("/api/devices").send(deviceData);
-        createdItem = { id: response.body.id, ...deviceData };
+        createdItem = {id: response.body.id, ...deviceData};
     });
     it("should return 201 when creating a weblink for an existing device", async () => {
         const weblinkData = {
@@ -1093,4 +1093,8 @@ describe("Test Weblinks Route", () => {
         const response2 = await agent.get(`/api/devices/${createdItem.id}/weblinks`);
         expect(response2.status).to.eql(404);
     });
+});
+
+describe("Test Device CheckIn / Out Routes", () => {
+    // TODO: Test checkin / checkout routes
 });
