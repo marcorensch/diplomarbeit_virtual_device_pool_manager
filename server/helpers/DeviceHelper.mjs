@@ -126,4 +126,27 @@ export default class DeviceHelper {
             return [];
         }
     }
+
+    static async checkoutDevice(deviceId, userId, checkoutNotes, checkoutTime) {
+        console.log(deviceId, userId, checkoutNotes)
+        const databaseModel = new DatabaseModel();
+        const query = `UPDATE devices
+                       SET checked_out_by = ?,
+                           checkout_time  = ?,
+                           checkout_notes = ?
+                       WHERE id = ?`;
+        const values = [userId, checkoutTime, checkoutNotes, deviceId];
+        return await databaseModel.query(query, values);
+    }
+
+    static async checkinDevice(deviceId) {
+        const databaseModel = new DatabaseModel();
+        const query = `UPDATE devices
+                       SET checked_out_by = NULL,
+                           checkout_time = NULL,
+                           checkout_notes = NULL
+                       WHERE id = ?`;
+        const values = [deviceId];
+        return await databaseModel.query(query, values);
+    }
 }

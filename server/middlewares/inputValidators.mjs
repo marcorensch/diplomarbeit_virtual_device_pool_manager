@@ -37,6 +37,15 @@ const weblinkValidator = [
     }
 ];
 
+const checkoutValidator = [
+    body('notes').optional().escape().trim(),
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) return res.status(400).send({success: false, message: errors.array()[0].msg});
+        next()
+    }
+]
+
 const msisdnValidator = [];
 
-export {deviceDataValidator, poolBuilderValidator, msisdnValidator, weblinkValidator};
+export {deviceDataValidator, poolBuilderValidator, msisdnValidator, weblinkValidator, checkoutValidator};

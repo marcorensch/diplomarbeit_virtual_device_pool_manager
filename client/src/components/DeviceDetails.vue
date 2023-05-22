@@ -284,6 +284,23 @@
             class="uk-textarea"
           ></textarea>
         </div>
+        <div class="uk-modal-footer">
+          <div class="uk-grid-small uk-flex uk-flex-right@m" uk-grid>
+            <div>
+              <button class="uk-button uk-button-secondary uk-button-close">
+                Cancel
+              </button>
+            </div>
+            <div>
+              <button
+                class="uk-button uk-button-primary"
+                @click="handleConfirmCheckoutClicked"
+              >
+                Checkout
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -347,15 +364,45 @@ export default {
   methods: {
     showCheckInConfirm() {
       UIkit.modal
-        .confirm("Are you sure you want to check in this device?", {
-          labels: { ok: "Yes", cancel: "No" },
-        })
+        .confirm(
+          "Please confirm that the device is back in the device pool & plugged in.",
+          {
+            labels: { ok: "Yes", cancel: "No" },
+            stack: true,
+          }
+        )
         .then(() => {
-          this.checkInDevice();
+          this.handleCheckInConfirmed();
         });
     },
     showCheckoutModal() {
       UIkit.modal("#checkout-modal").show();
+    },
+
+    async handleCheckInConfirmed() {
+      const response = await axios.post(
+        `/api/devices/${this.device.id}/checkin`
+      );
+      if (response.status === 200) {
+        this.device.checked_out_by = null;
+        this.device.checkout_time = null;
+        this.device.checkout_notes = null;
+      }
+    },
+    async handleConfirmCheckoutClicked() {
+      const notes = document.getElementById("checkout-notes").value;
+      const response = await axios.post(
+        `/api/devices/${this.device.id}/checkout`,
+        {
+          notes,
+        }
+      );
+      if (response.status === 200) {
+        this.device.checked_out_by = response.data.checked_out_by;
+        this.device.checkout_time = response.data.checkout_time;
+        this.device.checkout_notes = response.data.checkout_notes;
+      }
+      UIkit.modal("#checkout-modal").hide();
     },
     canEditDevice() {
       return (
