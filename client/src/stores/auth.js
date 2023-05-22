@@ -19,6 +19,9 @@ export const useAuthStore = defineStore("auth", {
         state.user?.permissions.includes(permission)
       );
     },
+    getUser: (state) => {
+      return state.user;
+    },
   },
   actions: {
     setLocalStorageConfig(key, value) {

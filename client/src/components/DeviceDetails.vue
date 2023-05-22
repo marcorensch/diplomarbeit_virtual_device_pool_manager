@@ -42,7 +42,7 @@
                   <td>
                     <div v-if="device.checked_out_by">
                       <template
-                        v-if="device.checked_out_by === authStore.user.id"
+                        v-if="device.checked_out_by === authStore.getUser?.id"
                       >
                         <span class="uk-text-meta">Checked out by you</span>
                         <button
@@ -53,17 +53,51 @@
                         </button>
                       </template>
                       <template v-else>
-                        <font-awesome-icon
-                          :icon="['fas', 'triangle-exclamation']"
-                          class="uk-preserve-width uk-text-warning"
-                        />
-                        <span
-                          class="uk-margin-small-left uk-margin-small-right"
+                        <div
+                          class="nxd-no-select"
+                          :class="{
+                            'nxd-cursor-help': authStore.getUser,
+                          }"
                         >
-                          Checked out by
-                          {{ device.checked_out_by_name || "Unknown" }}</span
-                        >
+                          <font-awesome-icon
+                            :icon="['fas', 'triangle-exclamation']"
+                            class="uk-preserve-width uk-text-warning"
+                          />
+                          <span
+                            class="uk-margin-small-left uk-margin-small-right"
+                          >
+                            Checked out</span
+                          >
+                        </div>
+                        <div v-if="authStore.getUser" uk-drop>
+                          <div
+                            class="uk-card uk-card-default uk-card-body uk-card-small"
+                          >
+                            <div class="uk-text-bold nxd-text-navy">
+                              Checked out by
+                              {{
+                                device.checkout_fullname ||
+                                device.checkout_username
+                              }}
+                            </div>
+                            <div>
+                              {{ createDateTimeString(device.checkout_time) }}
+                              o'clock
+                            </div>
+                            <div class="uk-margin-small-top">
+                              <div class="uk-text-bold nxd-text-navy">
+                                Notes:
+                              </div>
+                              <div
+                                class="uk-text-break nxd-max-height-small uk-overflow-auto"
+                              >
+                                {{ device.checkout_notes }}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                         <button
+                          v-if="canCheckIn"
                           class="uk-button uk-button-small uk-button-secondary uk-display-inline-block uk-width-auto"
                           @click="showCheckInConfirm"
                         >
@@ -360,6 +394,17 @@ export default {
       },
     };
   },
+  computed: {
+    canCheckIn() {
+      if (!this.authStore.getUser) return false;
+      if (
+        this.device.checked_out_by === this.authStore.getUser.id ||
+        this.authStore.hasPermission("canForceCheckinDevices")
+      )
+        return true;
+      return false;
+    },
+  },
   mounted() {},
   methods: {
     showCheckInConfirm() {
@@ -413,10 +458,19 @@ export default {
       );
     },
     createDateString(date) {
-      return new Date(date).toLocaleDateString({
+      return new Date(date).toLocaleDateString(navigator.language, {
         year: "numeric",
         month: "long",
         day: "numeric",
+      });
+    },
+    createDateTimeString(date) {
+      return new Date(date).toLocaleDateString(navigator.language, {
+        year: "2-digit",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "numeric",
+        minute: "numeric",
       });
     },
     show(device) {

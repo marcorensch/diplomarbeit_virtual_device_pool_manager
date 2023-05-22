@@ -7,13 +7,16 @@ export default class DeviceHelper {
         let devices = [];
         const databaseModel = new DatabaseModel();
         const query = `SELECT d.*,
-                              m.name  AS manufacturer_name,
-                              m.image AS manufacturer_logo,
-                              dt.name AS device_type_name,
-                              dt.icon AS device_type_icon
+                              m.name                                   AS manufacturer_name,
+                              m.image                                  AS manufacturer_logo,
+                              dt.name                                  AS device_type_name,
+                              dt.icon                                  AS device_type_icon,
+                              acc.username                             AS checkout_username,
+                              CONCAT(acc.firstname, ' ', acc.lastname) AS checkout_fullname
                        FROM devices as d
                                 LEFT JOIN device_types as dt ON d.device_type_id = dt.id
                                 LEFT JOIN manufacturers as m ON d.manufacturer_id = m.id
+                                LEFT JOIN accounts as acc ON d.checked_out_by = acc.id
                        ORDER BY d.id DESC
                        LIMIT ${limit} OFFSET ${offset}`;
         try {
