@@ -1096,5 +1096,82 @@ describe("Test Weblinks Route", () => {
 });
 
 describe("Test Device CheckIn / Out Routes", () => {
-    // TODO: Test checkin / checkout routes
+    const agent = supertest.agent(app);
+    let createdItem;
+    before(async () => {
+        await agent.post("/api/auth/login").send(adminCredentials);
+        const deviceData = {
+            name: "test device for checkin / checkout",
+            notes: "test device",
+            device_type_id: 1,
+            added: new Date().toISOString(),
+        }
+        const response = await agent.post("/api/devices").send(deviceData);
+        createdItem = {id: response.body.id, ...deviceData};
+    });
+    after(async () => {
+        await agent.delete(`/api/devices/${createdItem.id}`);
+    });
+
+    it("should return 200 when checking out a device", async () => {
+        const response = await agent.post(`/api/devices/${createdItem.id}/checkout`).send({notes: "test checkout"});
+        expect(response.status).to.eql(200);
+        expect(response.body).to.have.property("message");
+        expect(response.body.message).to.eql("Device checked out");
+        expect(response.body).to.have.property("checked_out_by")
+    });
+    it('should return 403 with message Device is already checked out when trying to checkout the device again', function () {
+        return agent.post(`/api/devices/${createdItem.id}/checkout`).send({notes: "test checkout"});
+        expect(response.status).to.eql(403);
+        expect(response.body).to.have.property("message");
+        expect(response.body.message).to.eql("Device is already checked out");
+    });
+    it('should return 200 when checking in a device', function () {
+        return agent.post(`/api/devices/${createdItem.id}/checkin`);
+        expect(response.status).to.eql(200);
+        expect(response.body).to.have.property("message");
+        expect(response.body.message).to.eql("Device checked in");
+    });
+
+    it("should return 403 when trying to check in a device that is not checked out", async () => {
+        const response = await agent.post(`/api/devices/${createdItem.id}/checkin`);
+        expect(response.status).to.eql(403);
+        expect(response.body).to.have.property("message");
+        expect(response.body.message).to.eql("Device is not checked out");
+    });
+
+    it("should return 200 when checking out device again after checking in", async () => {
+        const response = await agent.post(`/api/devices/${createdItem.id}/checkout`).send({notes: "test checkout 2"});
+        expect(response.status).to.eql(200);
+        expect(response.body).to.have.property("message");
+        expect(response.body.message).to.eql("Device checked out");
+        expect(response.body).to.have.property("checked_out_by")
+
+        await agent.post(`/api/devices/${createdItem.id}/checkout`);
+    });
+
+    it("should return 40x when another user (without forced permissions) tries to check in the device", async () => {
+        await agent.post(`/api/devices/${createdItem.id}/checkin`);
+        const userSession = supertest.agent(app);
+        await userSession.post("/api/auth/login").send(userCredentials);
+
+        const response = await userSession.post(`/api/devices/${createdItem.id}/checkin`);
+        expect(response.status).to.eql(403);
+        expect(response.body).to.have.property("message");
+        expect(response.body.message).to.eql("Forbidden");
+
+        await agent.post(`/api/devices/${createdItem.id}/checkout`);
+    });
+
+    it("should return 200 when an admin checks in the device (Forced CheckIn)", async () => {
+        const userSession = supertest.agent(app);
+        await userSession.post("/api/auth/login").send(userCredentials);
+        await userSession.post(`/api/devices/${createdItem.id}/checkout`).send({notes: "test checkout for forced checkin"});
+
+        const response = await agent.post(`/api/devices/${createdItem.id}/checkin`);
+        expect(response.status).to.eql(200);
+        expect(response.body).to.have.property("message");
+        expect(response.body.message).to.eql("Device checked in");
+    });
+
 });

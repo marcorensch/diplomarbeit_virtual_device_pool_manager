@@ -246,7 +246,7 @@ router.post("/:id/weblinks", UserValidator.validateTokens, UserValidator.setCook
 router.post("/:id/checkout", UserValidator.validateTokens, UserValidator.setCookies, UserValidator.hasPermission("canCheckoutInDevices"), checkoutValidator, async (req, res) => {
     const currentUserId = req.user.id;
     const deviceId = req.params.id;
-    const checkout_notes = req.body.notes;
+    const checkout_notes = req.body.notes || "";
     const checkout_time = new Date()
     let device;
     try {
@@ -275,6 +275,22 @@ router.post("/:id/checkout", UserValidator.validateTokens, UserValidator.setCook
 });
 
 router.post("/:id/checkin", UserValidator.validateTokens, UserValidator.setCookies, canCheckInDevice, async (req, res) => {
+
+    // Get device
+    let device;
+    try {
+        device = await DeviceHelper.getDeviceById(req.device.id);
+        if (!device) return res.status(404).send({success: false, message: "Device not found"});
+    }catch (e) {
+        console.log(e.message);
+        return res.status(500).send({success: false, message: e.message});
+    }
+
+    // Check if device is checked out
+    if (!device.checked_out_by) return res.status(403).send({success: false, message: "Device is not checked out"});
+
+
+
     try {
         const result = await DeviceHelper.checkinDevice(req.device.id);
         if (!result.affectedRows) return res.status(500).send({
