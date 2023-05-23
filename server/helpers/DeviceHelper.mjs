@@ -131,7 +131,6 @@ export default class DeviceHelper {
     }
 
     static async checkoutDevice(deviceId, userId, checkoutNotes, checkoutTime) {
-        console.log(deviceId, userId, checkoutNotes)
         const databaseModel = new DatabaseModel();
         const query = `UPDATE devices
                        SET checked_out_by = ?,

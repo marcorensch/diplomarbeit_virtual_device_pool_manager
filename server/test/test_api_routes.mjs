@@ -552,7 +552,7 @@ describe("Test FileManager API Endpoints", () => {
         const response = await agent.get("/api/filemanager");
         expect(response.status).to.eql(400);
     });
-    it("should return 200 when loading list of files of logos path", async () => {
+    it("should return 200 when loading list of files from logos path", async () => {
         await agent.post("/api/auth/login").send(adminCredentials);
         const response = await agent.get("/api/filemanager?path=logos");
         expect(response.status).to.eql(200);
@@ -560,8 +560,21 @@ describe("Test FileManager API Endpoints", () => {
     it("should return stored files and folders when loading contents of logos path", async () => {
         await agent.post("/api/auth/login").send(adminCredentials);
         const response = await agent.get("/api/filemanager?path=logos");
+        console.log(response.body)
         expect(response.body).to.have.property("folders");
         expect(response.body).to.have.property("files");
+    });
+    it("should return 400 when loading contents from outside of root path", async () => {
+        await agent.post("/api/auth/login").send(adminCredentials);
+        const response = await agent.get("/api/filemanager?path=../../../");
+        expect(response.status).to.eql(400);
+        expect(response.body).to.have.property("message");
+        expect(response.body.message).to.eql("Invalid path");
+    });
+    it("should return 400 when loading contents from parent", async () => {
+        await agent.post("/api/auth/login").send(adminCredentials);
+        const response = await agent.get("/api/filemanager?path=logos/../");
+        expect(response.status).to.eql(400);
     });
     it("should return 401 when trying access File Manager without being logged in", async () => {
         const response = await agent.get("/api/filemanager?path=logos");
@@ -585,8 +598,25 @@ describe("Test FileManager API Endpoints", () => {
         expect(response.status).to.eql(403);
     });
 
+    it("should return 403 when trying to delete a file with user permissions", async () => {
+        const existingFileData = {name: "nxd-logo.png", relativePath: "test", fullPath: "test/nxd-logo.png"};
+        await agent.post("/api/auth/login").send(userCredentials);
+        const response = await agent.delete("/api/filemanager").send({files: [existingFileData]});
+        expect(response.status).to.eql(403);
+    });
+
     it("should return 403 when trying to rename file with guest permissions", async () => {
         await agent.post("/api/auth/login").send({username: "guest", password: "test"});
+        const response = await agent.put("/api/filemanager/rename").send({
+            oldName: "nxd-logo.png",
+            newName: "nxd-logo2.png",
+            parentDir: "test"
+        });
+        expect(response.status).to.eql(403);
+    });
+
+    it("should return 403 when trying to rename file with user permissions", async () => {
+        await agent.post("/api/auth/login").send(userCredentials);
         const response = await agent.put("/api/filemanager/rename").send({
             oldName: "nxd-logo.png",
             newName: "nxd-logo2.png",
@@ -606,7 +636,7 @@ describe("Test FileManager API Endpoints", () => {
         expect(response.status).to.eql(200);
     });
 
-    it("should return 404 when deleting file from server", async () => {
+    it("should return 404 when deleting file from server that does not exist", async () => {
         const nonExistingFileData = {name: "nxd-logo.png", relativePath: "test", fullPath: "test/thisisNotHere.png"};
         await agent.post("/api/auth/login").send(adminCredentials);
         const response = await agent.delete("/api/filemanager").send({files: [nonExistingFileData]});
@@ -628,7 +658,7 @@ describe("Test FileManager API Endpoints", () => {
         expect(response.body).to.have.property("message");
         expect(response.body.message).to.eql("Parent folder cannot be empty");
     });
-    it("should return 400 with correct message when uploading file to server without file", async () => {
+    it("should return 400 with correct message when using upload route without file", async () => {
         await agent.post("/api/auth/login").send(adminCredentials);
         const response = await agent.post("/api/filemanager/upload").field("relativePath", "test");
 

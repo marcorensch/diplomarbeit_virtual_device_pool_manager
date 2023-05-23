@@ -8,6 +8,7 @@ import fs from "fs";
 import FileManager from "../helpers/FileManager.mjs";
 import multer from "multer";
 import UserValidator from "../middlewares/UserValidator.mjs";
+import {pathValidator} from "../middlewares/fileManagerValidators.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,7 +20,7 @@ const regex = /^[a-z|\d]+[a-z|\d \-_.]*$/i;
 router.use(UserValidator.validateTokens);
 router.use(UserValidator.setCookies);
 
-router.get("/", UserValidator.hasPermission("canAccessFileManager"), async (req, res) => {
+router.get("/", UserValidator.hasPermission("canAccessFileManager"), pathValidator, async (req, res) => {
     let files = [];
     let folders = [];
     const relPath = req.query.path || "";
@@ -28,8 +29,7 @@ router.get("/", UserValidator.hasPermission("canAccessFileManager"), async (req,
     if(!relPath) return res.status(400).send({success: false, message: "Path cannot be empty"});
     const absolutePath = path.join(publicDir, relPath, name);
     if (absolutePath.includes("/../")) {
-        res.send({folders: [], files: []});
-        return;
+        return res.send({folders: [], files: []});
     }
 
     if (fs.existsSync(absolutePath)) {

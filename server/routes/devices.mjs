@@ -249,6 +249,7 @@ router.post("/:id/checkout", UserValidator.validateTokens, UserValidator.setCook
     const checkout_notes = req.body.notes || "";
     const checkout_time = new Date()
     let device;
+
     try {
         device = await DeviceHelper.getDeviceById(deviceId);
         if (!device) return res.status(404).send({success: false, message: "Device not found"});
