@@ -33,14 +33,16 @@
                   ...slot,
                 })
               "
-              :uk-tooltip="buildSlotLabel(row, slot)"
+              :uk-tooltip="buildSlotTooltip(row, slot)"
             >
               {{ slot.name }}
               <div class="uk-position-top-right">
                 <font-awesome-icon
                   :icon="['fas', 'circle']"
                   class="slot-status-icon uk-preserve-width"
-                  :class="slot.device_id ? 'uk-text-danger' : 'uk-text-success'"
+                  :class="
+                    slot.device_ids ? 'uk-text-danger' : 'uk-text-success'
+                  "
                 />
               </div>
             </div>
@@ -104,6 +106,17 @@ export default {
           label += `0`;
         }
         label += `${slot.name}`;
+      }
+      return label;
+    },
+    buildSlotTooltip(row, slot) {
+      let label = this.buildSlotLabel(row, slot);
+      if (slot.device_names) {
+        label += "<br><br><b>Devices&colon;</b>";
+        const names = slot.device_names.split(",");
+        names.forEach((name) => {
+          label += `<br>&nbsp;- ${name}`;
+        });
       }
       return label;
     },
