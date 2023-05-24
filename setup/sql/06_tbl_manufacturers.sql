@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS `manufacturers`
     hidden      text      NOT NULL,
     created_at  timestamp NOT NULL DEFAULT NOW(),
     modified_at timestamp NOT NULL DEFAULT NOW() ON UPDATE NOW(),
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    FULLTEXT(name) -- Volltextsuch-Index auf der Spalte "name"
 )
     ENGINE = InnoDB
     DEFAULT CHARSET = utf8

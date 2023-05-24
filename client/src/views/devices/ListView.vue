@@ -5,7 +5,10 @@
   >
     <div class="uk-container">
       <h1>Pool Devices</h1>
-      <DevicesActionbar @createDevice="handleCreateDeviceClicked" />
+      <DevicesActionbar
+        @createDevice="handleCreateDeviceClicked"
+        @search="handleNewSearchRequest"
+      />
 
       <div class="uk-margin">
         <table
@@ -95,6 +98,7 @@
 <script>
 import { useAuthStore } from "@/stores/auth";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { useToast } from "vue-toastification";
 import DeviceHelper from "@/helpers/DeviceHelper.mjs";
 import DeviceDetails from "@/components/DeviceDetails.vue";
 import DevicesActionbar from "@/components/devices/devicesActionbar.vue";
@@ -104,27 +108,39 @@ export default {
   components: { DevicesActionbar, DeviceDetails, FontAwesomeIcon },
   setup() {
     const authStore = useAuthStore();
+    const toast = useToast();
     return {
       authStore,
+      toast,
     };
   },
   data() {
     return {
       devices: [],
+      limit: 20,
+      offset: 0,
     };
   },
   async mounted() {
-    await this.getDevices(20, 0);
+    await this.getDevices(this.limit, this.offset);
   },
   methods: {
-    async getDevices(limit, offset) {
-      this.devices = await DeviceHelper.getDevices(limit, offset);
+    async getDevices(limit, offset, searchTerm) {
+      this.devices = await DeviceHelper.getDevices(limit, offset, searchTerm);
     },
     handleDeviceSelected(device) {
       this.$refs.deviceDetailsOffcanvas.show(device);
     },
     handleCreateDeviceClicked() {
       this.$router.push({ name: "create-device" });
+    },
+    async handleNewSearchRequest(searchTerm) {
+      if (searchTerm.trim().length < 3) {
+        this.toast.warning("Search term should be at least 3 characters long");
+        return await this.getDevices(this.limit, this.offset);
+      }
+
+      await this.getDevices(this.limit, this.offset, searchTerm);
     },
   },
 };

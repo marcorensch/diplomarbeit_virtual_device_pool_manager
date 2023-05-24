@@ -38,7 +38,7 @@ export async function createAccount(dbName, username, pwd, role, connectionData)
     const status = await DatabaseConnector.execute(`INSERT INTO accounts (username, password, notes, hidden, role_id) VALUES (?, ?, ?, ?, ?)`, [username, hashedPassword, '', '', adminUserRoleData[0].id], connectionData);
 
     if (status.affectedRows === 1) {
-        console.log(chalk.bold.green("\n********************* Admin user created! *********************\n"));
+        console.log(chalk.bold.green("\n********************* User created! *********************\n"));
         console.log(chalk.bold.yellow("Username: " + username));
         console.log(chalk.bold.yellow("Password: " + password));
         console.log(chalk.bold.green("\n***************************************************************"));

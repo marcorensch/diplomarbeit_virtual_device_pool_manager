@@ -3,22 +3,30 @@ import PoolHelper from "./PoolHelper.mjs";
 import WeblinksHelper from "./WeblinksHelper.mjs";
 
 export default class DeviceHelper {
-    static async getDevices(limit, offset) {
+    static async getDevices(limit, offset, searchTerm) {
+        const matchTermWords = searchTerm.trim().length ? searchTerm.trim().split(' ').map((word, index) => index>0 ? `"*${word}*"`: ` "*${word}*"`).join(' ') : null;
         let devices = [];
         const databaseModel = new DatabaseModel();
-        const query = `SELECT d.*,
+        let query = `SELECT d.*,
                               m.name                                   AS manufacturer_name,
                               m.image                                  AS manufacturer_logo,
                               dt.name                                  AS device_type_name,
                               dt.icon                                  AS device_type_icon,
                               acc.username                             AS checkout_username,
-                              CONCAT(acc.firstname, ' ', acc.lastname) AS checkout_fullname
-                       FROM devices as d
+                              CONCAT(acc.firstname, ' ', acc.lastname) AS checkout_fullname`;
+        if (matchTermWords) {
+            query += `, (MATCH(m.name) AGAINST(${matchTermWords} IN BOOLEAN MODE) + MATCH(d.name) AGAINST(${matchTermWords} IN BOOLEAN MODE)) AS relevance`;
+        }
+        query += ` FROM devices as d
                                 LEFT JOIN device_types as dt ON d.device_type_id = dt.id
                                 LEFT JOIN manufacturers as m ON d.manufacturer_id = m.id
-                                LEFT JOIN accounts as acc ON d.checked_out_by = acc.id
-                       ORDER BY d.id DESC
-                       LIMIT ${limit} OFFSET ${offset}`;
+                                LEFT JOIN accounts as acc ON d.checked_out_by = acc.id`;
+        if (matchTermWords) {
+            query += ` WHERE MATCH(m.name) AGAINST(${matchTermWords} IN BOOLEAN MODE) OR MATCH(d.name) AGAINST(${matchTermWords} IN BOOLEAN MODE) ORDER BY relevance DESC`;
+        } else {
+            query += ` ORDER BY d.id DESC`;
+        }
+        query += ` LIMIT ${limit} OFFSET ${offset}`;
         try {
             devices = await databaseModel.query(query);
         } catch (e) {
@@ -26,15 +34,18 @@ export default class DeviceHelper {
         }
 
         for (const device of devices) {
+            console.log("HELLO BEFORE")
             try {
                 device.slot = await PoolHelper.getItem(device.slot_id, false);
             } catch (e) {
                 console.log(e.message);
             }
 
+            console.log("HELLO")
+
             try {
                 device.weblinks = await WeblinksHelper.getWeblinksByDeviceId(device.id);
-            }catch (e) {
+            } catch (e) {
                 console.log(e.message);
             }
         }
@@ -42,18 +53,14 @@ export default class DeviceHelper {
         return devices;
     }
 
-    static async getDevicesBySearch(searchString, limit, offset) {
-
-    }
-
     static async getDeviceById(id) {
         const databaseModel = new DatabaseModel();
         const query = `SELECT d.*,
-                                      GROUP_CONCAT(n.number_id SEPARATOR ', ')  AS linked_msisdns
-                               FROM devices d
-                                        LEFT JOIN device_number n ON d.id = n.device_id
-                               WHERE d.id = ${id}
-                               GROUP BY d.id;`;
+                              GROUP_CONCAT(n.number_id SEPARATOR ', ') AS linked_msisdns
+                       FROM devices d
+                                LEFT JOIN device_number n ON d.id = n.device_id
+                       WHERE d.id = ${id}
+                       GROUP BY d.id;`;
         const result = await databaseModel.query(query);
         return result[0];
     }
@@ -145,7 +152,7 @@ export default class DeviceHelper {
         const databaseModel = new DatabaseModel();
         const query = `UPDATE devices
                        SET checked_out_by = NULL,
-                           checkout_time = NULL,
+                           checkout_time  = NULL,
                            checkout_notes = NULL
                        WHERE id = ?`;
         const values = [deviceId];

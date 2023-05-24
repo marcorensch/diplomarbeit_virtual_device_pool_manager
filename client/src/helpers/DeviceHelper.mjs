@@ -39,16 +39,19 @@ export default class DeviceHelper {
         }
     }
 
-    static async getDevices(limit, offset) {
+    static async getDevices(limit, offset, searchTerm) {
         if (!limit) {
             limit = 20;
         }
         if (!offset) {
             offset = 0;
         }
+        if (!searchTerm) {
+            searchTerm = "";
+        }
 
         try{
-            const response = await axios.get(`/api/devices?limit=${limit}&offset=${offset}`);
+            const response = await axios.get(`/api/devices?limit=${limit}&offset=${offset}&searchTerm=${searchTerm}`);
             console.log(response.data)
             return response.data;
         }catch (e) {

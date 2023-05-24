@@ -2,7 +2,12 @@ import express from "express";
 import UserValidator from "../middlewares/UserValidator.mjs";
 import DeviceHelper from "../helpers/DeviceHelper.mjs";
 import Device from "../models/Device.mjs";
-import {checkoutValidator, deviceDataValidator, weblinkValidator } from "../middlewares/inputValidators.mjs";
+import {
+    checkoutValidator,
+    deviceDataValidator,
+    deviceSearchValidator,
+    weblinkValidator
+} from "../middlewares/inputValidators.mjs";
 import WeblinksHelper from "../helpers/WeblinksHelper.mjs";
 import {PermissionHandler} from "../helpers/PermissionHandler.mjs";
 
@@ -46,21 +51,18 @@ const canCheckInDevice = async (req, res, next) => {
 
 };
 
-router.get("/", async (req, res) => {
-    const limit = req.query.limit || 10;
+router.get("/", deviceSearchValidator, async (req, res) => {
+    const limit = req.query.limit || 20;
     const offset = req.query.offset || 0;
+    const searchTerm = req.query.searchTerm || "";
 
     try {
-        const devices = await DeviceHelper.getDevices(limit, offset);
+        const devices = await DeviceHelper.getDevices(limit, offset, searchTerm);
         res.send(devices);
     } catch (e) {
         console.log(e.message);
         res.status(500).send({success: false, message: e.message});
     }
-});
-
-router.get("/search", async (req, res) => {
-
 });
 
 router.get("/:id", async (req, res) => {

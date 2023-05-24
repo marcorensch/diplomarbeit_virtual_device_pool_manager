@@ -1,4 +1,4 @@
-import {body, validationResult} from 'express-validator';
+import {body, query, validationResult} from 'express-validator';
 
 const deviceDataValidator = [
     body('name').exists().withMessage("Name is required").escape().trim(),
@@ -46,6 +46,17 @@ const checkoutValidator = [
     }
 ]
 
+const deviceSearchValidator = [
+    query('searchString').optional().escape().trim(),
+    query('limit').exists().isNumeric().withMessage("Limit must be a number"),
+    query('offset').exists().isNumeric().withMessage("Offset must be a number"),
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) return res.status(400).send({success: false, message: errors.array()[0].msg});
+        next()
+    }
+];
+
 const msisdnValidator = [];
 
-export {deviceDataValidator, poolBuilderValidator, msisdnValidator, weblinkValidator, checkoutValidator};
+export {deviceDataValidator, poolBuilderValidator, msisdnValidator, weblinkValidator, checkoutValidator, deviceSearchValidator};
