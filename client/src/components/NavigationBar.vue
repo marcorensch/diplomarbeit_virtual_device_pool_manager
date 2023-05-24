@@ -50,7 +50,7 @@
                 </div>
                 <div
                   class="uk-navbar-dropdown uk-position-relative"
-                  style="height: 0; padding: 0; margin: 0"
+                  style="height: 0; padding: 0; margin: 0; tab-index: 999"
                 >
                   <div class="uk-position-absolute navbar-submenu">
                     <ul class="uk-nav uk-navbar-dropdown-nav">

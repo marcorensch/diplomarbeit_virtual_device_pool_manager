@@ -14,6 +14,12 @@ const routes = [
     children: [
       {
         path: "",
+        name: "search-devices",
+        component: () => import("../views/devices/SearchView.vue"),
+        meta: { transition: "fade" },
+      },
+      {
+        path: "list",
         name: "devices",
         component: () => import("../views/devices/ListView.vue"),
         meta: { transition: "fade" },

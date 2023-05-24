@@ -126,7 +126,6 @@ export default {
           `/api/devicepool/items/${id}?deep=true`
         );
         this.cabinet = response.data;
-        console.log(this.cabinet);
       } catch (e) {
         console.log(e);
         this.cabinet = null;
