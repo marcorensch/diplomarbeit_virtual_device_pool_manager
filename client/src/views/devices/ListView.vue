@@ -5,22 +5,7 @@
   >
     <div class="uk-container">
       <h1>Pool Devices</h1>
-      <div
-        class="uk-width-1-1 uk-border-rounded uk-background-muted uk-padding-small"
-      >
-        <div class="uk-flex uk-flex-right">
-          <div v-if="authStore.hasPermission('canCreateDevices')">
-            <router-link
-              :to="{ name: 'create-device' }"
-              class="uk-button uk-button-primary uk-flex uk-flex-middle"
-            >
-              <div>
-                <font-awesome-icon :icon="['fas', 'plus']" /> Add Device
-              </div>
-            </router-link>
-          </div>
-        </div>
-      </div>
+      <DevicesActionbar @createDevice="handleCreateDeviceClicked" />
 
       <div class="uk-margin">
         <table
@@ -112,10 +97,11 @@ import { useAuthStore } from "@/stores/auth";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import DeviceHelper from "@/helpers/DeviceHelper.mjs";
 import DeviceDetails from "@/components/DeviceDetails.vue";
+import DevicesActionbar from "@/components/devices/devicesActionbar.vue";
 
 export default {
   name: "ListView",
-  components: { DeviceDetails, FontAwesomeIcon },
+  components: { DevicesActionbar, DeviceDetails, FontAwesomeIcon },
   setup() {
     const authStore = useAuthStore();
     return {
@@ -136,6 +122,9 @@ export default {
     },
     handleDeviceSelected(device) {
       this.$refs.deviceDetailsOffcanvas.show(device);
+    },
+    handleCreateDeviceClicked() {
+      this.$router.push({ name: "create-device" });
     },
   },
 };

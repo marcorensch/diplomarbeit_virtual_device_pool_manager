@@ -6,7 +6,13 @@
     <div :class="{ 'uk-card-body': inCard }">
       <table class="uk-table uk-table-divider uk-table-small uk-table-middle">
         <thead>
-          <th></th>
+          <th class="uk-table-shrink">
+            <font-awesome-icon
+              :icon="['fas', 'grip-lines-vertical']"
+              class="uk-preserve-width"
+              style="opacity: 0"
+            />
+          </th>
           <th>Label</th>
           <th>URL</th>
           <th></th>

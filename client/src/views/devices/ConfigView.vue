@@ -377,13 +377,13 @@ export default {
       this.device.imei.splice(index, 1);
     },
     handleCancelClicked() {
-      this.$router.push({ name: "deviceslist" });
+      this.$router.push({ name: "devices" });
     },
     handleDeleteClicked() {
       UIkit.modal.confirm("Are you sure you want to delete this device?").then(
         async () => {
           await DeviceHelper.delete(this.device.id);
-          this.$router.push({ name: "deviceslist" });
+          this.$router.push({ name: "devices" });
         },
         () => {}
       );
@@ -392,7 +392,7 @@ export default {
       const formIsValid = await this.v$.device.$validate();
       if (!formIsValid) return;
       await DeviceHelper.store(this.device);
-      this.$router.push({ name: "deviceslist" });
+      this.$router.push({ name: "devices" });
     },
 
     handleDeviceTypeClicked(deviceTypeId) {
