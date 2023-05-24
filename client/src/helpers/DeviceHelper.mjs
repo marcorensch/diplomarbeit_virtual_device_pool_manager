@@ -30,6 +30,15 @@ export default class DeviceHelper {
         }
     }
 
+    static async delete(deviceId) {
+        try{
+            await axios.delete(`/api/devices/${deviceId}`);
+            toast.success("Device deleted");
+        }catch (e) {
+            toast.error("Device could not be deleted");
+        }
+    }
+
     static async getDevices(limit, offset) {
         if (!limit) {
             limit = 20;

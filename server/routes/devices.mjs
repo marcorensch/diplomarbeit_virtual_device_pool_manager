@@ -87,7 +87,6 @@ router.get("/:id", async (req, res) => {
     res.send(device);
 });
 
-
 router.post("/", UserValidator.validateTokens, UserValidator.setCookies, deviceDataValidator, deviceManagementValidator, async (req, res) => {
 
     const device = new Device();

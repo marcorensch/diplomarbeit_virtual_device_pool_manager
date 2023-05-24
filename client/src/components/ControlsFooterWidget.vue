@@ -7,7 +7,7 @@
         class="uk-child-width-1-1 uk-child-width-auto@m uk-grid-small"
         uk-grid
       >
-        <div v-if="!showDelete">
+        <div v-if="canDelete">
           <button
             class="uk-button uk-button-danger uk-width-1-1"
             @click="handleDeleteClicked"
@@ -48,7 +48,7 @@ export default {
   name: "ControlsFooterWidget",
   emits: ["cancel", "save", "delete"],
   props: {
-    showDelete: {
+    canDelete: {
       type: Boolean,
       default: false,
     },

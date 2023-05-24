@@ -245,12 +245,15 @@
     <ControlsFooterWidget
       @cancel="handleCancelClicked"
       @save="handleSaveClicked"
+      @delete="handleDeleteClicked"
+      :canDelete="authStore.hasPermission('canDeleteDevices')"
     />
     <PoolSelector ref="poolSelector" @selected="handleSlotSelected($event)" />
   </div>
 </template>
 
 <script>
+import UIkit from "uikit";
 import ImageWidget from "@/components/widgets/configform/ImageWidget.vue";
 import NotesWidget from "@/components/widgets/configform/NotesWidget.vue";
 import ControlsFooterWidget from "@/components/ControlsFooterWidget.vue";
@@ -361,10 +364,6 @@ export default {
       let path = imageRelativePath.length ? "/public/" + imageRelativePath : "";
       this.device.image = path;
     },
-    handleCancelClicked() {
-      this.$router.push({ name: "deviceslist" });
-    },
-
     handleAddImeiClicked() {
       this.device.imei.push({ imei: "" });
       this.$nextTick(() => {
@@ -376,6 +375,18 @@ export default {
     },
     handleRemoveImeiClicked(index) {
       this.device.imei.splice(index, 1);
+    },
+    handleCancelClicked() {
+      this.$router.push({ name: "deviceslist" });
+    },
+    handleDeleteClicked() {
+      UIkit.modal.confirm("Are you sure you want to delete this device?").then(
+        async () => {
+          await DeviceHelper.delete(this.device.id);
+          this.$router.push({ name: "deviceslist" });
+        },
+        () => {}
+      );
     },
     async handleSaveClicked() {
       const formIsValid = await this.v$.device.$validate();
