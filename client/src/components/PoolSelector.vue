@@ -61,10 +61,12 @@ export default {
     return {
       selectedCabinet: null,
       selectedLocation: null,
+      modal: null,
     };
   },
   mounted() {
     this.registerEventListeners();
+    this.modal = UIkit.modal("#device-pool-selector-modal");
   },
   methods: {
     registerEventListeners() {
@@ -76,7 +78,7 @@ export default {
       });
     },
     showModal() {
-      UIkit.modal("#device-pool-selector-modal").show();
+      this.modal.show();
     },
 
     resetSelection() {
@@ -90,13 +92,12 @@ export default {
     },
 
     handleCabinetSelected(cabinet) {
-      console.log(cabinet);
       this.getCabinet(cabinet.id);
     },
 
     handleSlotSelected(slot) {
       this.$emit("selected", slot);
-      UIkit.modal("#device-pool-selector-modal").hide();
+      this.modal.hide();
     },
   },
 };
