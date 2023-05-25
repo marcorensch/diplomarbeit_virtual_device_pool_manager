@@ -3,8 +3,9 @@ import PoolHelper from "./PoolHelper.mjs";
 import WeblinksHelper from "./WeblinksHelper.mjs";
 
 export default class DeviceHelper {
-    static async getDevices(limit, offset, searchTerm) {
-        const matchTermWords = searchTerm.trim().length ? searchTerm.trim().split(' ').map((word, index) => index>0 ? `"*${word}*"`: ` "*${word}*"`).join(' ') : null;
+    static async getDevices(limit, offset, filters) {
+        let total_count = 0;
+        const matchTermWords = filters.search.trim().length ? filters.search.trim().split(' ').map((word, index) => index>0 ? `"*${word}*"`: ` "*${word}*"`).join(' ') : null;
         let devices = [];
         const databaseModel = new DatabaseModel();
         let query = `SELECT d.*,
@@ -21,27 +22,71 @@ export default class DeviceHelper {
                                 LEFT JOIN device_types as dt ON d.device_type_id = dt.id
                                 LEFT JOIN manufacturers as m ON d.manufacturer_id = m.id
                                 LEFT JOIN accounts as acc ON d.checked_out_by = acc.id`;
+
         if (matchTermWords) {
-            query += ` WHERE MATCH(m.name) AGAINST(${matchTermWords} IN BOOLEAN MODE) OR MATCH(d.name) AGAINST(${matchTermWords} IN BOOLEAN MODE) ORDER BY relevance DESC`;
+            query += ` WHERE (MATCH(m.name) AGAINST(${matchTermWords} IN BOOLEAN MODE) OR MATCH(d.name) AGAINST(${matchTermWords} IN BOOLEAN MODE))`;
+        }
+
+        if(filters.type || filters.availability !== null) {
+            if(!matchTermWords) {
+                query += ` WHERE 1=1`;
+            }
+            if (filters.type) {
+                query += ` AND d.device_type_id = ${filters.type}`;
+            }
+            if (filters.availability !== null) {
+                if (filters.availability === true) {
+                    query += ` AND d.checked_out_by IS NULL`;
+                } else {
+                    query += ` AND d.checked_out_by IS NOT NULL`;
+                }
+            }
+        }
+
+
+
+
+        if (matchTermWords) {
+            query += ` ORDER BY relevance DESC`;
         } else {
             query += ` ORDER BY d.id DESC`;
         }
+
         query += ` LIMIT ${limit} OFFSET ${offset}`;
+
+        console.log(query)
+
+        // Count of devices "total_count"
+        let countQuery  = `SELECT COUNT(*) AS total_count FROM devices as d
+           LEFT JOIN device_types as dt ON d.device_type_id = dt.id
+           LEFT JOIN manufacturers as m ON d.manufacturer_id = m.id
+           LEFT JOIN accounts as acc ON d.checked_out_by = acc.id`;
+        if (matchTermWords) {
+            countQuery += ` WHERE MATCH(m.name) AGAINST(${matchTermWords} IN BOOLEAN MODE) OR MATCH(d.name) AGAINST(${matchTermWords} IN BOOLEAN MODE)`;
+        }
+
         try {
             devices = await databaseModel.query(query);
         } catch (e) {
             console.log(e.message);
         }
 
-        for (const device of devices) {
-            console.log("HELLO BEFORE")
-            try {
-                device.slot = await PoolHelper.getItem(device.slot_id, false);
-            } catch (e) {
-                console.log(e.message);
-            }
+        try {
+            const count = await databaseModel.query(countQuery);
+            total_count = count[0].total_count;
+        }catch (e) {
+            console.log(e.message);
+        }
 
-            console.log("HELLO")
+        for (const device of devices) {
+
+            if(device.slot_id) {
+                try {
+                    device.slot = await PoolHelper.getItem(device.slot_id, false);
+                } catch (e) {
+                    console.log(e.message);
+                }
+            }
 
             try {
                 device.weblinks = await WeblinksHelper.getWeblinksByDeviceId(device.id);
@@ -50,7 +95,7 @@ export default class DeviceHelper {
             }
         }
 
-        return devices;
+        return {devices, total_count};
     }
 
     static async getDeviceById(id) {

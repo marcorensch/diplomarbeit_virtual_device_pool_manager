@@ -54,10 +54,14 @@ const canCheckInDevice = async (req, res, next) => {
 router.get("/", deviceSearchValidator, async (req, res) => {
     const limit = req.query.limit || 20;
     const offset = req.query.offset || 0;
-    const searchTerm = req.query.searchTerm || "";
+    const search = req.query.search || "";
+    const type = req.query.type || null;
+    let availability = req.query.availability || null;
+    if(availability) availability = availability === "true";
+    const filters = {search, type, availability};
 
     try {
-        const devices = await DeviceHelper.getDevices(limit, offset, searchTerm);
+        const devices = await DeviceHelper.getDevices(limit, offset, filters);
         res.send(devices);
     } catch (e) {
         console.log(e.message);

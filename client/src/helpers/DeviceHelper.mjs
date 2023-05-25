@@ -39,20 +39,21 @@ export default class DeviceHelper {
         }
     }
 
-    static async getDevices(limit, offset, searchTerm) {
-        if (!limit) {
-            limit = 20;
-        }
-        if (!offset) {
-            offset = 0;
-        }
-        if (!searchTerm) {
-            searchTerm = "";
-        }
+    static async getDevices(limit, offset, filters) {
+        let filterString = "";
+        let paginationString = "";
+
+        limit = !limit ? 20 : limit;
+        offset = !offset ? 0 : offset;
+        paginationString += `limit=${limit}&offset=${offset}`;
+
+        filterString += filters.search ? `&search=${filters.search}` : "";
+        filterString += filters.type ? `&type=${filters.type}` : "";
+        filterString += filters.availability ? `&availability=${filters.availability}` : "";
+
 
         try{
-            const response = await axios.get(`/api/devices?limit=${limit}&offset=${offset}&searchTerm=${searchTerm}`);
-            console.log(response.data)
+            const response = await axios.get(`/api/devices?${paginationString}${filterString}`);
             return response.data;
         }catch (e) {
             toast.error("Error getting devices");

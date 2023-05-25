@@ -119,14 +119,15 @@ export default {
       devices: [],
       limit: 20,
       offset: 0,
+      search: this.$route.query.search,
     };
   },
-  async mounted() {
-    await this.getDevices(this.limit, this.offset);
-  },
+  async mounted() {},
   methods: {
-    async getDevices(limit, offset, searchTerm) {
-      this.devices = await DeviceHelper.getDevices(limit, offset, searchTerm);
+    async getDevices(limit, offset, filters) {
+      const data = await DeviceHelper.getDevices(limit, offset, filters);
+      this.devices = data.devices;
+      this.total_count = data.total_count;
     },
     handleDeviceSelected(device) {
       this.$refs.deviceDetailsOffcanvas.show(device);
@@ -134,13 +135,14 @@ export default {
     handleCreateDeviceClicked() {
       this.$router.push({ name: "create-device" });
     },
-    async handleNewSearchRequest(searchTerm) {
-      if (searchTerm.trim().length < 3) {
+    async handleNewSearchRequest(filters) {
+      console.log(filters);
+      if (filters.search.trim().length && filters.search.trim().length < 3) {
         this.toast.warning("Search term should be at least 3 characters long");
-        return await this.getDevices(this.limit, this.offset);
+        filters.search = "";
       }
 
-      await this.getDevices(this.limit, this.offset, searchTerm);
+      await this.getDevices(this.limit, this.offset, filters);
     },
   },
 };

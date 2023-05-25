@@ -72,6 +72,7 @@ import {
   faExclamationTriangle,
   faCheckCircle,
   faSearch,
+  faRotate,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
@@ -102,7 +103,8 @@ library.add(
   faGripLinesVertical,
   faExclamationTriangle,
   faCheckCircle,
-  faSearch
+  faSearch,
+  faRotate
 );
 library.add(faSort, faSortUp, faSortDown, faSlash);
 library.add(

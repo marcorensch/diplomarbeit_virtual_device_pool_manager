@@ -47,9 +47,14 @@ const checkoutValidator = [
 ]
 
 const deviceSearchValidator = [
-    query('searchString').optional().escape().trim(),
+    query('search').optional().escape().trim(),
     query('limit').exists().isNumeric().withMessage("Limit must be a number"),
     query('offset').exists().isNumeric().withMessage("Offset must be a number"),
+    query('availability').optional().custom((value) => {
+        if (value === "true" || value === "false") return true;
+        return false;
+    }).withMessage("Availability must be a boolean"),
+    query('type').optional().isNumeric().withMessage("Type must be a nummeric type ID"),
     (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) return res.status(400).send({success: false, message: errors.array()[0].msg});
