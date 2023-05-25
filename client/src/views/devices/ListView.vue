@@ -91,6 +91,13 @@
         </table>
       </div>
     </div>
+    <PaginationWidget
+      :total_count="total_count"
+      :default_page_size="limit"
+      :updateTrigger="updateTrigger"
+      @pageChange="handlePageChange"
+      @pageSizeChange="handlePageSizeChanged"
+    />
     <DeviceDetails device="device" ref="deviceDetailsOffcanvas" />
   </div>
 </template>
@@ -102,10 +109,16 @@ import { useToast } from "vue-toastification";
 import DeviceHelper from "@/helpers/DeviceHelper.mjs";
 import DeviceDetails from "@/components/DeviceDetails.vue";
 import DevicesActionbar from "@/components/devices/devicesActionbar.vue";
+import PaginationWidget from "@/components/widgets/PaginationWidget.vue";
 
 export default {
   name: "ListView",
-  components: { DevicesActionbar, DeviceDetails, FontAwesomeIcon },
+  components: {
+    PaginationWidget,
+    DevicesActionbar,
+    DeviceDetails,
+    FontAwesomeIcon,
+  },
   setup() {
     const authStore = useAuthStore();
     const toast = useToast();
@@ -119,16 +132,32 @@ export default {
       devices: [],
       limit: 20,
       offset: 0,
-      search: this.$route.query.search,
+      filters: {},
+      total_count: 0,
+      updateTrigger: 0,
     };
   },
   async mounted() {},
   methods: {
-    async getDevices(limit, offset, filters) {
-      const data = await DeviceHelper.getDevices(limit, offset, filters);
+    handlePageChange(page) {
+      this.offset = (page - 1) * this.limit;
+      this.getDevices(this.limit, this.offset);
+      this.updateTrigger++;
+    },
+    handlePageSizeChanged(pageSize) {
+      console.log(pageSize);
+      this.limit = pageSize;
+      this.getDevices(this.limit, this.offset);
+      this.updateTrigger++;
+    },
+    async getDevices() {
+      const data = await DeviceHelper.getDevices(
+        this.limit,
+        this.offset,
+        this.filters
+      );
       this.devices = data.devices;
       this.total_count = data.total_count;
-      console.log(this.total_count);
     },
     handleDeviceSelected(device) {
       this.$refs.deviceDetailsOffcanvas.show(device);
@@ -137,13 +166,14 @@ export default {
       this.$router.push({ name: "create-device" });
     },
     async handleNewSearchRequest(filters) {
-      console.log(filters);
+      this.offset = 0;
+      this.filters = filters;
       if (filters.search.trim().length && filters.search.trim().length < 3) {
         this.toast.warning("Search term should be at least 3 characters long");
         filters.search = "";
       }
 
-      await this.getDevices(this.limit, this.offset, filters);
+      await this.getDevices(0);
     },
   },
 };
