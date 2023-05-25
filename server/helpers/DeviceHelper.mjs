@@ -43,9 +43,6 @@ export default class DeviceHelper {
             }
         }
 
-
-
-
         if (matchTermWords) {
             query += ` ORDER BY relevance DESC`;
         } else {
@@ -54,15 +51,28 @@ export default class DeviceHelper {
 
         query += ` LIMIT ${limit} OFFSET ${offset}`;
 
-        console.log(query)
-
         // Count of devices "total_count"
         let countQuery  = `SELECT COUNT(*) AS total_count FROM devices as d
            LEFT JOIN device_types as dt ON d.device_type_id = dt.id
            LEFT JOIN manufacturers as m ON d.manufacturer_id = m.id
            LEFT JOIN accounts as acc ON d.checked_out_by = acc.id`;
         if (matchTermWords) {
-            countQuery += ` WHERE MATCH(m.name) AGAINST(${matchTermWords} IN BOOLEAN MODE) OR MATCH(d.name) AGAINST(${matchTermWords} IN BOOLEAN MODE)`;
+            countQuery += ` WHERE (MATCH(m.name) AGAINST(${matchTermWords} IN BOOLEAN MODE) OR MATCH(d.name) AGAINST(${matchTermWords} IN BOOLEAN MODE))`;
+        }
+        if(filters.type || filters.availability !== null) {
+            if(!matchTermWords) {
+                countQuery += ` WHERE 1=1`;
+            }
+            if (filters.type) {
+                countQuery += ` AND d.device_type_id = ${filters.type}`;
+            }
+            if (filters.availability !== null) {
+                if (filters.availability === true) {
+                    countQuery += ` AND d.checked_out_by IS NULL`;
+                } else {
+                    countQuery += ` AND d.checked_out_by IS NOT NULL`;
+                }
+            }
         }
 
         try {

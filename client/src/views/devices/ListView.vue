@@ -128,6 +128,7 @@ export default {
       const data = await DeviceHelper.getDevices(limit, offset, filters);
       this.devices = data.devices;
       this.total_count = data.total_count;
+      console.log(this.total_count);
     },
     handleDeviceSelected(device) {
       this.$refs.deviceDetailsOffcanvas.show(device);

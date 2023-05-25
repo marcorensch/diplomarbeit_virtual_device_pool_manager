@@ -19,7 +19,9 @@
                 type="search"
                 placeholder="Search Devices"
                 aria-label="Search Devices"
+                ref="search"
                 v-model="form.search"
+                uk-tooltip="Search (ctrl + f)"
               />
             </form>
           </div>
@@ -28,7 +30,9 @@
               name="type_selection"
               id="type_selection"
               class="uk-select uk-width-1-1 uk-border-rounded"
+              ref="type"
               v-model="form.type"
+              uk-tooltip="Type (ctrl + t)"
             >
               <option value="">Type</option>
               <option
@@ -45,7 +49,9 @@
               name="availability_selection"
               id="availability_selection"
               class="uk-select uk-width-1-1 uk-border-rounded"
+              ref="availability"
               v-model="form.availability"
+              uk-tooltip="Availability (ctrl + a)"
             >
               <option value="" selected>Availability</option>
               <option value="true">Available</option>
@@ -65,14 +71,14 @@
               <button
                 class="uk-button uk-button-default uk-flex uk-flex-middle"
                 @click="handleClrFilterClicked"
-                uk-tooltip="Clear Filter"
+                uk-tooltip="Clear Filter (esc)"
               >
                 <font-awesome-icon :icon="['fas', 'rotate']" />
               </button>
               <button
                 class="uk-button uk-button-default uk-flex uk-flex-middle"
                 @click="handleSearchSubmit"
-                uk-tooltip="Search"
+                uk-tooltip="Search (return)"
               >
                 <font-awesome-icon :icon="['fas', 'search']" />
               </button>
@@ -82,7 +88,7 @@
             <button
               class="uk-button uk-button-primary uk-flex uk-flex-middle"
               @click="handleAddDeviceClicked"
-              uk-tooltip="Add Device"
+              uk-tooltip="Add Device (ctrl + n)"
               v-if="
                 authStore.hasPermission('canCreateDevices') ||
                 authStore.hasPermission('canCreateVirtualDevices')
@@ -123,11 +129,32 @@ export default {
     };
   },
   async mounted() {
+    document.body.addEventListener("keydown", this.handleKeyDown);
     this.form.search = this.$route.query.search || "";
     this.$emit("search", this.form);
     await this.getDeviceTypes();
   },
   methods: {
+    handleKeyDown(e) {
+      if (e.key === "Escape") {
+        this.handleClrFilterClicked();
+      }
+      if (e.key === "Enter") {
+        this.handleSearchSubmit(e);
+      }
+      if (e.key === "n" && e.ctrlKey) {
+        this.handleAddDeviceClicked();
+      }
+      if (e.key === "f" && e.ctrlKey) {
+        this.$refs.search.focus();
+      }
+      if (e.key === "t" && e.ctrlKey) {
+        this.$refs.type.focus();
+      }
+      if (e.key === "a" && e.ctrlKey) {
+        this.$refs.availability.focus();
+      }
+    },
     handleClrFilterClicked() {
       this.form.search = "";
       this.form.type = "";
