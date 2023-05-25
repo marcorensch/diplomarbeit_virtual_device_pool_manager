@@ -1,5 +1,5 @@
 <template>
-  <h2>Select Location</h2>
+  <h4>Select Location</h4>
   <template v-if="locations.length"
     ><div v-for="location in locations" :key="location.id" class="uk-margin">
       <div

@@ -10,8 +10,8 @@
       </a>
     </div>
     <div>
-      <h2 class="uk-margin-remove">{{ selectedLocation.name }}</h2>
-      <h3 class="uk-margin-remove">Select Cabinet</h3>
+      <h5 class="uk-margin-remove">{{ selectedLocation.name }}</h5>
+      <h4 class="uk-margin-remove">Select Cabinet</h4>
     </div>
   </div>
   <template v-if="cabinets">

@@ -10,10 +10,10 @@
       </a>
     </div>
     <div>
-      <h2 class="uk-margin-remove">
+      <h3 class="uk-margin-remove">
         {{ selectedLocation.name }}, Cabinet {{ selectedCabinet.name }}
-      </h2>
-      <h3 class="uk-margin-remove">Select Slot</h3>
+      </h3>
+      <h4 class="uk-margin-remove">Select Slot</h4>
     </div>
   </div>
   <template v-if="cabinet?.children">
