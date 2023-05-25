@@ -145,7 +145,6 @@ export default {
       this.updateTrigger++;
     },
     handlePageSizeChanged(pageSize) {
-      console.log(pageSize);
       this.limit = pageSize;
       this.getDevices(this.limit, this.offset);
       this.updateTrigger++;
