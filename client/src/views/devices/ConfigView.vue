@@ -222,6 +222,9 @@
             </div>
           </div>
         </div>
+        <div class="uk-width-1-1 uk-width-1-3@s" v-if="canSetPhysicalDevices()">
+          <SelectDeviceWidget />
+        </div>
         <div class="uk-width-1-1 uk-width-2-3@s">
           <MsisdnWidget
             :storedDeviceMsisdns="device.msisdns"
@@ -266,6 +269,7 @@ import WeblinksWidget from "@/components/widgets/configform/weblinksWidget.vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { useAuthStore } from "@/stores/auth";
 import { useToast } from "vue-toastification";
+import SelectDeviceWidget from "@/components/widgets/configform/SelectDeviceWidget.vue";
 const toast = useToast();
 
 const exactLength = (length) => (value) => value.toString().length === length;
@@ -273,6 +277,7 @@ const exactLength = (length) => (value) => value.toString().length === length;
 export default {
   name: "DeviceConfigView",
   components: {
+    SelectDeviceWidget,
     FontAwesomeIcon,
     WeblinksWidget,
     PoolSelector,
