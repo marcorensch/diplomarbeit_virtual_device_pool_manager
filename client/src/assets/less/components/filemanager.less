@@ -12,6 +12,10 @@
 }
 
 .file-manager {
+  .uk-button, .uk-button-small {
+      min-width: 44px;
+      min-height: 40px;
+  }
   background-color: #fff;
   border-radius: 0;
   border: 1px solid @color-grey-light;
@@ -79,8 +83,7 @@
       }
 
       .uk-button-group {
-        button {
-          min-width: 0;
+        .uk-button {
           border-right: 1px solid @color-grey-lighter;
 
           &:first-child {
