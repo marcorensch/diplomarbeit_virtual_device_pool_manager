@@ -44,16 +44,6 @@ export const permissions = {
     DELETE_ITEM: 'canDeleteItem',
     UPDATE_ITEM: 'canUpdateItem',
 
-    // Documents
-    CREATE_DOCUMENTS: 'canCreateDocuments',
-    DELETE_DOCUMENTS: 'canDeleteDocuments',
-    UPDATE_DOCUMENTS: 'canUpdateDocuments',
-    DELETE_OWN_DOCUMENTS: 'canDeleteOwnDocuments',
-    UPDATE_OWN_DOCUMENTS: 'canUpdateOwnDocuments',
-    // Images
-    CREATE_IMAGES: 'canCreateImages',
-    DELETE_IMAGES: 'canDeleteImages',
-    UPDATE_IMAGES: 'canUpdateImages',
     // Links
     CREATE_LINKS: 'canCreateLinks',
     DELETE_LINKS: 'canDeleteLinks',
