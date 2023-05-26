@@ -86,15 +86,16 @@
               </button>
             </div>
           </div>
-          <div>
+          <div
+            v-if="
+              authStore.hasPermission('canCreateDevices') ||
+              authStore.hasPermission('canCreateVirtualDevices')
+            "
+          >
             <button
               class="uk-button uk-button-primary uk-flex uk-flex-middle"
               @click="handleAddDeviceClicked"
               uk-tooltip="Add Device (ctrl + n)"
-              v-if="
-                authStore.hasPermission('canCreateDevices') ||
-                authStore.hasPermission('canCreateVirtualDevices')
-              "
             >
               <font-awesome-icon :icon="['fas', 'plus']" />
             </button>
