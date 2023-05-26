@@ -13,12 +13,6 @@
               <a href="#" @click="handlePageSelected(page)">{{ page }}</a>
             </li>
           </template>
-          <!--          <li class="uk-disabled"><span>…</span></li>-->
-
-          <!--          <li class="uk-active"><span>7</span></li>-->
-
-          <!--          <li class="uk-disabled"><span>…</span></li>-->
-          <!--          <li><a href="#">20</a></li>-->
           <li>
             <a href="#" @click="handleNextPageSelected"
               ><span uk-pagination-next></span
@@ -81,7 +75,7 @@ export default {
       pages: 0,
       available_pages: [],
       selected_page_size: this.default_page_size,
-      page_sizes: [2, 10, 20, 50, 100],
+      page_sizes: [10, 20, 50, 100],
     };
   },
   methods: {

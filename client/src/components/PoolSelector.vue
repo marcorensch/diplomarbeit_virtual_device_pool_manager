@@ -6,7 +6,9 @@
   >
     <div class="uk-modal-dialog uk-margin-auto-vertical nxd-min-height-80vh">
       <button class="uk-modal-close-default" type="button" uk-close></button>
-      <div class="uk-modal-header">Pool Location Selection</div>
+      <div class="uk-modal-header">
+        <h3 class="uk-modal-title">Select Pool Location</h3>
+      </div>
       <div
         class="uk-modal-body"
         uk-scrollspy="target: >div; cls: uk-animation-fade; delay:50; repeat:true;"

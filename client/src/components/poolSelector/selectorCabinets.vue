@@ -4,13 +4,13 @@
       <a href="#" class="go-back-link">
         <font-awesome-icon
           :icon="['fas', 'arrow-left']"
-          class="uk-h2 uk-margin-remove"
+          class="uk-h3 uk-margin-remove"
           @click="this.$emit('showLocations')"
         />
       </a>
     </div>
     <div>
-      <h2 class="uk-margin-remove">{{ selectedLocation.name }}</h2>
+      <h4 class="uk-margin-remove">{{ selectedLocation.name }}</h4>
       <h3 class="uk-margin-remove">Select Cabinet</h3>
     </div>
   </div>

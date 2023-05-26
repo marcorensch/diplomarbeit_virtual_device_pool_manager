@@ -33,6 +33,7 @@
               ref="type"
               v-model="form.type"
               uk-tooltip="Type (ctrl + t)"
+              @change="handleSearchSubmit"
             >
               <option value="">Type</option>
               <option
@@ -52,6 +53,7 @@
               ref="availability"
               v-model="form.availability"
               uk-tooltip="Availability (ctrl + a)"
+              @change="handleSearchSubmit"
             >
               <option value="" selected>Availability</option>
               <option value="true">Available</option>
@@ -71,7 +73,7 @@
               <button
                 class="uk-button uk-button-default uk-flex uk-flex-middle"
                 @click="handleClrFilterClicked"
-                uk-tooltip="Clear Filter (esc)"
+                uk-tooltip="Clear Filter (ctrl + del)"
               >
                 <font-awesome-icon :icon="['fas', 'rotate']" />
               </button>
@@ -136,7 +138,7 @@ export default {
   },
   methods: {
     handleKeyDown(e) {
-      if (e.key === "Escape") {
+      if (e.key === "Backspace" || (e.key === "Delete" && e.ctrlKey)) {
         this.handleClrFilterClicked();
       }
       if (e.key === "Enter") {
