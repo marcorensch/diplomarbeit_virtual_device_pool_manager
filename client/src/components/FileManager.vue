@@ -49,19 +49,25 @@
                   class="uk-nav uk-nav-primary uk-nav-center uk-margin-auto-vertical"
                 >
                   <li class="uk-nav-header">Options</li>
-                  <li>
+                  <li
+                    v-if="authStore.hasPermission('canCreateFileManagerItem')"
+                  >
                     <a href="#" @click="handleCreateFolderClicked"
                       ><font-awesome-icon :icon="['fas', 'folder-plus']" />
                       Create Folder</a
                     >
                   </li>
-                  <li>
+                  <li
+                    v-if="authStore.hasPermission('canCreateFileManagerItem')"
+                  >
                     <a href="#" @click="handleShowFileUploadClicked">
                       <font-awesome-icon :icon="['fas', 'cloud-arrow-up']" />
                       Upload File
                     </a>
                   </li>
-                  <li>
+                  <li
+                    v-if="authStore.hasPermission('canUpdateFileManagerItem')"
+                  >
                     <a
                       href="#"
                       :class="{ 'uk-disabled': !exactlyOneChoosen }"
@@ -70,7 +76,9 @@
                       <font-awesome-icon :icon="['fas', 'pencil']" /> Rename
                     </a>
                   </li>
-                  <li>
+                  <li
+                    v-if="authStore.hasPermission('canDeleteFileManagerItem')"
+                  >
                     <a
                       href="#"
                       :class="{ 'uk-disabled': !anyChoosen }"
@@ -125,12 +133,14 @@
               <button
                 class="uk-button uk-button-default uk-button-small"
                 @click="handleCreateFolderClicked"
+                v-if="authStore.hasPermission('canCreateFileManagerItem')"
               >
                 <font-awesome-icon :icon="['fas', 'folder-plus']" />
               </button>
               <button
                 class="uk-button uk-button-default uk-button-small"
                 @click="handleShowFileUploadClicked"
+                v-if="authStore.hasPermission('canCreateFileManagerItem')"
               >
                 <font-awesome-icon :icon="['fas', 'cloud-arrow-up']" />
               </button>
@@ -138,6 +148,7 @@
                 class="uk-button uk-button-default uk-button-small"
                 :class="{ 'uk-disabled': !exactlyOneChoosen }"
                 @click="handleRenameElementClicked"
+                v-if="authStore.hasPermission('canUpdateFileManagerItem')"
               >
                 <font-awesome-icon :icon="['fas', 'pencil']" />
               </button>
@@ -145,6 +156,7 @@
                 class="uk-button uk-button-danger uk-button-small"
                 :class="{ 'uk-disabled': !anyChoosen }"
                 @click="handleDeleteClicked"
+                v-if="authStore.hasPermission('canDeleteFileManagerItem')"
               >
                 <font-awesome-icon :icon="['fas', 'trash']" />
               </button>
@@ -439,6 +451,7 @@
 
 <script>
 import FileManagerDirectoryItem from "@/components/FileManagerDirectoryItem.vue";
+import { useAuthStore } from "@/stores/auth";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { useToast } from "vue-toastification";
 import UIkit from "uikit";
@@ -449,6 +462,12 @@ const regex = /^[a-z|\d]+[a-z|\d \-_.]*$/i;
 
 export default {
   name: "FileManager",
+  setup() {
+    const authStore = useAuthStore();
+    return {
+      authStore,
+    };
+  },
   components: {
     FontAwesomeIcon,
     FileManagerDirectoryItem,
