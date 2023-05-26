@@ -698,6 +698,7 @@ export default {
     },
 
     triggerFolderSelect(fullPath) {
+      console.log("triggerFolderSelect", fullPath);
       const mediaTreeContainer = document.getElementById(
         "media-tree-container"
       );
@@ -793,7 +794,7 @@ export default {
       if (folders) {
         folders.forEach((folder, index) => {
           if (folder === "") return;
-          const fullPath = `${this.baseDir}/${folders
+          const fullPath = `${this.baseDir}${folders
             .slice(0, index + 1)
             .join("/")}`;
           breadcrumbs.push({
@@ -803,7 +804,6 @@ export default {
           });
         });
       }
-
       if (breadcrumbs.length > limit) {
         const itemToReAdd = breadcrumbs[breadcrumbs.length - limit - 1];
         itemToReAdd.name = "...";
