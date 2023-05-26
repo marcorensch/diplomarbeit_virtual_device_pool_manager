@@ -38,9 +38,6 @@ export default class FileManager {
 
     static createFolder(relativePath, name) {
         const absPath = path.join(publicDir, relativePath, name);
-
-        console.log(`Creating folder ${absPath}`)
-
         if (absPath.includes("..")) {
             throw({status: 403, message: "Forbidden path"})
         }
@@ -59,7 +56,6 @@ export default class FileManager {
             const absPath = path.join(publicDir, el.fullPath);
 
             if (!fs.existsSync(absPath)) {
-                console.log(`Trying to delete ${absPath} that does not exist`);
                 throw({status: 404, message: "File or Folder not found" })
             }
 
@@ -68,7 +64,6 @@ export default class FileManager {
                     if (err) {
                         throw {status: 500, message: err.message}
                     }
-                    console.log(`${absPath} is deleted!`)
                 })
             } catch (e) {
                 throw(e)

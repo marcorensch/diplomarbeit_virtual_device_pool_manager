@@ -185,7 +185,7 @@
 
               <ul class="media-tree">
                 <li
-                  class="media-tree-item"
+                  class="media-tree-item uk-width-1-1 uk-margin-remove-right"
                   v-for="(folder, index) in folderTree"
                   :key="index"
                 >
@@ -784,7 +784,6 @@ export default {
       let breadcrumbs = [];
       let bcPath = this.currentFolder.fullPath.replace(this.baseDir, "");
       let folders = bcPath?.split("/");
-
       breadcrumbs.push({
         name: "Home",
         hint: "Home",
