@@ -38,7 +38,8 @@ const routes = [
           if (authStore.hasPermission("canCreateDevices")) {
             return true;
           } else {
-            return { name: "NotFound" };
+            toast.error("You don't have permission to access this page");
+            return { path: "" };
           }
         },
       },
@@ -61,7 +62,8 @@ const routes = [
           ) {
             return true;
           } else {
-            return { name: "NotFound" };
+            toast.error("You don't have permission to access this page");
+            return { path: "" };
           }
         },
       },
@@ -84,7 +86,8 @@ const routes = [
           if (authStore.hasPermission("canAccessManufacturersList")) {
             return true;
           } else {
-            return { name: "NotFound" };
+            toast.error("You don't have permission to access this page");
+            return { path: "" };
           }
         },
       },
@@ -102,7 +105,8 @@ const routes = [
           if (authStore.hasPermission("canCreateManufacturer")) {
             return true;
           } else {
-            return { name: "NotFound" };
+            toast.error("You don't have permission to access this page");
+            return { path: "" };
           }
         },
       },
@@ -120,7 +124,8 @@ const routes = [
           if (authStore.hasPermission("canUpdateManufacturer")) {
             return true;
           } else {
-            return { name: "NotFound" };
+            toast.error("You don't have permission to access this page");
+            return { path: "" };
           }
         },
       },
@@ -197,7 +202,10 @@ const routes = [
         component: () => import("../views/admin/msisdn/MsisdnEditorView.vue"),
         beforeEnter: () => {
           const authStore = useAuthStore();
-          if (authStore.hasPermission("canUpdateMsisdn")) {
+          if (
+            authStore.hasPermission("canAccessMsisdnManager") &&
+            authStore.hasPermission("canUpdateMsisdn")
+          ) {
             return true;
           } else {
             toast.error("You are not allowed to access this page");
@@ -212,7 +220,10 @@ const routes = [
         component: () => import("../views/admin/msisdn/MsisdnEditorView.vue"),
         beforeEnter: () => {
           const authStore = useAuthStore();
-          if (authStore.hasPermission("canCreateMsisdn")) {
+          if (
+            authStore.hasPermission("canAccessMsisdnManager") &&
+            authStore.hasPermission("canCreateMsisdn")
+          ) {
             return true;
           } else {
             toast.error("You are not allowed to access this page");
@@ -226,7 +237,10 @@ const routes = [
         component: () => import("../views/admin/UsersView.vue"),
         beforeEnter: () => {
           const authStore = useAuthStore();
-          if (authStore.hasPermission("canAccessAdmin")) {
+          if (
+            authStore.hasPermission("canAccessAdmin") &&
+            authStore.hasPermission("canAccessAccountManager")
+          ) {
             return true;
           } else {
             toast.error("You are not allowed to access this page");
@@ -261,11 +275,14 @@ const routes = [
             toast.error("You must be logged in to access this page");
             return { name: "login" };
           }
-          if (authStore.hasPermission("canAccessPoolBuilder")) {
+          if (
+            authStore.hasPermission("canAccessAdmin") &&
+            authStore.hasPermission("canAccessPoolBuilder")
+          ) {
             return true;
           } else {
             toast.error("You are not allowed to access this page");
-            return { path: "" };
+            return { name: "devices" };
           }
         },
       },
