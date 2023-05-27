@@ -4,7 +4,7 @@
       <button class="uk-offcanvas-close" type="button" uk-close></button>
       <div id="offcanvas-content" v-if="device">
         <div class="uk-child-width-expand uk-grid-small" uk-grid>
-          <div class="uk-width-1-3">
+          <div class="uk-width-1-1 uk-width-1-3@m">
             <div id="device-image">
               <img v-if="device.image" :src="device.image" alt="" />
               <font-awesome-icon

@@ -21,8 +21,8 @@
   .uk-offcanvas-bar{
     background: @color-white;
     color: @color-grey-dark;
-    width: 45vw;
-    max-width: 100%;
+    width: 90vw;
+    max-width: 100vw;
     .uk-offcanvas-close {
       color: @color-grey-dark;
     }
@@ -43,6 +43,12 @@
 
     .device-controls {
       background: @color-horizon;
+    }
+  }
+
+  @media (min-width: @screen-medium) {
+    .uk-offcanvas-bar{
+      width: 50vw;
     }
   }
 

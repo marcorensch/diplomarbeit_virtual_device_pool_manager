@@ -107,7 +107,7 @@ import { useAuthStore } from "@/stores/auth";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { useToast } from "vue-toastification";
 import DeviceHelper from "@/helpers/DeviceHelper.mjs";
-import DeviceDetails from "@/components/DeviceDetails.vue";
+import DeviceDetails from "@/components/devices/DeviceDetails.vue";
 import DevicesActionbar from "@/components/devices/devicesActionbar.vue";
 import PaginationWidget from "@/components/widgets/PaginationWidget.vue";
 
