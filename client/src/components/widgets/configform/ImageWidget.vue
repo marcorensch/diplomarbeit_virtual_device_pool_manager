@@ -30,7 +30,7 @@
         Select
       </button>
     </div>
-    <div id="file-manager-modal" class="uk-modal-container" uk-modal>
+    <div id="image-manager-modal" class="uk-modal-container" uk-modal>
       <div class="uk-modal-dialog">
         <div class="uk-modal-header">
           <h2 class="uk-modal-title">Select {{ title }}</h2>
@@ -38,6 +38,7 @@
         <div class="uk-modal-body uk-padding-remove">
           <div>
             <FileManager
+              :id="'image-manager'"
               :updateTriggerCounter="updateTriggerCounter"
               :baseDir="baseDir"
               @file-selected="handleFileSelected"
@@ -111,7 +112,7 @@ export default {
     },
     handleOpenFileManagerModal() {
       this.updateTriggerCounter++;
-      UIkit.modal("#file-manager-modal").show();
+      UIkit.modal("#image-manager-modal").show();
     },
     handleFileSelected(selectedFile) {
       this.selectedFile = selectedFile;

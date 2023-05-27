@@ -73,6 +73,10 @@ import {
   faCheckCircle,
   faSearch,
   faRotate,
+  faFile,
+  faEye,
+  faCloudArrowDown,
+  faUnlink,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
@@ -99,12 +103,15 @@ library.add(
   faChevronLeft,
   faCubes,
   faLink,
+  faUnlink,
   faArrowUpRightFromSquare,
   faGripLinesVertical,
   faExclamationTriangle,
   faCheckCircle,
   faSearch,
-  faRotate
+  faRotate,
+  faFile,
+  faEye
 );
 library.add(faSort, faSortUp, faSortDown, faSlash);
 library.add(
@@ -130,6 +137,7 @@ library.add(
   faSquare,
   faFolderPlus,
   faCloudArrowUp,
+  faCloudArrowDown,
   faTableCells,
   faFolder,
   faHome,

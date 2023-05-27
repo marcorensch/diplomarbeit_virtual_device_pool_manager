@@ -1,5 +1,5 @@
 <template>
-  <div class="file-manager">
+  <div :ref="id" class="file-manager">
     <div class="folder-controls">
       <div class="uk-grid-small uk-flex-right@s uk-flex-middle" uk-grid>
         <div class="uk-width-3-4 uk-width-auto@s">
@@ -183,7 +183,7 @@
     </div>
     <div class="uk-flex uk-grid-match">
       <div class="uk-width-medium uk-visible@m">
-        <div id="media-tree-container" class="folder-list">
+        <div :ref="id + '-media-tree-container'" class="folder-list">
           <ul class="media-tree-root">
             <li class="media-tree-item media-tree-root-item">
               <a
@@ -404,7 +404,7 @@
                     :uk-tooltip="file.name"
                     :data-fullpath="file.fullPath"
                     @click="handleItemChoosen(file, $event)"
-                    @dblclick="handleShowLightbox($event)"
+                    @dblclick.exact="handleShowLightbox($event)"
                   ></div>
                 </tr>
               </tbody>
@@ -414,7 +414,7 @@
       </div>
     </div>
   </div>
-  <div id="upload-modal" uk-modal>
+  <div :ref="id + '-upload-modal'" uk-modal>
     <div class="uk-modal-dialog">
       <div class="uk-modal-header">
         <h2 class="uk-modal-title">File Upload</h2>
@@ -423,7 +423,7 @@
         <div class="uk-margin">
           <input
             type="file"
-            id="file-upload"
+            :ref="id + '-file-input'"
             multiple
             :accept="allowedFiletypes"
           />
@@ -474,6 +474,10 @@ export default {
   },
   emits: ["file-selected"],
   props: {
+    id: {
+      type: String,
+      default: "file-manager",
+    },
     updateTriggerCounter: {
       type: Number,
       default: 0,
@@ -671,6 +675,7 @@ export default {
     handleDeleteClicked() {
       const checkedFolders = this.subFolders.filter((folder) => folder.choosen);
       const checkedFiles = this.files.filter((file) => file.choosen);
+      this.$emit("file-selected", null);
 
       axios
         .delete("/api/filemanager", {
@@ -718,9 +723,7 @@ export default {
 
     triggerFolderSelect(fullPath) {
       console.log("triggerFolderSelect", fullPath);
-      const mediaTreeContainer = document.getElementById(
-        "media-tree-container"
-      );
+      const mediaTreeContainer = this.$refs[this.id + "-media-tree-container"];
       const element = mediaTreeContainer.querySelector(
         `[data-fullpath="${fullPath}"]`
       );
@@ -728,13 +731,14 @@ export default {
         element.click();
       }
     },
+
     handleShowFileUploadClicked() {
-      const uploadModal = document.getElementById("upload-modal");
+      const uploadModal = this.$refs[this.id + "-upload-modal"];
       UIkit.modal(uploadModal, { stack: true }).show();
     },
     handleFileUploadClicked() {
-      const uploadModal = document.getElementById("upload-modal");
-      const fileUpload = document.getElementById("file-upload");
+      const uploadModal = this.$refs[this.id + "-upload-modal"];
+      const fileUpload = this.$refs[this.id + "-file-input"];
       const formData = new FormData();
       for (let i = 0; i < fileUpload.files.length; i++) {
         formData.append("files", fileUpload.files[i]);
@@ -746,18 +750,20 @@ export default {
             "Content-Type": "multipart/form-data",
           },
         })
-        .then((response) => {
-          console.log(response);
+        .then(() => {
           fileUpload.value = "";
           this.triggerFolderSelect(this.currentFolder.fullPath);
         })
         .catch((error) => {
-          console.log(error);
+          if (error.response.data.message)
+            toast.error(error.response.data.message);
+          else toast.error("Something went wrong");
         })
         .finally(() => {
           UIkit.modal(uploadModal).hide();
         });
     },
+
     async handleCreateFolderClicked() {
       const parentFolder = this.currentFolder.fullPath;
       if (!parentFolder) {
