@@ -5,7 +5,7 @@
   "main": "setup.mjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node setup.mjs"
+    "setup": "node setup.mjs"
   },
   "author": "Marco Rensch",
   "license": "MIT",

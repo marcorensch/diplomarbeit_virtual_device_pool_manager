@@ -5,7 +5,8 @@
   "main": "server.mjs",
   "scripts": {
     "test": "cross-env NODE_ENV=test mocha --exit test/*.mjs",
-    "devStart": "cross-env NODE_ENV=development node --watch server.mjs"
+    "devStart": "cross-env NODE_ENV=development node --watch server.mjs",
+    "start": "cross-env NODE_ENV=production node server.mjs"
   },
   "author": "Marco Rensch",
   "license": "MIT",

@@ -10,7 +10,8 @@
     "install_setup": "cd setup && npm install",
     "postinstall": "npm run install_setup && npm run install_server && npm run install_client",
     "devStart": "conc -n=\"server,client\" -c=\"green,blue\" \"cd server && npm run devStart\" \"cd client && npm run serve\"",
-    "setup": "cd setup && npm run start"
+    "setup": "cd setup && npm run setup",
+    "start": "conc -n=\"server,client\" -c=\"green,blue\" \"cd server && cross-env USE_SSL=false npm run start\" \"node serve.mjs\""
   },
   "repository": {
     "type": "git",
@@ -34,8 +35,10 @@
   },
   "homepage": "https://github.com/marcorensch/diplomarbeit_virtual_device_pool_manager#readme",
   "dependencies": {
+    "chalk": "^5.2.0",
     "concurrently": "^8.0.1",
     "cross-env": "^7.0.3",
+    "express": "^4.18.2",
     "rate-limiter-flexible": "^2.4.1"
   }
 }
