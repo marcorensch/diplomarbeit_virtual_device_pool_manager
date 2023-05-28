@@ -10,7 +10,6 @@ const pathValidator = [
         .custom(value => {
             return !value.includes('../');
         }).withMessage("Invalid path")
-        .escape()
         .trim(),
     (req, res, next) => {
         const errors = validationResult(req);
@@ -37,7 +36,6 @@ const newFolderValidator = [
         .custom(value => {
             return !value.includes('../');
         }).withMessage("Invalid path")
-        .escape()
         .trim(),
     (req, res, next) => {
         const errors = validationResult(req);
@@ -71,7 +69,6 @@ const renameValidator = [
         .custom(value => {
             return !value.includes('../');
         }).withMessage("Invalid path")
-        .escape()
         .trim(),
     (req, res, next) => {
         const errors = validationResult(req);

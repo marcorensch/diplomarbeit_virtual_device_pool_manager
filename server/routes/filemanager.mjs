@@ -88,6 +88,8 @@ router.put("/rename", UserValidator.hasPermission("canUpdateFileManagerItem"), r
     const newName = req.body.newName;
     const parentFolderPath = req.body.parentDir;
 
+    console.log(oldName, newName, parentFolderPath)
+
     try {
         await FileManager.rename(parentFolderPath, oldName, newName);
         return res.send('ok');

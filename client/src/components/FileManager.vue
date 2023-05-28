@@ -665,12 +665,18 @@ export default {
       }).show();
     },
     checkIsImage(file) {
-      return (
-        file.data.mimeType.startsWith("image") &&
-        ["jpg", "jpeg", "png", "gif", "svg", "webp"].includes(
-          file.data.type.toLowerCase()
-        )
-      );
+      console.log(file);
+      let isImage = false;
+      try {
+        isImage =
+          file.data.mimeType.startsWith("image") &&
+          ["jpg", "jpeg", "png", "gif", "svg", "webp"].includes(
+            file.data.type.toLowerCase()
+          );
+      } catch (e) {
+        console.log(e);
+      }
+      return isImage;
     },
     handleDeleteClicked() {
       const checkedFolders = this.subFolders.filter((folder) => folder.choosen);

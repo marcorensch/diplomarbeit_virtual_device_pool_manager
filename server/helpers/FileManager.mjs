@@ -56,7 +56,7 @@ export default class FileManager {
             const absPath = path.join(publicDir, el.fullPath);
 
             if (!fs.existsSync(absPath)) {
-                throw({status: 404, message: "File or Folder not found" })
+                throw({status: 404, message: "File or Folder not found"})
             }
 
             try {
@@ -69,8 +69,10 @@ export default class FileManager {
                 throw(e)
             }
 
-            const query = `UPDATE manufacturers SET image = NULL WHERE image LIKE '%${el.fullPath}%'`;
-            try{
+            const query = `UPDATE manufacturers
+                           SET image = NULL
+                           WHERE image LIKE '%${el.fullPath}%'`;
+            try {
                 await databaseModel.query(query);
             } catch (e) {
                 console.log(e)
@@ -97,9 +99,9 @@ export default class FileManager {
             if (fs.existsSync(absFilePath)) {
                 throw({status: 400, message: "File already exists"})
             }
-            try{
+            try {
                 await fs.promises.rename(file.path, path.join(absPath, file.originalname));
-            }catch (e) {
+            } catch (e) {
                 console.log(e);
                 throw({status: 500, message: "Error uploading file"});
             }
@@ -113,9 +115,7 @@ export default class FileManager {
         const oldRelativePath = path.join(parentFolder, oldName);
         const newRelativePath = path.join(parentFolder, newName);
 
-        if (absPath.includes("..") || newAbsPath.includes("..")) throw({status: 403, message: "Forbidden path"});
-
-        if (!fs.existsSync(absPath)) throw({status: 404, message: "File or Folder not found" });
+        if (!fs.existsSync(absPath)) throw({status: 404, message: "File or Folder not found"});
 
         try {
             fs.renameSync(absPath, newAbsPath);
@@ -123,10 +123,32 @@ export default class FileManager {
             console.log(e)
             throw({status: 500, message: "Error renaming filesystem element"})
         }
+        const target = parentFolder.split("/")[0];
+
+        let query;
+        switch (target) {
+            case "images":
+                query = `UPDATE devices
+                         SET image = REPLACE(image, '${oldRelativePath}', '${newRelativePath}')
+                         WHERE image LIKE '%${oldRelativePath}%'`;
+
+                break;
+            case "logos":
+                query = `UPDATE manufacturers
+                         SET image = REPLACE(image, '${oldRelativePath}', '${newRelativePath}')
+                         WHERE image LIKE '%${oldRelativePath}%'`;
+                break;
+            case "documents":
+                query = `UPDATE documents
+                         SET path = REPLACE(path, '${oldRelativePath}', '${newRelativePath}')
+                         WHERE path LIKE '%${oldRelativePath}%'`;
+                break;
+            default:
+                throw({status: 400, message: "Invalid target"})
+        }
 
         const databaseModel = new DatabaseModel();
-        const query = `UPDATE manufacturers SET image = REPLACE(image, '${oldRelativePath}', '${newRelativePath}') WHERE image LIKE '%${oldRelativePath}%'`;
-        try{
+        try {
             await databaseModel.query(query);
         } catch (e) {
             console.log(e)
