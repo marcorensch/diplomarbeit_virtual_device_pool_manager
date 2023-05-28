@@ -188,6 +188,7 @@ answers.USER_PWD_MIN_LENGTH = 8;
 answers.USER_NAME_MIN_LENGTH = 7;
 answers.MAX_SLOTS_PER_ROW = 12;
 answers.MAX_ROWS_PER_CABINET = 20;
+answers.MAX_UPLOAD_SIZE_MB = 8;
 
 const envConfigurations = [
     {
