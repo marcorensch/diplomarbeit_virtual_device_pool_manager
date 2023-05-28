@@ -8,12 +8,27 @@ import fs from "fs";
 import FileManager from "../helpers/FileManager.mjs";
 import multer from "multer";
 import UserValidator from "../middlewares/UserValidator.mjs";
-import {pathValidator} from "../middlewares/fileManagerValidators.mjs";
+import {pathValidator, handleMulterError } from "../middlewares/fileManagerValidators.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const publicDir = path.join(__dirname, '..', 'public');
-const upload = multer({dest: path.join(__dirname, "..", "uploads")});
+const upload = multer({
+    dest: path.join(__dirname, "..", "uploads"),
+    fileFilter: (req, file, cb) => {
+        if(file.mimetype === 'image/png' || file.mimetype === 'image/jpeg') {
+            cb(null, true);
+        } else {
+            const err = new multer.MulterError();
+            err.code = "FILETYPE_NOT_ALLOWED";
+            err.message = "Filetype is not allowed!";
+            cb(err, false);
+        }
+    },
+    limits: {
+        fileSize: 1024 * 1024 * 1 // 8MB
+    },
+});
 
 const regex = /^[a-z|\d]+[a-z|\d \-_.]*$/i;
 
@@ -101,10 +116,9 @@ router.put("/rename", UserValidator.hasPermission("canUpdateFileManagerItem"), a
     res.send('ok');
 });
 
-router.post("/upload", UserValidator.hasPermission("canCreateFileManagerItem"), upload.any(), async (req, res) => {
+router.post("/upload", UserValidator.hasPermission("canCreateFileManagerItem"), upload.any(), handleMulterError, async (req, res) => {
     const parentFolderPath = req.body.relativePath || "";
     const files = req.files;
-    console.log(files)
 
     if (parentFolderPath.includes("/../")) return res.status(400).send({success: false, message: "Invalid path"});
     if (!parentFolderPath) return res.status(400).send({success: false, message: "Parent folder cannot be empty"});
@@ -116,7 +130,13 @@ router.post("/upload", UserValidator.hasPermission("canCreateFileManagerItem"), 
         return res.status(e.status).send({success: false, message: e.message});
     }
 
-    res.status(201).send('ok');
+    return res.status(201).send('ok');
+});
+
+router.use((err, req, res, next) => {
+    // Fehlerbehandlung hier
+    console.log(err);
+    res.status(500).json({ success: false, message: 'Something went wrong' });
 });
 
 export default router;

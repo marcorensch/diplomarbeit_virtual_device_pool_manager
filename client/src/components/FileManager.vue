@@ -751,7 +751,6 @@ export default {
           },
         })
         .then(() => {
-          fileUpload.value = "";
           this.triggerFolderSelect(this.currentFolder.fullPath);
         })
         .catch((error) => {
@@ -761,6 +760,7 @@ export default {
         })
         .finally(() => {
           UIkit.modal(uploadModal).hide();
+          fileUpload.value = "";
         });
     },
 
