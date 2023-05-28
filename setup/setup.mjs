@@ -189,6 +189,9 @@ answers.USER_NAME_MIN_LENGTH = 7;
 answers.MAX_SLOTS_PER_ROW = 12;
 answers.MAX_ROWS_PER_CABINET = 20;
 answers.MAX_UPLOAD_SIZE_MB = 8;
+answers.ALLOWED_IMG_FILETYPES='image/jpeg, image/png, image/gif, image/webp'
+answers.ALLOWED_DOC_FILETYPES='application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-powerpoint, application/vnd.openxmlformats-officedocument.presentationml.presentation, text/plain, application/zip, application/x-rar-compressed, application/x-7z-compressed, application/x-tar, application/x-bzip, application/x-bzip2, application/gzip'
+
 
 const envConfigurations = [
     {

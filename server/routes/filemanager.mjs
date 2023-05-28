@@ -8,15 +8,18 @@ import fs from "fs";
 import FileManager from "../helpers/FileManager.mjs";
 import multer from "multer";
 import UserValidator from "../middlewares/UserValidator.mjs";
-import {pathValidator, handleMulterError } from "../middlewares/fileManagerValidators.mjs";
+import {pathValidator, handleMulterError , renameValidator, newFolderValidator} from "../middlewares/fileManagerValidators.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const publicDir = path.join(__dirname, '..', 'public');
+const allowedImageFileTypes = process.env.ALLOWED_IMG_FILETYPES.split(',').map((type) => { return type.trim() });
+const allowedDocumentFileTypes = process.env.ALLOWED_DOC_FILETYPES.split(',').map((type) => { return type.trim() });
+const allowedFileTypes = allowedImageFileTypes.concat(allowedDocumentFileTypes);
 const upload = multer({
     dest: path.join(__dirname, "..", "uploads"),
     fileFilter: (req, file, cb) => {
-        if(file.mimetype === 'image/png' || file.mimetype === 'image/jpeg') {
+        if(allowedFileTypes.includes(file.mimetype.toLowerCase())) {
             cb(null, true);
         } else {
             const err = new multer.MulterError();
@@ -26,11 +29,9 @@ const upload = multer({
         }
     },
     limits: {
-        fileSize: 1024 * 1024 * process.env.MAX_UPLOAD_SIZE_MB || 8,
+        fileSize: 1024 * 1024 * process.env .MAX_UPLOAD_SIZE_MB || 8,
     },
 });
-
-const regex = /^[a-z|\d]+[a-z|\d \-_.]*$/i;
 
 router.use(UserValidator.validateTokens);
 router.use(UserValidator.setCookies);
@@ -38,22 +39,19 @@ router.use(UserValidator.setCookies);
 router.get("/", UserValidator.hasPermission("canAccessFileManager"), pathValidator, async (req, res) => {
     let files = [];
     let folders = [];
-    const relPath = req.query.path || "";
+    const relPath = req.query.path;
     const name = req.query.name || "";
-
-    if(!relPath) return res.status(400).send({success: false, message: "Path cannot be empty"});
     const absolutePath = path.join(publicDir, relPath, name);
-    if (absolutePath.includes("/../")) {
-        return res.send({folders: [], files: []});
-    }
 
     if (fs.existsSync(absolutePath)) {
+        try{
         folders = await FileManager.getDirectories(relPath, absolutePath);
         files = await FileManager.getFiles(relPath, absolutePath);
+        return res.send({success: true, files, folders});
+        } catch (e) {
+            return res.status(500).send({success: false, message: e.message, files, folders});
+        }
     }
-
-    res.send({folders, files});
-
 });
 
 router.delete("/", UserValidator.hasPermission("canDeleteFileManagerItem"), async (req, res) => {
@@ -62,79 +60,59 @@ router.delete("/", UserValidator.hasPermission("canDeleteFileManagerItem"), asyn
     const items = [...folders, ...files];
 
     if (items.length === 0) {
-        res.status(400).send({success: false, message: "No files or folders selected"});
-        return;
+        return res.status(400).send({success: false, message: "No files or folders selected"});
     }
 
     try {
         await FileManager.delete(items);
+        return res.send('ok');
     } catch (e) {
-        res.status(e.status).send({success: false, message: e.message});
-        return;
+        return res.status(500).send({success: false, message: e.message});
     }
-
-    res.send('ok');
 });
 
-router.post("/folders", UserValidator.hasPermission("canCreateFileManagerItem"), async (req, res) => {
+router.post("/folders", UserValidator.hasPermission("canCreateFileManagerItem"), newFolderValidator, async (req, res) => {
     const dirName = req.body.newFolderName;
     const parentFolderPath = req.body.parentFolder;
 
-
-    if (!dirName) return res.status(400).send({success: false, message: "Folder name cannot be empty"});
-    if (!parentFolderPath) return res.status(400).send({success: false, message: "Parent folder cannot be empty"});
-    if (!regex.test(dirName)) return res.status(400).send({success: false, message: "Invalid folder name"});
-
     try {
         await FileManager.createFolder(parentFolderPath, dirName);
+        return res.status(201).send('ok');
     } catch (e) {
-        res.status(e.status).send({success: false, message: e.message});
-        return;
+        return res.status(500).send({success: false, message: e.message});
     }
-
-    res.status(201).send('ok');
 });
 
-router.put("/rename", UserValidator.hasPermission("canUpdateFileManagerItem"), async (req, res) => {
+router.put("/rename", UserValidator.hasPermission("canUpdateFileManagerItem"), renameValidator, async (req, res) => {
     const oldName = req.body.oldName;
     const newName = req.body.newName;
     const parentFolderPath = req.body.parentDir;
 
-    if (!oldName) return res.status(400).send({success: false, message: "Old name cannot be empty"});
-    if (!newName) return res.status(400).send({success: false, message: "New name cannot be empty"});
-    if (!parentFolderPath) return res.status(400).send({success: false, message: "Parent folder cannot be empty"});
-    if (!regex.test(newName)) return res.status(400).send({success: false, message: "Invalid name"});
-
     try {
-        const result = await FileManager.rename(parentFolderPath, oldName, newName);
-        console.log(result);
+        await FileManager.rename(parentFolderPath, oldName, newName);
+        return res.send('ok');
     }catch (e) {
-        res.status(e.status).send({success: false, message: e.message});
-        return;
+        return res.status(e.status).send({success: false, message: e.message});
     }
-
-    res.send('ok');
 });
 
-router.post("/upload", UserValidator.hasPermission("canCreateFileManagerItem"), upload.any(), handleMulterError, async (req, res) => {
-    const parentFolderPath = req.body.relativePath || "";
+router.post("/upload", UserValidator.hasPermission("canCreateFileManagerItem"), pathValidator, upload.any(), handleMulterError, async (req, res) => {
+    const parentFolderPath = req.query.path;
     const files = req.files;
 
-    if (parentFolderPath.includes("/../")) return res.status(400).send({success: false, message: "Invalid path"});
-    if (!parentFolderPath) return res.status(400).send({success: false, message: "Parent folder cannot be empty"});
     if (!files.length) return res.status(400).send({success: false, message: "No file was uploaded"});
 
     try {
         await FileManager.upload(parentFolderPath, files);
+        return res.status(201).send('ok');
     }catch (e) {
-        return res.status(e.status).send({success: false, message: e.message});
+        return res.status(500).send({success: false, message: e.message});
     }
 
-    return res.status(201).send('ok');
+
 });
 
 router.use((err, req, res, next) => {
-    // Fehlerbehandlung hier
     console.log(err);
     res.status(500).json({ success: false, message: 'Something went wrong' });
 });

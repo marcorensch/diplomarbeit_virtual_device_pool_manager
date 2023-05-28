@@ -232,7 +232,7 @@
         <div class="folder-content">
           <div
             v-if="displayMode === 'grid'"
-            class="uk-grid-small uk-child-width-1-2 uk-child-width-1-3@s uk-child-width-1-6@m uk-text-center"
+            class="uk-grid-small uk-child-width-1-2 uk-child-width-1-3@s uk-child-width-1-4@m uk-child-width-1-6@l uk-text-center"
             uk-grid
           >
             <div
@@ -743,13 +743,16 @@ export default {
       for (let i = 0; i < fileUpload.files.length; i++) {
         formData.append("files", fileUpload.files[i]);
       }
-      formData.append("relativePath", this.currentFolder.fullPath);
       axios
-        .post("/api/filemanager/upload", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        })
+        .post(
+          `/api/filemanager/upload?path=${this.currentFolder.fullPath}`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        )
         .then(() => {
           this.triggerFolderSelect(this.currentFolder.fullPath);
         })
