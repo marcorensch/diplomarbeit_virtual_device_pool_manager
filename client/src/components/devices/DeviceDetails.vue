@@ -302,7 +302,7 @@
         </div>
       </div>
     </template>
-    <div id="checkout-modal" uk-modal="stack:true">
+    <div :ref="'checkout-modal-' + device.id" uk-modal="stack:true">
       <div class="uk-modal-dialog">
         <div class="uk-modal-header">
           <h3 class="uk-modal-title">Device Checkout</h3>
@@ -319,15 +319,20 @@
           ></textarea>
         </div>
         <div class="uk-modal-footer">
-          <div class="uk-grid-small uk-flex uk-flex-right@m" uk-grid>
+          <div
+            class="uk-grid-small uk-flex uk-flex-right@m uk-child-width-1-1 uk-child-width-auto@m"
+            uk-grid
+          >
             <div>
-              <button class="uk-button uk-button-secondary uk-button-close">
+              <button
+                class="uk-button uk-button-secondary uk-modal-close uk-width-1-1"
+              >
                 Cancel
               </button>
             </div>
             <div>
               <button
-                class="uk-button uk-button-primary"
+                class="uk-button uk-button-primary uk-width-1-1"
                 @click="handleConfirmCheckoutClicked"
               >
                 Checkout
@@ -421,7 +426,8 @@ export default {
         });
     },
     showCheckoutModal() {
-      UIkit.modal("#checkout-modal").show();
+      const modalRef = this.$refs[`checkout-modal-${this.device.id}`];
+      UIkit.modal(modalRef).show();
     },
 
     async handleCheckInConfirmed() {
@@ -435,6 +441,7 @@ export default {
       }
     },
     async handleConfirmCheckoutClicked() {
+      const modalRef = this.$refs[`checkout-modal-${this.device.id}`];
       const notes = document.getElementById("checkout-notes").value;
       const response = await axios.post(
         `/api/devices/${this.device.id}/checkout`,
@@ -447,7 +454,7 @@ export default {
         this.device.checkout_time = response.data.checkout_time;
         this.device.checkout_notes = response.data.checkout_notes;
       }
-      UIkit.modal("#checkout-modal").hide();
+      UIkit.modal(modalRef).hide();
     },
     canEditDevice() {
       return (

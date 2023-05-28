@@ -60,7 +60,9 @@
                   uk-tooltip="Available"
                 >
                   <font-awesome-icon :icon="['fas', 'check']" />
-                  <span class="uk-hidden@m">Available</span>
+                  <span class="uk-hidden@m uk-margin-small-left"
+                    >Available</span
+                  >
                 </div>
                 <div
                   class="uk-text-primary"
@@ -68,11 +70,15 @@
                   uk-tooltip="Virtual Device"
                 >
                   <font-awesome-icon :icon="['fas', 'cloud']" />
-                  <span class="uk-hidden@m">Virtual Device</span>
+                  <span class="uk-hidden@m uk-margin-small-left"
+                    >Virtual Device</span
+                  >
                 </div>
                 <div v-else class="uk-text-danger" uk-tooltip="Unavailable">
                   <font-awesome-icon :icon="['fas', 'close']" />
-                  <span class="uk-hidden@m">Unavailable</span>
+                  <span class="uk-hidden@m uk-margin-small-left"
+                    >Unavailable</span
+                  >
                 </div>
               </td>
               <td class="uk-visible@m">
