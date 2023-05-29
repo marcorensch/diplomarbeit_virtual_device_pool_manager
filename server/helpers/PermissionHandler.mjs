@@ -1,8 +1,8 @@
 
 export const permissions = {
-    // Admin
+    // Admin / General
     ACCESS_ADMIN: 'canAccessAdmin',
-    HIDDEN_NOTES: 'canSeeEditHiddenNotes',
+    HIDDEN_NOTES: 'canHandleHiddenInformation',
     // Account Management
     ACCESS_ACCOUNT_MANAGER: 'canAccessAccountManager',
     ACCESS_ROLES_LIST: 'canAccessRolesList',
@@ -19,8 +19,6 @@ export const permissions = {
     CREATE_VIRTUAL_DEVICES: 'canCreateVirtualDevices',
     DELETE_VIRTUAL_DEVICES: 'canDeleteVirtualDevices',
     UPDATE_VIRTUAL_DEVICES: 'canUpdateVirtualDevices',
-    UPDATE_OWN_DEVICES: 'canUpdateOwnDevices',
-    DELETE_OWN_DEVICES: 'canDeleteOwnDevices',
     CHECKOUT_IN_DEVICES: 'canCheckoutInDevices',
     FORCE_CHECKIN_DEVICES: 'canForceCheckinDevices',
     // Manufacturers
@@ -29,10 +27,10 @@ export const permissions = {
     DELETE_MANUFACTURER: 'canDeleteManufacturer',
     UPDATE_MANUFACTURER: 'canUpdateManufacturer',
     // Filesystem
-    ACCESS_FILEMANAGER: 'canAccessFileManager',
-    CREATE_FILEMANAGER_ITEM: 'canCreateFileManagerItem',
-    DELETE_FILEMANAGER_ITEM: 'canDeleteFileManagerItem',
-    UPDATE_FILEMANAGER_ITEM: 'canUpdateFileManagerItem',
+    ACCESS_FILE_MANAGER: 'canAccessFileManager',
+    CREATE_FILE_MANAGER_ITEM: 'canCreateFileManagerItem',
+    DELETE_FILE_MANAGER_ITEM: 'canDeleteFileManagerItem',
+    UPDATE_FILE_MANAGER_ITEM: 'canUpdateFileManagerItem',
     // MSISDN Manager
     ACCESS_MSISDN_MANAGER: 'canAccessMsisdnManager',
     CREATE_MSISDN: 'canCreateMsisdn',
@@ -44,7 +42,6 @@ export const permissions = {
     CREATE_ITEM: 'canCreateItem',
     DELETE_ITEM: 'canDeleteItem',
     UPDATE_ITEM: 'canUpdateItem',
-
     // Links
     CREATE_LINKS: 'canCreateLinks',
     DELETE_LINKS: 'canDeleteLinks',
@@ -76,11 +73,6 @@ export const rolePermissions = {
         permissions.CREATE_VIRTUAL_DEVICES,
         permissions.UPDATE_VIRTUAL_DEVICES,
         permissions.CHECKOUT_IN_DEVICES,
-        permissions.DELETE_OWN_DEVICES,
-        permissions.UPDATE_OWN_DEVICES,
-        permissions.CREATE_IMAGES,
-        permissions.DELETE_IMAGES,
-        permissions.UPDATE_IMAGES,
         permissions.CREATE_LINKS,
         permissions.DELETE_LINKS,
         permissions.UPDATE_LINKS,
@@ -98,10 +90,10 @@ export const rolePermissions = {
         permissions.DELETE_GUIDES,
         permissions.UPDATE_GUIDES,
 
-        permissions.ACCESS_FILEMANAGER,
-        permissions.CREATE_FILEMANAGER_ITEM,
-        permissions.DELETE_FILEMANAGER_ITEM,
-        permissions.UPDATE_FILEMANAGER_ITEM,
+        permissions.ACCESS_FILE_MANAGER,
+        permissions.CREATE_FILE_MANAGER_ITEM,
+        permissions.DELETE_FILE_MANAGER_ITEM,
+        permissions.UPDATE_FILE_MANAGER_ITEM,
     ],
     [roles.USER]: [
         permissions.ACCESS_DEVICE_LIST,
@@ -116,8 +108,8 @@ export const rolePermissions = {
         permissions.CREATE_LINKS,
         permissions.ACCESS_GUIDES,
 
-        permissions.ACCESS_FILEMANAGER,
-        permissions.CREATE_FILEMANAGER_ITEM,
+        permissions.ACCESS_FILE_MANAGER,
+        permissions.CREATE_FILE_MANAGER_ITEM,
     ],
     [roles.GUEST]: [
         permissions.ACCESS_DEVICE_LIST,

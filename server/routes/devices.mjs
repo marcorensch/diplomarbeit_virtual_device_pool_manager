@@ -58,22 +58,22 @@ router.get("/", UserValidator.setCanHandleHiddenInformation, deviceSearchValidat
     let availability = req.query.availability || null;
     if(availability) availability = availability === "true";
     const filters = {search, type, availability};
-    let devices;
+    let response;
     try {
-        devices = await DeviceHelper.getDevices(limit, offset, filters);
+        response = await DeviceHelper.getDevices(limit, offset, filters);
     } catch (e) {
         console.log(e.message);
         res.status(500).send({success: false, message: e.message});
     }
 
-    if(!req.canHandleHiddenInformation) {
-        devices = devices.map(device => {
+    if(!req.canHandleHiddenInformation && response.devices.length > 0) {
+        response.devices = response.devices.map(device => {
             if(device.hasOwnProperty("hidden")) delete device.hidden;
             return device;
         });
     }
 
-    res.send(devices);
+    res.send(response);
 });
 
 router.get("/:id", UserValidator.setCanHandleHiddenInformation,async (req, res) => {
@@ -107,7 +107,7 @@ router.get("/:id", UserValidator.setCanHandleHiddenInformation,async (req, res) 
 router.post("/", UserValidator.validateTokens, UserValidator.setCookies, UserValidator.setCanHandleHiddenInformation, deviceDataValidator, deviceManagementValidator, async (req, res) => {
 
     const device = new Device();
-    req.body.hidden = req.canHandleHiddenInformation ? req.body.hidden : "";
+    req.body.hidden = req.canHandleHiddenInformation ? (req.body.hidden ? req.body.hidden : "") : "";
     device.setData(req.body)
 
     try {

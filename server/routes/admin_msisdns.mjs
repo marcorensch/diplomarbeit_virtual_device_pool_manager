@@ -12,14 +12,14 @@ router.get('/', UserValidator.hasPermission('canAccessMsisdnManager'), async (re
     let numbers = [];
     try {
         numbers = await MsisdnHelper.getAllMsisdns(parentOnly, false);
-    }catch (e) {
+    } catch (e) {
         console.log(e)
         return res.status(500).json({error: "Could not get MSISDN's"});
     }
 
-    if (!req.canHandleHiddenInformation) {
+    if (!req.canHandleHiddenInformation && numbers.length > 0 ) {
         numbers.forEach(number => {
-            delete number.hidden
+            if (number.hasOwnProperty("hidden")) delete number.hidden;
         });
     }
 
@@ -30,7 +30,7 @@ router.get('/:id', UserValidator.hasPermission('canUpdateMsisdn'), async (req, r
     let number;
     try {
         number = await MsisdnHelper.getMsisdnById(req.params.id);
-    }catch (e) {
+    } catch (e) {
         console.log(e)
         return res.status(500).json({error: "Could not get MSISDN"});
     }
@@ -43,12 +43,13 @@ router.get('/:id', UserValidator.hasPermission('canUpdateMsisdn'), async (req, r
 
 router.post('/', UserValidator.hasPermission('canCreateMsisdn'), msisdnValidator, async (req, res) => {
     const data = req.body;
-    if(!req.canHandleHiddenInformation) {
-        delete data.hidden
+    if (!req.canHandleHiddenInformation) {
+        data.hidden = "";
     }
     let id;
     const msisdn = MsisdnHelper.createMsisdn(data);
-    try{
+
+    try {
         const result = await MsisdnHelper.store(msisdn);
         id = result.id;
     } catch (e) {
@@ -60,12 +61,12 @@ router.post('/', UserValidator.hasPermission('canCreateMsisdn'), msisdnValidator
 
 router.put('/:id', UserValidator.hasPermission('canUpdateMsisdn'), msisdnValidator, async (req, res) => {
     const data = req.body;
-    if(!req.canHandleHiddenInformation) {
+    if (!req.canHandleHiddenInformation) {
         delete data.hidden
     }
     try {
         const res = await MsisdnHelper.updateMsisdn(req.params.id, data);
-        if(!res.affectedRows) return res.status(500).json({error: "Could not update MSISDN"});
+        if (!res.affectedRows) return res.status(500).json({error: "Could not update MSISDN"});
     } catch (e) {
         console.log(e)
         return res.status(500).json({error: "Could not update MSISDN"});
@@ -74,9 +75,9 @@ router.put('/:id', UserValidator.hasPermission('canUpdateMsisdn'), msisdnValidat
 });
 
 router.delete('/:id', UserValidator.hasPermission('canDeleteMsisdn'), async (req, res) => {
-try {
+    try {
         const status = await MsisdnHelper.deleteMsisdn(req.params.id);
-        if(!status) return res.status(500).json({error: "Could not delete MSISDN"});
+        if (!status) return res.status(500).json({error: "Could not delete MSISDN"});
     } catch (e) {
         console.log(e)
         return res.status(500).json({error: "Could not delete MSISDN"});

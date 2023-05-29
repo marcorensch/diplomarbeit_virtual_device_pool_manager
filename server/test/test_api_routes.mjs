@@ -560,7 +560,6 @@ describe("Test FileManager API Endpoints", () => {
     it("should return stored files and folders when loading contents of logos path", async () => {
         await agent.post("/api/auth/login").send(adminCredentials);
         const response = await agent.get("/api/filemanager?path=logos");
-        console.log(response.body)
         expect(response.body).to.have.property("folders");
         expect(response.body).to.have.property("files");
     });
@@ -589,7 +588,6 @@ describe("Test FileManager API Endpoints", () => {
         await agent.post("/api/auth/login").send(adminCredentials);
         const pathToLocalFile = path.join(__dirname, "nxd-logo.png");
         const response = await agent.post("/api/filemanager/upload?path=test").attach("file", pathToLocalFile);
-        console.log(response.body);
         expect(response.status).to.eql(201);
     });
     it("should return 403 when trying to delete a file with guest permissions", async () => {
@@ -633,7 +631,6 @@ describe("Test FileManager API Endpoints", () => {
             newName: "nxd-logo2.png",
             parentDir: "test"
         });
-        console.log(response.text)
         expect(response.status).to.eql(200);
     });
 

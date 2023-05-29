@@ -48,8 +48,8 @@ const checkoutValidator = [
 
 const deviceSearchValidator = [
     query('search').optional().escape().trim(),
-    query('limit').exists().isNumeric().withMessage("Limit must be a number"),
-    query('offset').exists().isNumeric().withMessage("Offset must be a number"),
+    query('limit').optional().isNumeric().withMessage("Limit must be a number"),
+    query('offset').optional().isNumeric().withMessage("Offset must be a number"),
     query('availability').optional().custom((value) => {
         if (value === "true" || value === "false") return true;
         return false;
