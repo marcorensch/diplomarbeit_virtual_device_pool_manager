@@ -85,7 +85,7 @@ export default {
     FontAwesomeIcon,
     FileManager,
   },
-  emits: ["image-changed"],
+  emits: ["image-changed", "update-value"],
   props: {
     title: {
       type: String,
@@ -106,7 +106,15 @@ export default {
       selectedFile: null,
     };
   },
+  mounted() {
+    this.registerEvents();
+  },
   methods: {
+    registerEvents() {
+      UIkit.util.on("#image-manager-modal", "hide", () => {
+        this.$emit("update-value");
+      });
+    },
     handleImageChanged() {
       this.$emit("image-changed", this.selectedFile.fullPath);
     },

@@ -158,7 +158,8 @@
             :title="'Image'"
             :image="device.image"
             :baseDir="'images'"
-            @image-changed="handleImageChanged"
+            @imageChanged="handleImageChanged"
+            @updateValue="refreshData('image')"
           />
         </div>
         <div class="uk-width-1-1 uk-width-2-3@s" v-if="canSetPhysicalDevices()">
@@ -368,6 +369,13 @@ export default {
     handleImageChanged(imageRelativePath) {
       let path = imageRelativePath.length ? "/public/" + imageRelativePath : "";
       this.device.image = path;
+    },
+    async refreshData(key) {
+      // This method is required to refresh the data in the device object on possible changes in the filemanager
+      if (!this.id) return;
+      const deviceData = await DeviceHelper.loadDevice(this.id);
+      if (!deviceData || !deviceData[key]) return;
+      this.device[key] = deviceData[key];
     },
     handleAddImeiClicked() {
       this.device.imei.push({ imei: "" });
