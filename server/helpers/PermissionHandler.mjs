@@ -2,6 +2,7 @@
 export const permissions = {
     // Admin
     ACCESS_ADMIN: 'canAccessAdmin',
+    HIDDEN_NOTES: 'canSeeEditHiddenNotes',
     // Account Management
     ACCESS_ACCOUNT_MANAGER: 'canAccessAccountManager',
     ACCESS_ROLES_LIST: 'canAccessRolesList',
