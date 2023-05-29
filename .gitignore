@@ -1,6 +1,6 @@
 uploads
-server/public/documents
-server/public/images
+public/documents
+public/images
 
 # Logs
 logs
