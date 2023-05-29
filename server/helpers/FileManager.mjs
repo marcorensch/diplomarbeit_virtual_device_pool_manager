@@ -71,9 +71,10 @@ export default class FileManager {
 
             const query = `UPDATE manufacturers
                            SET image = NULL
-                           WHERE image LIKE '%${el.fullPath}%'`;
+                           WHERE image LIKE ?`;
+            const value = `%${el.fullPath}%`;
             try {
-                await databaseModel.query(query);
+                await databaseModel.query(query, [value]);
             } catch (e) {
                 console.log(e)
                 throw({status: 500, message: "Error updating database"})
@@ -129,23 +130,25 @@ export default class FileManager {
         switch (target) {
             case "images":
                 query = `UPDATE devices
-                         SET image = REPLACE(image, '${oldRelativePath}', '${newRelativePath}')
-                         WHERE image LIKE '%${oldRelativePath}%'`;
+                         SET image = REPLACE(image, ?, ?)
+                         WHERE image LIKE ?`;
 
                 break;
             case "logos":
                 query = `UPDATE manufacturers
-                         SET image = REPLACE(image, '${oldRelativePath}', '${newRelativePath}')
-                         WHERE image LIKE '%${oldRelativePath}%'`;
+                         SET image = REPLACE(image, ?, ?)
+                         WHERE image LIKE ?`;
                 break;
             case "documents":
                 query = `UPDATE documents
-                         SET path = REPLACE(path, '${oldRelativePath}', '${newRelativePath}')
-                         WHERE path LIKE '%${oldRelativePath}%'`;
+                         SET path = REPLACE(path, ?, ?)
+                         WHERE path LIKE ?`;
                 break;
             default:
                 throw({status: 400, message: "Invalid target"})
         }
+
+        const values = [oldRelativePath, newRelativePath, `%${oldRelativePath}%`];
 
         const databaseModel = new DatabaseModel();
         try {
