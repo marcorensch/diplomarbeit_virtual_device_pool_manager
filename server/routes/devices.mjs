@@ -48,10 +48,9 @@ const canCheckInDevice = async (req, res, next) => {
     req.device = device;
 
     next();
-
 };
 
-router.get("/", deviceSearchValidator, async (req, res) => {
+router.get("/", UserValidator.setCanHandleHiddenInformation, deviceSearchValidator, async (req, res) => {
     const limit = req.query.limit || 20;
     const offset = req.query.offset || 0;
     const search = req.query.search || "";
@@ -59,17 +58,25 @@ router.get("/", deviceSearchValidator, async (req, res) => {
     let availability = req.query.availability || null;
     if(availability) availability = availability === "true";
     const filters = {search, type, availability};
-
+    let devices;
     try {
-        const devices = await DeviceHelper.getDevices(limit, offset, filters);
-        res.send(devices);
+        devices = await DeviceHelper.getDevices(limit, offset, filters);
     } catch (e) {
         console.log(e.message);
         res.status(500).send({success: false, message: e.message});
     }
+
+    if(!req.canHandleHiddenInformation) {
+        devices = devices.map(device => {
+            delete device.hidden;
+            return device;
+        });
+    }
+
+    res.send(devices);
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", UserValidator.setCanHandleHiddenInformation,async (req, res) => {
     const id = req.params.id;
     const device = new Device();
     if (!id) return res.status(400).send({success: false, message: "ID is required"});
@@ -90,12 +97,17 @@ router.get("/:id", async (req, res) => {
         return res.status(500).send({success: false, message: "Error getting weblinks"});
     }
 
+    if(!req.canHandleHiddenInformation) {
+        delete device.hidden;
+    }
+
     res.send(device);
 });
 
-router.post("/", UserValidator.validateTokens, UserValidator.setCookies, deviceDataValidator, deviceManagementValidator, async (req, res) => {
+router.post("/", UserValidator.validateTokens, UserValidator.setCookies, UserValidator.setCanHandleHiddenInformation, deviceDataValidator, deviceManagementValidator, async (req, res) => {
 
     const device = new Device();
+    req.body.hidden = req.canHandleHiddenInformation ? req.body.hidden : "";
     device.setData(req.body)
 
     try {
@@ -141,12 +153,15 @@ router.post("/", UserValidator.validateTokens, UserValidator.setCookies, deviceD
 
 });
 
-router.put("/:id", UserValidator.validateTokens, UserValidator.setCookies, deviceDataValidator, async (req, res) => {
+router.put("/:id", UserValidator.validateTokens, UserValidator.setCookies, UserValidator.setCanHandleHiddenInformation, deviceDataValidator, async (req, res) => {
 
     if (!req.params.id) return res.status(400).send({success: false, message: "ID cannot be empty"});
 
     const device = new Device();
     device.setData({id: req.params.id, ...req.body})
+    if(!req.canHandleHiddenInformation) {
+        delete device.hidden;
+    }
 
     try {
         const deviceFromDb = await DeviceHelper.getDeviceById(device.id);
@@ -294,8 +309,6 @@ router.post("/:id/checkin", UserValidator.validateTokens, UserValidator.setCooki
 
     // Check if device is checked out
     if (!device.checked_out_by) return res.status(403).send({success: false, message: "Device is not checked out"});
-
-
 
     try {
         const result = await DeviceHelper.checkinDevice(req.device.id);

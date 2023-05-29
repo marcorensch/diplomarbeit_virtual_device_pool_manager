@@ -139,20 +139,28 @@ export default class DeviceHelper {
 
     static async update(device) {
         const databaseModel = new DatabaseModel();
-        const query = `UPDATE devices
+        let query = `UPDATE devices
                        SET name            = ?,
                            image           = ?,
                            notes           = ?,
-                           hidden          = ?,
                            device_type_id  = ?,
                            manufacturer_id = ?,
                            same_as         = ?,
                            imei            = ?,
                            params          = ?,
                            slot_id         = ?,
-                           added=?
-                       WHERE id = ?`;
-        const values = [device.name, device.image, device.notes, device.hidden, device.device_type_id, device.manufacturer_id, device.same_as, device.imei, device.params, device.slot_id, device.added, device.id];
+                           added           = ?`;
+        const values = [device.name, device.image, device.notes, device.device_type_id, device.manufacturer_id, device.same_as, device.imei, device.params, device.slot_id, device.added];
+
+        if (device.hasOwnProperty('hidden')) {
+            query += ', hidden = ?';
+            values.push(device.hidden);
+        }
+
+        query += ' WHERE id = ?';
+        values.push(device.id);
+
+
         return await databaseModel.query(query, values);
     }
 

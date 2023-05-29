@@ -12,7 +12,10 @@
           v-model="device.notes"
         ></textarea>
       </div>
-      <div class="uk-margin">
+      <div
+        class="uk-margin"
+        v-if="authStore.hasPermission('canSeeEditHiddenNotes')"
+      >
         <label for="hidden">Hidden Notes</label>
         <textarea
           id="hidden"
@@ -26,8 +29,15 @@
 </template>
 
 <script>
+import { useAuthStore } from "@/stores/auth";
+
 export default {
   name: "NotesWidget",
+  setup() {
+    return {
+      authStore: useAuthStore(),
+    };
+  },
   props: {
     inCard: {
       type: Boolean,

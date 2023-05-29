@@ -137,6 +137,17 @@ export default class UserValidator {
         next();
     }
 
+    static setCanHandleHiddenInformation (req, res, next) {
+        req.canHandleHiddenInformation = false;
+        if(req.user?.role) {
+            const permissionHandler = new PermissionHandler();
+            const permissionsMap = permissionHandler.getPermissions(req.user.role);
+            req.canHandleHiddenInformation = permissionsMap.has("canHandleHiddenInformation");
+        }
+
+        next();
+    };
+
     static hasPermission(action) {
         return function (req, res, next) {
             if (!req.user?.role) return res.status(403).send({message: "Unauthorized"});
