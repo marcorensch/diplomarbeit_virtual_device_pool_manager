@@ -3,11 +3,13 @@ import UserValidator from "../middlewares/UserValidator.mjs";
 import PoolHelper from "../helpers/PoolHelper.mjs";
 
 const router = express.Router();
+router.use(UserValidator.setCanHandleHiddenInformation)
 
 router.get("/items", async (req, res) => {
     const categoryAlias = req.query.category || false;
     const parent_id = req.query.location || false;
     let category;
+    let items = [];
     if(!categoryAlias)
         return res.status(400).send({message: "No category specified"});
     try {
@@ -24,12 +26,19 @@ router.get("/items", async (req, res) => {
         return res.status(400).send({message: "Invalid parent ID"});
 
     try {
-        const items = await PoolHelper.getItems(category.id, parent_id);
-        return res.status(200).send(items);
+        items = await PoolHelper.getItems(category.id, parent_id);
     }catch (e) {
         console.log(e)
         return res.status(500).send({message: "Could not get Items"});
     }
+
+    if(!req.canHandleHiddenInformation) {
+        items.forEach(item => {
+            if(item.hasOwnProperty("hidden")) delete item.hidden;
+        });
+    }
+
+    return res.status(200).send(items);
 });
 
 router.get("/items/:id", async (req, res) => {
@@ -46,6 +55,10 @@ router.get("/items/:id", async (req, res) => {
         if(e.type === "NO_ID_SPECIFIED") return res.status(400).send({message: "No ID specified"});
         console.log(e)
         return res.status(500).send({message: "Could not get Item"});
+    }
+
+    if(!req.canHandleHiddenInformation) {
+        if(item && item.hasOwnProperty("hidden")) delete item.hidden;
     }
 
     return res.status(200).send(item);
