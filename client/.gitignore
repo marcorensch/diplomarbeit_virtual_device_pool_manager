@@ -4,8 +4,8 @@ node_modules
 
 /tests/e2e/videos/
 /tests/e2e/screenshots/
-public/images/
-public/documents/
+/public/images/
+/public/documents/
 
 
 # local env files
