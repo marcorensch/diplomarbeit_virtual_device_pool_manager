@@ -30,7 +30,10 @@
                 v-model="manufacturerEditStore.manufacturer.notes"
               ></textarea>
             </div>
-            <div class="uk-margin">
+            <div
+              class="uk-margin"
+              v-if="authStore.hasPermission('canSeeEditHiddenNotes')"
+            >
               <label for="hidden">Hidden Notes</label>
               <textarea
                 id="hidden"
@@ -45,7 +48,8 @@
             :title="'Logo'"
             :image="manufacturerEditStore.manufacturer.image"
             :baseDir="'logos'"
-            @image-changed="handleImageChanged"
+            @imageChanged="handleImageChanged"
+            @updateValue="refreshData('image')"
           />
         </div>
       </div>
@@ -59,15 +63,22 @@
 
 <script>
 import { useManufacturerEditStore } from "@/stores/manufacturerEdit";
+import { useAuthStore } from "@/stores/auth";
 import ImageWidget from "@/components/widgets/configform/ImageWidget.vue";
 import ControlsFooterWidget from "@/components/ControlsFooterWidget.vue";
 
 export default {
   name: "ManufacturerConfigView",
   components: { ImageWidget, ControlsFooterWidget },
-  data() {
+  setup() {
     return {
       manufacturerEditStore: useManufacturerEditStore(),
+      authStore: useAuthStore(),
+    };
+  },
+  data() {
+    return {
+      id: null,
     };
   },
   async beforeMount() {
@@ -78,7 +89,7 @@ export default {
     }
   },
   async mounted() {
-    console.log(this.manufacturerEditStore.manufacturer);
+    this.id = this.$route.params.id || null;
   },
   methods: {
     handleCancelClicked() {
@@ -91,6 +102,14 @@ export default {
     handleImageChanged(imageRelativePath) {
       let path = imageRelativePath.length ? "/public/" + imageRelativePath : "";
       this.manufacturerEditStore.manufacturer.image = path;
+    },
+    async refreshData(key) {
+      console.log("refreshData for key", key);
+      // This method is required to refresh the data in the device object on possible changes in the filemanager
+      if (!this.id) return;
+      const newData = await this.manufacturerEditStore.getUpdatedData(this.id);
+      if (!newData || !newData[key]) return;
+      this.manufacturerEditStore.manufacturer[key] = newData[key];
     },
   },
 };

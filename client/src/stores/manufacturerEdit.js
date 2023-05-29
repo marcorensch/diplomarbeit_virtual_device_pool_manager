@@ -40,5 +40,9 @@ export const useManufacturerEditStore = defineStore("manufacturerEdit", {
       const response = await axios.get(`/api/manufacturers/${id}`);
       this.manufacturer = response.data;
     },
+    async getUpdatedData(id) {
+      const response = await axios.get(`/api/manufacturers/${id}`);
+      return response.data;
+    },
   },
 });
