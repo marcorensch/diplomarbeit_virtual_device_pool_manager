@@ -152,7 +152,7 @@ export default class FileManager {
 
         const databaseModel = new DatabaseModel();
         try {
-            await databaseModel.query(query);
+            await databaseModel.query(query, values);
         } catch (e) {
             console.log(e)
             throw({status: 500, message: "Error updating database"})
