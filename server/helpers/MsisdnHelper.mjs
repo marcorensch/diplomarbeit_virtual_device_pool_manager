@@ -4,21 +4,24 @@ import Msisdn from "../models/Msisdn.mjs";
 export default class MsisdnHelper {
     static async getMsisdnById(id) {
         const database = new DatabaseModel();
-        const numberData = await database.query("SELECT * FROM numbers WHERE id = ? LIMIT 1", [id]);
+        const query = "SELECT * FROM numbers WHERE id = ? LIMIT 1";
+        const numberData = await database.query(query, [id]);
         if (numberData.length === 0) return null;
         return this.createMsisdn(numberData[0]);
     }
 
     static async getMsisdnByMsisdn(msisdn) {
         const database = new DatabaseModel();
-        const numberData = await database.query("SELECT * FROM numbers WHERE msisdn = ? LIMIT 1", [msisdn]);
+        const query = "SELECT * FROM numbers WHERE msisdn = ? LIMIT 1";
+        const numberData = await database.query(query, [msisdn]);
         if (numberData.length === 0) return null;
         return this.createMsisdn(numberData[0]);
     }
 
     static async getMsisdnsByParentId(parentId) {
         const database = new DatabaseModel();
-        const numbersData = await database.query("SELECT a.*, b.name AS simTypeName FROM numbers as a LEFT JOIN sim_types AS b ON a.sim_type_id = b.id WHERE a.parent_id = ? ORDER BY a.abonnement ASC, a.msisdn ASC", [parentId]);
+        const query = "SELECT a.*, b.name AS simTypeName FROM numbers as a LEFT JOIN sim_types AS b ON a.sim_type_id = b.id WHERE a.parent_id = ? ORDER BY a.abonnement ASC, a.msisdn ASC";
+        const numbersData = await database.query(query, [parentId]);
         if (numbersData.length === 0) return [];
         const numbers = [];
         for (const numberData of numbersData) {
@@ -29,7 +32,8 @@ export default class MsisdnHelper {
 
     static async getAllMsisdns(parentOnly = false, flat = false) {
         const database = new DatabaseModel();
-        const numbersData = await database.query("SELECT a.*, b.name AS simTypeName FROM numbers as a LEFT JOIN sim_types AS b ON a.sim_type_id = b.id WHERE a.parent_id IS NULL ORDER BY a.abonnement ASC, a.msisdn ASC");
+        const query = "SELECT a.*, b.name AS simTypeName FROM numbers as a LEFT JOIN sim_types AS b ON a.sim_type_id = b.id WHERE a.parent_id IS NULL ORDER BY a.abonnement ASC, a.msisdn ASC"
+        const numbersData = await database.query(query);
         if (numbersData.length === 0) return [];
         const numbers = [];
         for (const numberData of numbersData) {
@@ -55,14 +59,18 @@ export default class MsisdnHelper {
         if (!msisdn) return null;
         msisdn.setData(data);
         const database = new DatabaseModel();
-        const result = await database.query("UPDATE numbers SET msisdn = ?, scn = ?, abonnement = ?, sim_number = ?, parent_id = ?, sim_type_id = ?, notes = ?, hidden = ? WHERE id = ?", [msisdn.msisdn, msisdn.scn, msisdn.abonnement, msisdn.sim_number, msisdn.parent_id, msisdn.sim_type_id, msisdn.notes, msisdn.hidden, id]);
+        const query = "UPDATE numbers SET msisdn = ?, scn = ?, abonnement = ?, sim_number = ?, parent_id = ?, sim_type_id = ?, notes = ?, hidden = ? WHERE id = ?";
+        const values = [msisdn.msisdn, msisdn.scn, msisdn.abonnement, msisdn.sim_number, msisdn.parent_id, msisdn.sim_type_id, msisdn.notes, msisdn.hidden, id];
+        const result = await database.query(query, values);
         if (result.affectedRows === 0) return null;
         return result;
     }
 
     static async store(msisdn) {
         const database = new DatabaseModel();
-        const result = await database.query("INSERT INTO numbers (msisdn, scn, abonnement, sim_number, parent_id, sim_type_id, notes, hidden) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", [msisdn.msisdn, msisdn.scn, msisdn.abonnement, msisdn.sim_number, msisdn.parent_id, msisdn.sim_type_id, msisdn.notes, msisdn.hidden]);
+        const query = "INSERT INTO numbers (msisdn, scn, abonnement, sim_number, parent_id, sim_type_id, notes, hidden) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        const values = [msisdn.msisdn, msisdn.scn, msisdn.abonnement, msisdn.sim_number, msisdn.parent_id, msisdn.sim_type_id, msisdn.notes, msisdn.hidden];
+        const result = await database.query(query, values);
         this.id = result.insertId;
         return this;
     }
@@ -75,7 +83,8 @@ export default class MsisdnHelper {
 
     static async deleteMsisdn(id) {
         const database = new DatabaseModel();
-        const result = await database.query("DELETE FROM numbers WHERE id = ?", [id]);
+        const query = "DELETE FROM numbers WHERE id = ?";
+        const result = await database.query(query, [id]);
         if (result.affectedRows === 0) return false;
         return true;
     }
