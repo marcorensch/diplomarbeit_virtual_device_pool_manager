@@ -7,6 +7,8 @@ export default class DeviceHelper {
         let total_count = 0;
         const matchTermWords = filters.search.trim().length ? filters.search.trim().split(' ').map((word, index) => index>0 ? `"*${word}*"`: ` "*${word}*"`).join(' ') : null;
         let devices = [];
+        let values = [];
+        let countValues = [];
         const databaseModel = new DatabaseModel();
         let query = `SELECT d.*,
                               m.name                                   AS manufacturer_name,
@@ -16,7 +18,8 @@ export default class DeviceHelper {
                               acc.username                             AS checkout_username,
                               CONCAT(acc.firstname, ' ', acc.lastname) AS checkout_fullname`;
         if (matchTermWords) {
-            query += `, (MATCH(m.name) AGAINST(${matchTermWords} IN BOOLEAN MODE) + MATCH(d.name) AGAINST(${matchTermWords} IN BOOLEAN MODE)) AS relevance`;
+            values.push(matchTermWords, matchTermWords);
+            query += `, (MATCH(m.name) AGAINST(? IN BOOLEAN MODE) + MATCH(d.name) AGAINST(? IN BOOLEAN MODE)) AS relevance`;
         }
         query += ` FROM devices as d
                                 LEFT JOIN device_types as dt ON d.device_type_id = dt.id
@@ -24,7 +27,8 @@ export default class DeviceHelper {
                                 LEFT JOIN accounts as acc ON d.checked_out_by = acc.id`;
 
         if (matchTermWords) {
-            query += ` WHERE (MATCH(m.name) AGAINST(${matchTermWords} IN BOOLEAN MODE) OR MATCH(d.name) AGAINST(${matchTermWords} IN BOOLEAN MODE))`;
+            values.push(matchTermWords, matchTermWords);
+            query += ` WHERE (MATCH(m.name) AGAINST(? IN BOOLEAN MODE) OR MATCH(d.name) AGAINST(? IN BOOLEAN MODE))`;
         }
 
         if(filters.type || filters.availability !== null) {
@@ -32,7 +36,8 @@ export default class DeviceHelper {
                 query += ` WHERE 1=1`;
             }
             if (filters.type) {
-                query += ` AND d.device_type_id = ${filters.type}`;
+                query += ` AND d.device_type_id = ?`;
+                values.push(filters.type);
             }
             if (filters.availability !== null) {
                 if (filters.availability === true) {
@@ -49,7 +54,8 @@ export default class DeviceHelper {
             query += ` ORDER BY d.id DESC`;
         }
 
-        query += ` LIMIT ${limit} OFFSET ${offset}`;
+        query += ` LIMIT ? OFFSET ?`;
+        values.push(parseInt(limit), parseInt(offset));
 
         // Count of devices "total_count"
         let countQuery  = `SELECT COUNT(*) AS total_count FROM devices as d
@@ -57,14 +63,16 @@ export default class DeviceHelper {
            LEFT JOIN manufacturers as m ON d.manufacturer_id = m.id
            LEFT JOIN accounts as acc ON d.checked_out_by = acc.id`;
         if (matchTermWords) {
-            countQuery += ` WHERE (MATCH(m.name) AGAINST(${matchTermWords} IN BOOLEAN MODE) OR MATCH(d.name) AGAINST(${matchTermWords} IN BOOLEAN MODE))`;
+            countValues.push(matchTermWords, matchTermWords);
+            countQuery += ` WHERE (MATCH(m.name) AGAINST(? IN BOOLEAN MODE) OR MATCH(d.name) AGAINST(? IN BOOLEAN MODE))`;
         }
         if(filters.type || filters.availability !== null) {
             if(!matchTermWords) {
                 countQuery += ` WHERE 1=1`;
             }
             if (filters.type) {
-                countQuery += ` AND d.device_type_id = ${filters.type}`;
+                countQuery += ` AND d.device_type_id = ?`;
+                countValues.push(filters.type);
             }
             if (filters.availability !== null) {
                 if (filters.availability === true) {
@@ -76,13 +84,13 @@ export default class DeviceHelper {
         }
 
         try {
-            devices = await databaseModel.query(query);
+            devices = await databaseModel.query(query, values);
         } catch (e) {
             console.log(e.message);
         }
 
         try {
-            const count = await databaseModel.query(countQuery);
+            const count = await databaseModel.query(countQuery, values);
             total_count = count[0].total_count;
         }catch (e) {
             console.log(e.message);
@@ -114,9 +122,9 @@ export default class DeviceHelper {
                               GROUP_CONCAT(n.number_id SEPARATOR ', ') AS linked_msisdns
                        FROM devices d
                                 LEFT JOIN device_number n ON d.id = n.device_id
-                       WHERE d.id = ${id}
+                       WHERE d.id = ?
                        GROUP BY d.id;`;
-        const result = await databaseModel.query(query);
+        const result = await databaseModel.query(query, [id]);
         return result[0];
     }
 
@@ -176,8 +184,8 @@ export default class DeviceHelper {
         const databaseModel = new DatabaseModel();
         const query = `DELETE
                        FROM devices
-                       WHERE id = ${id}`;
-        return await databaseModel.query(query);
+                       WHERE id = ?`;
+        return await databaseModel.query(query, [id]);
     }
 
     static async getDeviceTypes() {
