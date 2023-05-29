@@ -25,8 +25,15 @@ export default class ManufacturerHelper {
 
     static async updateManufacturer(manufacturer) {
         const databaseModel = new DatabaseModel()
-        const query = "UPDATE manufacturers SET name = ?, image = ?, notes = ?, hidden = ? WHERE id = ?";
-        const result = databaseModel.query(query, [manufacturer.name, manufacturer.image, manufacturer.notes, manufacturer.hidden, manufacturer.id]);
+        let query = "UPDATE manufacturers SET name = ?, image = ?, notes = ?;"
+        let values = [manufacturer.name, manufacturer.image, manufacturer.notes];
+        if (manufacturer.hasOwnProperty('hidden')) {
+            query += " hidden = ?;"
+            values.push(manufacturer.hidden);
+        }
+        query +=" WHERE id = ?";
+        values.push(manufacturer.id);
+        const result = databaseModel.query(query, values);
         return result;
     }
 
