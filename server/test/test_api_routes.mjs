@@ -588,7 +588,8 @@ describe("Test FileManager API Endpoints", () => {
     it("should return 201 when uploading file to server", async () => {
         await agent.post("/api/auth/login").send(adminCredentials);
         const pathToLocalFile = path.join(__dirname, "nxd-logo.png");
-        const response = await agent.post("/api/filemanager/upload").field("relativePath", "test").attach("file", pathToLocalFile);
+        const response = await agent.post("/api/filemanager/upload?path=test").attach("file", pathToLocalFile);
+        console.log(response.body);
         expect(response.status).to.eql(201);
     });
     it("should return 403 when trying to delete a file with guest permissions", async () => {
@@ -656,11 +657,11 @@ describe("Test FileManager API Endpoints", () => {
 
         expect(response.status).to.eql(400);
         expect(response.body).to.have.property("message");
-        expect(response.body.message).to.eql("Parent folder cannot be empty");
+        expect(response.body.message).to.eql("Path is required");
     });
     it("should return 400 with correct message when using upload route without file", async () => {
         await agent.post("/api/auth/login").send(adminCredentials);
-        const response = await agent.post("/api/filemanager/upload").field("relativePath", "test");
+        const response = await agent.post("/api/filemanager/upload?path=test");
 
         expect(response.status).to.eql(400);
         expect(response.body).to.have.property("message");
@@ -669,7 +670,7 @@ describe("Test FileManager API Endpoints", () => {
     it("should return 400 with correct message when uploading file to server with invalid relativePath", async () => {
         await agent.post("/api/auth/login").send(adminCredentials);
         const pathToLocalFile = path.join(__dirname, "nxd-logo.png");
-        const response = await agent.post("/api/filemanager/upload").field("relativePath", "test/../../").attach("file", pathToLocalFile);
+        const response = await agent.post("/api/filemanager/upload?path=test/../../").attach("file", pathToLocalFile);
 
         expect(response.status).to.eql(400);
         expect(response.body).to.have.property("message");

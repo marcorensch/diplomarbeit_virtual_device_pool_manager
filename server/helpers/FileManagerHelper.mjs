@@ -144,8 +144,10 @@ export default class FileManagerHelper {
                          SET path = REPLACE(path, ?, ?)
                          WHERE path LIKE ?`;
                 break;
+            case "test":
+                    return;
             default:
-                throw({status: 400, message: "Invalid target"})
+                throw({status: 500, message: `Cannot update database target ${target} unknown`})
         }
 
         const values = [oldRelativePath, newRelativePath, `%${oldRelativePath}%`];

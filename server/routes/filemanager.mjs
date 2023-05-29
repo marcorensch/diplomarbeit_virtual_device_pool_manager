@@ -67,7 +67,7 @@ router.delete("/", UserValidator.hasPermission("canDeleteFileManagerItem"), asyn
         await FileManagerHelper.delete(items);
         return res.send('ok');
     } catch (e) {
-        return res.status(500).send({success: false, message: e.message});
+        return res.status(e.status).send({success: false, message: e.message});
     }
 });
 
@@ -88,8 +88,6 @@ router.put("/rename", UserValidator.hasPermission("canUpdateFileManagerItem"), r
     const newName = req.body.newName;
     const parentFolderPath = req.body.parentDir;
 
-    console.log(oldName, newName, parentFolderPath)
-
     try {
         await FileManagerHelper.rename(parentFolderPath, oldName, newName);
         return res.send('ok');
@@ -102,7 +100,7 @@ router.post("/upload", UserValidator.hasPermission("canCreateFileManagerItem"), 
     const parentFolderPath = req.query.path;
     const files = req.files;
 
-    if (!files.length) return res.status(400).send({success: false, message: "No file was uploaded"});
+    if (!files || !files.length) return res.status(400).send({success: false, message: "No file was uploaded"});
 
     try {
         await FileManagerHelper.upload(parentFolderPath, files);
