@@ -9,7 +9,7 @@ const __dirname = path.dirname(__filename);
 const publicDir = path.join(__dirname, '..', 'public');
 const uploadDir = path.join(__dirname, '..', 'uploads');
 
-export default class FileManager {
+export default class FileManagerHelper {
     static async getDirectories(relativePath, absolutePath) {
         return (await fs.promises.readdir(absolutePath, {withFileTypes: true}))
             .filter(dirent => dirent.isDirectory())
