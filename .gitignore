@@ -1,4 +1,7 @@
 uploads
+public/documents
+public/images
+
 # Logs
 logs
 *.log
@@ -105,3 +108,4 @@ dist
 .tern-port
 
 certs
+/server/public/
