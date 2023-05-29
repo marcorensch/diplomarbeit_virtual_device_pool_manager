@@ -4,16 +4,14 @@ export default class PoolHelper {
     static async getItems(categoryId, parentId = null) {
 
         const databaseModel = new DatabaseModel();
-        const query = `SELECT *
-                       FROM builder_items
-                       WHERE category_id = ?
-                         AND parent_id ${parentId ? "= ?" : "IS NULL"}`;
-        const params = [categoryId];
-        if (parentId) params.push(parentId);
+        const query = `SELECT bi.*
+                       FROM builder_items AS bi
+                       WHERE bi.category_id = ?
+                         AND bi.parent_id ${parentId ? "= ?" : "IS NULL"}`;
+        const values = [categoryId];
+        if (parentId) values.push(parentId);
+        return await databaseModel.query(query, values);
 
-        const result = await databaseModel.query(query, params);
-
-        return result;
     }
 
     static async getCategoryByAlias(categoryAlias) {

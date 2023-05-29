@@ -5,7 +5,7 @@ const router = express.Router();
 import {fileURLToPath} from 'url';
 import path from "path";
 import fs from "fs";
-import FileManager from "../helpers/FileManager.mjs";
+import FileManagerHelper from "../helpers/FileManagerHelper.mjs";
 import multer from "multer";
 import UserValidator from "../middlewares/UserValidator.mjs";
 import {pathValidator, handleMulterError , renameValidator, newFolderValidator} from "../middlewares/fileManagerValidators.mjs";
@@ -45,8 +45,8 @@ router.get("/", UserValidator.hasPermission("canAccessFileManager"), pathValidat
 
     if (fs.existsSync(absolutePath)) {
         try{
-        folders = await FileManager.getDirectories(relPath, absolutePath);
-        files = await FileManager.getFiles(relPath, absolutePath);
+        folders = await FileManagerHelper.getDirectories(relPath, absolutePath);
+        files = await FileManagerHelper.getFiles(relPath, absolutePath);
         return res.send({success: true, files, folders});
         } catch (e) {
             return res.status(500).send({success: false, message: e.message, files, folders});
@@ -64,7 +64,7 @@ router.delete("/", UserValidator.hasPermission("canDeleteFileManagerItem"), asyn
     }
 
     try {
-        await FileManager.delete(items);
+        await FileManagerHelper.delete(items);
         return res.send('ok');
     } catch (e) {
         return res.status(500).send({success: false, message: e.message});
@@ -76,7 +76,7 @@ router.post("/folders", UserValidator.hasPermission("canCreateFileManagerItem"),
     const parentFolderPath = req.body.parentFolder;
 
     try {
-        await FileManager.createFolder(parentFolderPath, dirName);
+        await FileManagerHelper.createFolder(parentFolderPath, dirName);
         return res.status(201).send('ok');
     } catch (e) {
         return res.status(500).send({success: false, message: e.message});
@@ -91,7 +91,7 @@ router.put("/rename", UserValidator.hasPermission("canUpdateFileManagerItem"), r
     console.log(oldName, newName, parentFolderPath)
 
     try {
-        await FileManager.rename(parentFolderPath, oldName, newName);
+        await FileManagerHelper.rename(parentFolderPath, oldName, newName);
         return res.send('ok');
     }catch (e) {
         return res.status(e.status).send({success: false, message: e.message});
@@ -105,7 +105,7 @@ router.post("/upload", UserValidator.hasPermission("canCreateFileManagerItem"), 
     if (!files.length) return res.status(400).send({success: false, message: "No file was uploaded"});
 
     try {
-        await FileManager.upload(parentFolderPath, files);
+        await FileManagerHelper.upload(parentFolderPath, files);
         return res.status(201).send('ok');
     }catch (e) {
         return res.status(500).send({success: false, message: e.message});
