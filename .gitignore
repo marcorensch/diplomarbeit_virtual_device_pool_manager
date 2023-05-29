@@ -1,6 +1,8 @@
 uploads
 public/documents
 public/images
+.idea
+node_modules
 
 # Logs
 logs
