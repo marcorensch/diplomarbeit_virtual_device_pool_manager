@@ -68,7 +68,7 @@ router.get("/", UserValidator.setCanHandleHiddenInformation, deviceSearchValidat
 
     if(!req.canHandleHiddenInformation) {
         devices = devices.map(device => {
-            delete device.hidden;
+            if(device.hasOwnProperty("hidden")) delete device.hidden;
             return device;
         });
     }
@@ -97,7 +97,7 @@ router.get("/:id", UserValidator.setCanHandleHiddenInformation,async (req, res) 
         return res.status(500).send({success: false, message: "Error getting weblinks"});
     }
 
-    if(!req.canHandleHiddenInformation) {
+    if(!req.canHandleHiddenInformation && device && device.hasOwnProperty("hidden")) {
         delete device.hidden;
     }
 

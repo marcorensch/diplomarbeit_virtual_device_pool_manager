@@ -13,7 +13,7 @@ export default class ManufacturerHelper {
         const databaseModel = new DatabaseModel()
         const query = "SELECT * FROM manufacturers WHERE id = ?";
         const result = databaseModel.query(query, [id]);
-        return result;
+        return result[0];
     }
 
     static async createManufacturer(manufacturer) {

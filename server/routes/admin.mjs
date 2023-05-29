@@ -7,6 +7,7 @@ import UserValidator from "../middlewares/UserValidator.mjs";
 const router = express.Router();
 
 router.use(UserValidator.validateTokens);
+router.use(UserValidator.setCookies);
 router.use('/accounts', accountsRouter);
 router.use('/msisdns', msisdnsRouter);
 router.use('/sim_types', simTypesRouter);

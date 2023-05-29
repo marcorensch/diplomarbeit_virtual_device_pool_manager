@@ -8,7 +8,7 @@ router.get("/", UserValidator.setCanHandleHiddenInformation, async (req, res) =>
     const manufacturers = await ManufacturerHelper.getManufacturers();
     if(!req.canHandleHiddenInformation) {
         manufacturers.forEach(manufacturer => {
-            delete manufacturer.hidden
+            if(manufacturer.hasOwnProperty("hidden")) delete manufacturer.hidden;
         });
     }
     res.json(manufacturers);
@@ -16,10 +16,10 @@ router.get("/", UserValidator.setCanHandleHiddenInformation, async (req, res) =>
 
 router.get("/:id", UserValidator.setCanHandleHiddenInformation, async (req, res) => {
     const manufacturer = await ManufacturerHelper.getManufacturer(req.params.id);
-    if(!req.canHandleHiddenInformation) {
-        delete manufacturer[0].hidden
+    if(!req.canHandleHiddenInformation && manufacturer && manufacturer.hasOwnProperty("hidden")) {
+        delete manufacturer.hidden
     }
-    res.json(manufacturer[0]);
+    res.json(manufacturer);
 });
 
 router.post("/", async (req, res) => {
