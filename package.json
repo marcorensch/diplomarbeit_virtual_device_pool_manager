@@ -11,7 +11,8 @@
     "postinstall": "npm run install_setup && npm run install_server && npm run install_client",
     "devStart": "conc -n=\"server,client\" -c=\"green,blue\" \"cd server && npm run devStart\" \"cd client && npm run serve\"",
     "setup": "cd setup && npm run setup",
-    "start": "conc -n=\"server,client\" -c=\"green,blue\" \"cd server && cross-env USE_SSL=false npm run start\" \"node serve.mjs\""
+    "start": "conc -n=\"server,client\" -c=\"green,blue\" \"cd server && cross-env USE_SSL=false npm run start\" \"node serve.mjs\"",
+    "create-certificates": "cd setup && npm run create-certificates",
   },
   "repository": {
     "type": "git",

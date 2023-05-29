@@ -230,7 +230,11 @@
           />
         </div>
         <div class="uk-width-1-1 uk-width-1-3@s">
-          <NotesWidget />
+          <NotesWidget
+            :notes="device.notes"
+            :hidden="device.hidden"
+            @updateValue="setNewData"
+          />
         </div>
         <div class="uk-width-1-1 uk-width-2-3@s">
           <WeblinksWidget
@@ -350,6 +354,7 @@ export default {
   async mounted() {
     this.deviceTypes = await DeviceHelper.getDeviceTypes();
     this.manufacturers = await DeviceHelper.getManufacturers();
+    console.log(this.device);
   },
   methods: {
     canSetPhysicalDevices() {
@@ -376,6 +381,9 @@ export default {
       const deviceData = await DeviceHelper.loadDevice(this.id);
       if (!deviceData || !deviceData[key]) return;
       this.device[key] = deviceData[key];
+    },
+    setNewData(key, value) {
+      this.device[key] = value;
     },
     handleAddImeiClicked() {
       this.device.imei.push({ imei: "" });

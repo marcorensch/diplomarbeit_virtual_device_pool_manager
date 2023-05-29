@@ -6,8 +6,8 @@ process.env.NODE_ENV = 'setup';
 import * as path from "path";
 import inquirer from 'inquirer';
 import {fileURLToPath} from 'url';
+import crypto from "node:crypto";
 import chalk from "chalk";
-import crypto from "crypto";
 import EnvBuilder from "./model/EnvBuilder.mjs";
 import {createSSL, installDatabase, createAccount} from "./helpers/utilities.mjs";
 

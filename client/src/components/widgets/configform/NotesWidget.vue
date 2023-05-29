@@ -9,18 +9,20 @@
         <textarea
           id="notes"
           class="uk-textarea"
-          v-model="device.notes"
+          v-model="local.notes"
+          @change="$emit('updateValue', 'notes', local.notes)"
         ></textarea>
       </div>
       <div
         class="uk-margin"
-        v-if="authStore.hasPermission('canSeeEditHiddenNotes')"
+        v-if="authStore.hasPermission('canHandleHiddenInformation')"
       >
         <label for="hidden">Hidden Notes</label>
         <textarea
           id="hidden"
           class="uk-textarea"
-          v-model="device.hidden"
+          v-model="local.hidden"
+          @change="$emit('updateValue', 'hidden', local.hidden)"
         ></textarea>
       </div>
     </div>
@@ -33,6 +35,7 @@ import { useAuthStore } from "@/stores/auth";
 
 export default {
   name: "NotesWidget",
+  emits: ["updateValue"],
   setup() {
     return {
       authStore: useAuthStore(),
@@ -43,12 +46,20 @@ export default {
       type: Boolean,
       default: true,
     },
+    notes: {
+      type: String,
+      default: "",
+    },
+    hidden: {
+      type: String,
+      default: "",
+    },
   },
   data() {
     return {
-      device: {
-        notes: "",
-        hidden: "",
+      local: {
+        notes: this.notes,
+        hidden: this.hidden,
       },
     };
   },

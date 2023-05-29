@@ -32,7 +32,7 @@
             </div>
             <div
               class="uk-margin"
-              v-if="authStore.hasPermission('canSeeEditHiddenNotes')"
+              v-if="authStore.hasPermission('canHandleHiddenInformation')"
             >
               <label for="hidden">Hidden Notes</label>
               <textarea
