@@ -576,7 +576,6 @@ export default {
           console.log(error);
         });
     },
-
     updateFolderTree(fullPath, folders) {
       if (!this.folderTree.length || fullPath === this.rootFolder.fullPath) {
         this.folderTree = folders;
@@ -585,7 +584,6 @@ export default {
         this.closeFolders(fullPath, this.folderTree);
       }
     },
-
     closeFolders(pathToBeOpen, folderElements) {
       if (!folderElements) return;
       for (let folder of folderElements) {
@@ -598,7 +596,6 @@ export default {
         }
       }
     },
-
     updateSubFolderTree(
       fullPath,
       arrayOfFolders,
@@ -665,7 +662,6 @@ export default {
       }).show();
     },
     checkIsImage(file) {
-      console.log(file);
       let isImage = false;
       try {
         isImage =

@@ -1,6 +1,7 @@
 import DatabaseModel from "../models/DatabaseModel.mjs";
 import PoolHelper from "./PoolHelper.mjs";
 import WeblinksHelper from "./WeblinksHelper.mjs";
+import DocumentsHelper from "./DocumentsHelper.mjs";
 
 export default class DeviceHelper {
     static async getDevices(limit, offset, filters) {
@@ -109,6 +110,12 @@ export default class DeviceHelper {
             try {
                 device.weblinks = await WeblinksHelper.getWeblinksByDeviceId(device.id);
             } catch (e) {
+                console.log(e.message);
+            }
+
+            try {
+                device.documents = await DocumentsHelper.getDocumentsByDeviceId(device.id);
+            }catch (e) {
                 console.log(e.message);
             }
         }

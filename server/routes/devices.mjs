@@ -10,6 +10,7 @@ import {
 } from "../middlewares/inputValidators.mjs";
 import WeblinksHelper from "../helpers/WeblinksHelper.mjs";
 import {PermissionHandler} from "../helpers/PermissionHandler.mjs";
+import DocumentsHelper from "../helpers/DocumentsHelper.mjs";
 
 const router = express.Router();
 
@@ -97,6 +98,14 @@ router.get("/:id",UserValidator.validateTokens, UserValidator.setCookies, UserVa
         return res.status(500).send({success: false, message: "Error getting weblinks"});
     }
 
+    try {
+        const documents = await DocumentsHelper.getDocumentsByDeviceId(id);
+        device.setData({documents});
+    }catch (e) {
+        console.log(e.message);
+        return res.status(500).send({success: false, message: "Error getting documents"});
+    }
+
     if(!req.canHandleHiddenInformation && device && device.hasOwnProperty("hidden")) {
         delete device.hidden;
     }
@@ -119,7 +128,7 @@ router.post("/", UserValidator.validateTokens, UserValidator.setCookies, UserVal
         return res.status(500).send({success: false, message: e.message});
     }
 
-    if (device.weblinks.length) {
+    if (device.weblinks.length > 0) {
         try {
             for (const weblink of device.weblinks) {
                 const result = await WeblinksHelper.setOrUpdateWeblink(device.id, weblink);
@@ -134,13 +143,28 @@ router.post("/", UserValidator.validateTokens, UserValidator.setCookies, UserVal
         }
     }
 
-    if (device.msisdns.length) {
+    if (device.msisdns.length > 0) {
         try {
             for (const msisdn of device.msisdns) {
                 const result = await DeviceHelper.setOrUpdateMsisdnLink(device.id, msisdn);
                 if (!result.affectedRows) return res.status(500).send({
                     success: false,
                     message: "Device MSISDN link could not be set"
+                });
+            }
+        } catch (e) {
+            console.log(e.message);
+            return res.status(500).send({success: false, message: e.message});
+        }
+    }
+
+    if(device.documents.length > 0) {
+        try {
+            for (const document of device.documents) {
+                const result = await DocumentsHelper.setOrUpdateDocumentLink(device.id, document);
+                if (!result.affectedRows) return res.status(500).send({
+                    success: false,
+                    message: "Device document link could not be set"
                 });
             }
         } catch (e) {
@@ -182,7 +206,7 @@ router.put("/:id", UserValidator.validateTokens, UserValidator.setCookies, UserV
         });
     }
 
-    if (device.msisdns.length) {
+    if (device.msisdns.length > 0) {
         try {
             for (const msisdn of device.msisdns) {
                 const result = await DeviceHelper.setOrUpdateMsisdnLink(device.id, msisdn);
@@ -204,14 +228,28 @@ router.put("/:id", UserValidator.validateTokens, UserValidator.setCookies, UserV
         return res.status(500).send({success: false, message: e.message});
     }
 
-    if (device.weblinks.length) {
+    if (device.weblinks.length > 0) {
         try {
             for (const weblink of device.weblinks) {
-                console.log(weblink)
                 const result = await WeblinksHelper.setOrUpdateWeblink(device.id, weblink);
                 if (!result.affectedRows) return res.status(500).send({
                     success: false,
                     message: "Device weblink could not be updated"
+                });
+            }
+        } catch (e) {
+            console.log(e.message);
+            return res.status(500).send({success: false, message: e.message});
+        }
+    }
+
+    if(device.documents.length > 0) {
+        try {
+            for (const document of device.documents) {
+                const result = await DocumentsHelper.setOrUpdateDocumentLink(device.id, document);
+                if (!result.affectedRows) return res.status(500).send({
+                    success: false,
+                    message: "Device document link could not be set"
                 });
             }
         } catch (e) {

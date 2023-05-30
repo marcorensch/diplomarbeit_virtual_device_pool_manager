@@ -143,6 +143,36 @@
         </div>
         <div class="uk-margin">
           <h3>Documents</h3>
+          <table
+            class="uk-table uk-table-divider uk-table-hover uk-table-small"
+          >
+            <tbody>
+              <tr v-if="device.documents.length === 0">
+                <td>Nodocuments</td>
+              </tr>
+              <template v-else>
+                <tr
+                  v-for="doc of device.documents"
+                  :key="doc.id"
+                  class="uk-position-relative"
+                >
+                  <td>
+                    <a
+                      :href="'public/' + doc.uri"
+                      target="_blank"
+                      class="uk-position-cover"
+                      :title="doc.name"
+                    ></a>
+                    <font-awesome-icon
+                      :icon="['fas', 'file']"
+                      class="uk-margin-small-right"
+                    />
+                    {{ doc.name }}
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
         </div>
         <div class="uk-margin">
           <h3>Links</h3>

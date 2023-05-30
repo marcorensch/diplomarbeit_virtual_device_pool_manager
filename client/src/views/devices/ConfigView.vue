@@ -246,7 +246,11 @@
           />
         </div>
         <div class="uk-width-1-1 uk-width-1-3@s">
-          <DocumentsWidget />
+          <DocumentsWidget
+            :documents="device.documents"
+            @doc-linked="handleDocLinked($event)"
+            @doc-unlinked="handleDocUnlinked($event)"
+          />
         </div>
       </div>
     </div>
@@ -267,7 +271,7 @@ import NotesWidget from "@/components/widgets/configform/NotesWidget.vue";
 import ControlsFooterWidget from "@/components/ControlsFooterWidget.vue";
 import MsisdnWidget from "@/components/widgets/configform/MsisdnWidget.vue";
 import { useVuelidate } from "@vuelidate/core";
-import { required, numeric, helpers } from "@vuelidate/validators";
+import { helpers, numeric, required } from "@vuelidate/validators";
 import DeviceHelper from "@/helpers/DeviceHelper.mjs";
 import PoolSelector from "@/components/PoolSelector.vue";
 import WeblinksWidget from "@/components/widgets/configform/weblinksWidget.vue";
@@ -275,6 +279,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { useAuthStore } from "@/stores/auth";
 import { useToast } from "vue-toastification";
 import DocumentsWidget from "@/components/widgets/configform/DocumentsWidget.vue";
+
 const toast = useToast();
 
 const exactLength = (length) => (value) => value.toString().length === length;
@@ -343,7 +348,6 @@ export default {
     };
   },
   async beforeMount() {
-    // Handle the case where the user has no permission to update the device
     const deviceData = await DeviceHelper.loadDevice(this.id);
 
     if (this.id) {
@@ -364,7 +368,6 @@ export default {
   async mounted() {
     this.deviceTypes = await DeviceHelper.getDeviceTypes();
     this.manufacturers = await DeviceHelper.getManufacturers();
-    console.log(this.device);
   },
   methods: {
     canSetPhysicalDevices() {
@@ -382,8 +385,9 @@ export default {
       console.log(this.device);
     },
     handleImageChanged(imageRelativePath) {
-      let path = imageRelativePath.length ? "/public/" + imageRelativePath : "";
-      this.device.image = path;
+      this.device.image = imageRelativePath.length
+        ? "/public/" + imageRelativePath
+        : "";
     },
     async refreshData(key) {
       // This method is required to refresh the data in the device object on possible changes in the filemanager
@@ -422,6 +426,7 @@ export default {
     async handleSaveClicked() {
       const formIsValid = await this.v$.device.$validate();
       if (!formIsValid) return;
+      console.log(this.device);
       await DeviceHelper.store(this.device);
       this.$router.push({ name: "devices" });
     },
@@ -462,6 +467,26 @@ export default {
           i + 1;
       }
       console.log(this.device.weblinks);
+    },
+    handleDocLinked(doc) {
+      if (doc.id) {
+        this.device.documents = this.device.documents.map((d) => {
+          if (d.uri === doc.uri) {
+            d = doc;
+          }
+          return d;
+        });
+      } else {
+        this.device.documents.push(doc);
+      }
+    },
+    handleDocUnlinked(doc) {
+      this.device.documents = this.device.documents.map((d) => {
+        if (d.uri === doc.uri) {
+          d.toDelete = true;
+        }
+        return d;
+      });
     },
   },
 };

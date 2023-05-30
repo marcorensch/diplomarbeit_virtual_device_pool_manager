@@ -21,6 +21,7 @@ export default class Device{
         this.checkout_time = null;
         this.checkout_notes = null;
         this.checked_out_by_name = null;
+        this.documents = [];
     }
 
     setData(data){

@@ -9,23 +9,20 @@
           <li class="uk-text-truncate">
             <div class="uk-display-inline">
               <font-awesome-icon :icon="['fas', 'file']" />
-              <span class="uk-margin-small-left"
-                >This is areally long name lets see what happens now if there is
-                no space left</span
-              >
+              <span class="uk-margin-small-left">{{ doc.name }}</span>
             </div>
             <div uk-drop>
               <div
                 class="uk-card uk-card-default uk-padding-small uk-width-auto"
               >
                 <div class="uk-button-group">
-                  <button
+                  <a
                     :href="buildDocumentUri(doc)"
                     target="_blank"
                     class="uk-button uk-button-default uk-button-small uk-flex uk-flex-middle"
                   >
                     <font-awesome-icon :icon="['fas', 'eye']" />
-                  </button>
+                  </a>
                   <a
                     :href="buildDocumentUri(doc)"
                     download="true"
@@ -109,10 +106,24 @@ import FileManager from "@/components/FileManager.vue";
 
 export default {
   name: "DocumentsWidget",
+  emits: ["doc-linked", "doc-unlinked"],
+  props: {
+    documents: {
+      type: Array,
+      default: () => [],
+    },
+  },
   components: { FileManager, FontAwesomeIcon },
+  watch: {
+    documents: {
+      handler() {
+        this.updateTriggerCounter++;
+      },
+      deep: true,
+    },
+  },
   data() {
     return {
-      documents: [],
       selectedFile: null,
       updateTriggerCounter: 0,
     };
@@ -121,17 +132,25 @@ export default {
     show() {
       UIkit.modal("#documents-manager-modal").show();
     },
-    buildDocumentUri(document) {
-      console.log(document);
+    buildDocumentUri(doc) {
+      return `/public/${doc.uri}`;
     },
     handleDocumentUnlink(document) {
       console.log(document);
+      this.$emit("doc-unlinked", document);
     },
     handleFileSelected(file) {
-      console.log(file);
+      if (file) {
+        file.uri = file.fullPath;
+        this.selectedFile = file;
+      } else {
+        this.selectedFile = null;
+      }
     },
     handleDocumentSelected() {
-      console.log("handleDocumentSelected");
+      this.$emit("doc-linked", this.selectedFile);
+      this.updateTriggerCounter++;
+      this.selectedFile = null;
     },
   },
 };
