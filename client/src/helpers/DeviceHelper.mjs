@@ -132,4 +132,9 @@ export default class DeviceHelper {
             return [];
         }
     }
+
+    static isValidName(name) {
+        const regex = /^[a-z0-9_\- ]+$/i;
+        return regex.test(name);
+    }
 }

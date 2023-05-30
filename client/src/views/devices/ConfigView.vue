@@ -278,6 +278,9 @@ import DocumentsWidget from "@/components/widgets/configform/DocumentsWidget.vue
 const toast = useToast();
 
 const exactLength = (length) => (value) => value.toString().length === length;
+const validName = (value) => {
+  return DeviceHelper.isValidName(value);
+};
 
 export default {
   name: "DeviceConfigView",
@@ -305,7 +308,14 @@ export default {
   validations() {
     return {
       device: {
-        name: { required },
+        name: {
+          required,
+          validName: helpers.withMessage("Invalid name", validName),
+          maxLength: helpers.withMessage(
+            "Name must be less than 50 characters",
+            (value) => value.length <= 50
+          ),
+        },
         device_type_id: { required },
         added: { required },
         imei: {

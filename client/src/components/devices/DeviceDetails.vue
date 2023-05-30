@@ -193,7 +193,7 @@
         </div>
         <div class="uk-margin" v-if="device.notes">
           <h3>Notes</h3>
-          <div>{{ device.notes }}</div>
+          <div v-html="device.notes"></div>
         </div>
       </div>
       <div class="uk-position-bottom" v-if="showEditBtn">
