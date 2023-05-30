@@ -1,2 +1,4 @@
 import {createSSL} from "./helpers/utilities.mjs";
-createSSL("localhost").then(r => console.log(r));
+await createSSL("localhost");
+
+process.exit(0);

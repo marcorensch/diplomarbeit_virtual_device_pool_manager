@@ -5,7 +5,8 @@
   "main": "setup.mjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "setup": "node setup.mjs"
+    "setup": "node setup.mjs",
+    "create-certificates": "node create-certificates.mjs"
   },
   "author": "Marco Rensch",
   "license": "MIT",

@@ -4,7 +4,7 @@ import chalk from "chalk";
 import {fileURLToPath} from "url";
 import DatabaseConnector from "../model/DatabaseConnector.mjs";
 import bcrypt from "bcrypt";
-import crypto from "crypto";
+import crypto from "node:crypto";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
