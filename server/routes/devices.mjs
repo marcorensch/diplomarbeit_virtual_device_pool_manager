@@ -76,7 +76,7 @@ router.get("/", UserValidator.setCanHandleHiddenInformation, deviceSearchValidat
     res.send(response);
 });
 
-router.get("/:id", UserValidator.setCanHandleHiddenInformation,async (req, res) => {
+router.get("/:id",UserValidator.validateTokens, UserValidator.setCookies, UserValidator.setCanHandleHiddenInformation, async (req, res) => {
     const id = req.params.id;
     const device = new Device();
     if (!id) return res.status(400).send({success: false, message: "ID is required"});

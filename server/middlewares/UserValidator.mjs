@@ -43,19 +43,19 @@ export default class UserValidator {
 
     static async validateTokens(req, res, next) {
         let user, decoded;
-        const currentToken = req.cookies['nxd-token'];
-        const currentRefreshToken = req.cookies['nxd-refresh-token'];
+        req.currentToken = req.cookies['nxd-token'];
+        req.currentRefreshToken = req.cookies['nxd-refresh-token'];
         req.updateTokens = false;
 
-        if (!currentToken && !currentRefreshToken) {
+        if (!req.currentToken && !req.currentRefreshToken) {
             res.clearCookie('nxd-token');
             res.clearCookie('nxd-refresh-token');
             return res.status(401).send({message: "Unauthorized"});
         }
 
-        try{
-            const result = await TokenHelper.getTokens(currentRefreshToken);
-            if(!result || !result.length) {
+        try {
+            const result = await TokenHelper.getTokens(req.currentRefreshToken);
+            if (!result || !result.length) {
                 res.clearCookie('nxd-token');
                 res.clearCookie('nxd-refresh-token');
                 return res.status(401).send({message: "Unauthorized"});
@@ -65,9 +65,9 @@ export default class UserValidator {
             return res.status(500).send({message: "Error while validating"});
         }
 
-        if(currentToken){
+        if(req.currentToken){
             try {
-                decoded = jwt.verify(currentToken, process.env.JWT_SECRET);
+                decoded = jwt.verify(req.currentToken, process.env.JWT_SECRET);
             } catch (e) {
                 res.clearCookie('nxd-token');
                 res.clearCookie('nxd-refresh-token');
@@ -77,9 +77,9 @@ export default class UserValidator {
             req.updateTokens = true;
         }
 
-        if(!decoded && currentRefreshToken){
+        if(!decoded && req.currentRefreshToken){
             try {
-                decoded = jwt.verify(currentRefreshToken, process.env.JWT_REFRESH_SECRET);
+                decoded = jwt.verify(req.currentRefreshToken, process.env.JWT_REFRESH_SECRET);
                 req.updateTokens = true;
             } catch (e) {
                 res.clearCookie('nxd-token');
@@ -96,7 +96,7 @@ export default class UserValidator {
             return res.status(404).send({message: "User not found"});
         }
 
-        if(req.updateTokens){
+        if(user && req.updateTokens){
             try {
                 user = await TokenHelper.generateTokens(user);
             }catch (e) {
@@ -105,14 +105,14 @@ export default class UserValidator {
             }
 
             try {
-                await TokenHelper.updateTokens(user, currentRefreshToken);
+                await TokenHelper.updateTokens(user, req.currentRefreshToken);
             }catch (e) {
                 console.log(e)
                 return res.status(500).send({message: "Error while saving updated tokens"});
             }
         }
 
-        req.originalRefreshToken = currentRefreshToken;
+        req.originalRefreshToken = req.currentRefreshToken;
         req.user = user;
         next();
     }

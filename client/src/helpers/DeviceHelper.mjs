@@ -74,7 +74,7 @@ export default class DeviceHelper {
             device.msisdns = response.data.linked_msisdns?.split(",").map((el) => parseInt(el)) || [];
             device.slot = device.slot_id ? await DeviceHelper.getSlot(device.slot_id) : null;
         } catch (e) {
-            console.log(error);
+            console.log(e);
         }
 
         return device;

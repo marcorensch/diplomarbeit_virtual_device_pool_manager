@@ -8,6 +8,7 @@ const router = express.Router();
 
 router.use(UserValidator.validateTokens);
 router.use(UserValidator.setCookies);
+router.use(UserValidator.hasPermission("canAccessAdmin"));
 router.use('/accounts', accountsRouter);
 router.use('/msisdns', msisdnsRouter);
 router.use('/sim_types', simTypesRouter);

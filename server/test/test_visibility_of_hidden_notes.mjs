@@ -225,7 +225,7 @@ describe("Test visibility of hidden notes", () => {
     describe("Administrators should not see hidden notes on public routes", () => {
         before(async () => {
             await adminAgent.get("/api/auth/logout");
-            await adminAgent.post("/api/auth/login").send({username: "user", password: "test"});
+            await adminAgent.post("/api/auth/login").send({username: "administrator", password: "test"});
         });
         describe("Test devices routes for hidden notes", () => {
             it("return value should not contain hidden notes for device listing", async () => {
@@ -237,13 +237,13 @@ describe("Test visibility of hidden notes", () => {
                     expect(device).to.not.have.property("hidden");
                 });
             });
-            it("return value should not contain hidden notes for single device", async () => {
+            it("return value should contain hidden notes for single device", async () => {
                 const response = await adminAgent.get(`/api/devices/${createdDeviceID}`);
                 expect(response.status).to.equal(200);
                 expect(response.body).to.be.an("object");
                 expect(response.body).to.have.property("name");
                 expect(response.body).to.have.property("notes");
-                expect(response.body).to.not.have.property("hidden");
+                expect(response.body).to.have.property("hidden");
             });
         });
         describe("Test manufacturer routes for hidden notes", () => {
