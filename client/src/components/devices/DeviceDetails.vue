@@ -1,242 +1,253 @@
 <template>
   <div v-if="device" id="device-details" uk-offcanvas="flip: true">
-    <div class="uk-offcanvas-bar">
+    <div class="uk-offcanvas-bar uk-padding-remove">
       <button class="uk-offcanvas-close" type="button" uk-close></button>
       <div id="offcanvas-content" v-if="device">
-        <div class="uk-child-width-expand uk-grid-small" uk-grid>
-          <div class="uk-width-1-1 uk-width-1-3@m">
-            <div id="device-image">
-              <img v-if="device.image" :src="device.image" alt="" />
-              <font-awesome-icon
-                v-else
-                :icon="['fas', device.device_type_icon]"
-              />
+        <div class="uk-padding-small">
+          <div
+            class="uk-child-width-expand uk-grid-small uk-padding-small"
+            uk-grid
+          >
+            <div class="uk-width-1-1 uk-width-1-3@m">
+              <div id="device-image">
+                <img v-if="device.image" :src="device.image" alt="" />
+                <font-awesome-icon
+                  v-else
+                  :icon="['fas', device.device_type_icon]"
+                />
+              </div>
             </div>
-          </div>
-          <div>
-            <div
-              class="uk-h2 nxd-text-navy uk-margin-top uk-margin-remove-bottom"
-            >
-              {{ device.manufacturer_name }}
-            </div>
-            <div class="uk-h2 nxd-text-navy uk-margin-remove uk-text-light">
-              {{ device.name }}
-            </div>
-            <table
-              class="uk-table uk-table-divider uk-table-small uk-table-middle uk-table-justify uk-table-align-top"
-            >
-              <tbody>
-                <tr>
-                  <th class="uk-table-shrink">
-                    <span class="nxd-text-navy">Location:</span>
-                  </th>
-                  <td>
-                    <span v-if="device.slot">{{ device.slot.label }}</span>
-                    <span v-else>Virtual Device</span>
-                  </td>
-                </tr>
-                <tr v-if="device.slot">
-                  <th class="uk-table-middle">
-                    <span class="nxd-text-navy">Availability:</span>
-                  </th>
-                  <td>
-                    <div v-if="device.checked_out_by">
-                      <template
-                        v-if="device.checked_out_by === authStore.getUser?.id"
-                      >
-                        <span class="uk-text-meta">Checked out by you</span>
-                        <button
-                          class="uk-button uk-button-small uk-button-secondary uk-display-inline-block uk-width-auto"
-                          @click="showCheckInConfirm"
+            <div>
+              <div
+                class="uk-h2 nxd-text-navy uk-margin-top uk-margin-remove-bottom"
+              >
+                {{ device.manufacturer_name }}
+              </div>
+              <div class="uk-h2 nxd-text-navy uk-margin-remove uk-text-light">
+                {{ device.name }}
+              </div>
+              <table
+                class="uk-table uk-table-divider uk-table-small uk-table-middle uk-table-justify uk-table-align-top"
+              >
+                <tbody>
+                  <tr>
+                    <th class="uk-table-shrink">
+                      <span class="nxd-text-navy">Location:</span>
+                    </th>
+                    <td>
+                      <span v-if="device.slot">{{ device.slot.label }}</span>
+                      <span v-else>Virtual Device</span>
+                    </td>
+                  </tr>
+                  <tr v-if="device.slot">
+                    <th class="uk-table-middle">
+                      <span class="nxd-text-navy">Availability:</span>
+                    </th>
+                    <td>
+                      <div v-if="device.checked_out_by">
+                        <template
+                          v-if="device.checked_out_by === authStore.getUser?.id"
                         >
-                          CheckIn
-                        </button>
-                      </template>
-                      <template v-else>
-                        <div
-                          class="nxd-no-select"
-                          :class="{
-                            'nxd-cursor-help': authStore.getUser,
-                          }"
-                        >
-                          <font-awesome-icon
-                            :icon="['fas', 'triangle-exclamation']"
-                            class="uk-preserve-width uk-text-warning"
-                          />
-                          <span
-                            class="uk-margin-small-left uk-margin-small-right"
+                          <span class="uk-text-meta">Checked out by you</span>
+                          <button
+                            class="uk-button uk-button-small uk-button-secondary uk-display-inline-block uk-width-auto"
+                            @click="showCheckInConfirm"
                           >
-                            Checked out</span
-                          >
-                        </div>
-                        <div v-if="authStore.getUser" uk-drop>
+                            CheckIn
+                          </button>
+                        </template>
+                        <template v-else>
                           <div
-                            class="uk-card uk-card-default uk-card-body uk-card-small"
+                            class="nxd-no-select"
+                            :class="{
+                              'nxd-cursor-help': authStore.getUser,
+                            }"
                           >
-                            <div class="uk-text-bold nxd-text-navy">
-                              Checked out by
-                              {{
-                                device.checkout_fullname ||
-                                device.checkout_username
-                              }}
-                            </div>
-                            <div>
-                              {{ createDateTimeString(device.checkout_time) }}
-                              o'clock
-                            </div>
-                            <div class="uk-margin-small-top">
+                            <font-awesome-icon
+                              :icon="['fas', 'triangle-exclamation']"
+                              class="uk-preserve-width uk-text-warning"
+                            />
+                            <span
+                              class="uk-margin-small-left uk-margin-small-right"
+                            >
+                              Checked out</span
+                            >
+                          </div>
+                          <div v-if="authStore.getUser" uk-drop>
+                            <div
+                              class="uk-card uk-card-default uk-card-body uk-card-small"
+                            >
                               <div class="uk-text-bold nxd-text-navy">
-                                Notes:
+                                Checked out by
+                                {{
+                                  device.checkout_fullname ||
+                                  device.checkout_username
+                                }}
                               </div>
-                              <div
-                                class="uk-text-break nxd-max-height-small uk-overflow-auto"
-                              >
-                                {{ device.checkout_notes }}
+                              <div>
+                                {{ createDateTimeString(device.checkout_time) }}
+                                o'clock
+                              </div>
+                              <div class="uk-margin-small-top">
+                                <div class="uk-text-bold nxd-text-navy">
+                                  Notes:
+                                </div>
+                                <div
+                                  class="uk-text-break nxd-max-height-small uk-overflow-auto"
+                                >
+                                  {{ device.checkout_notes }}
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                        <button
-                          v-if="canCheckIn"
-                          class="uk-button uk-button-small uk-button-secondary uk-display-inline-block uk-width-auto"
-                          @click="showCheckInConfirm"
+                          <button
+                            v-if="canCheckIn"
+                            class="uk-button uk-button-small uk-button-secondary uk-display-inline-block uk-width-auto"
+                            @click="showCheckInConfirm"
+                          >
+                            CheckIn
+                          </button>
+                        </template>
+                      </div>
+                      <div v-else>
+                        <font-awesome-icon
+                          :icon="['fas', 'check-circle']"
+                          class="uk-preserve-width uk-text-success"
+                        /><span
+                          class="uk-margin-small-left uk-margin-small-right"
+                          >Available</span
                         >
-                          CheckIn
+                        <button
+                          class="uk-button uk-button-small uk-button-secondary uk-display-inline-block uk-width-auto"
+                          @click="showCheckoutModal"
+                        >
+                          Checkout
                         </button>
-                      </template>
-                    </div>
-                    <div v-else>
-                      <font-awesome-icon
-                        :icon="['fas', 'check-circle']"
-                        class="uk-preserve-width uk-text-success"
-                      /><span class="uk-margin-small-left uk-margin-small-right"
-                        >Available</span
-                      >
-                      <button
-                        class="uk-button uk-button-small uk-button-secondary uk-display-inline-block uk-width-auto"
-                        @click="showCheckoutModal"
-                      >
-                        Checkout
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <th>
-                    <span class="nxd-text-navy">Added: </span>
-                  </th>
-                  <td>
-                    <span>{{ createDateString(device.added) }}</span>
-                  </td>
-                </tr>
-                <tr v-if="imeis.length">
-                  <th><span class="nxd-text-navy">IMEI</span></th>
-                  <td>
-                    <div v-for="(imei, index) of imeis" :key="index">
-                      {{ imei.imei }}
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>
+                      <span class="nxd-text-navy">Added: </span>
+                    </th>
+                    <td>
+                      <span>{{ createDateString(device.added) }}</span>
+                    </td>
+                  </tr>
+                  <tr v-if="imeis.length">
+                    <th><span class="nxd-text-navy">IMEI</span></th>
+                    <td>
+                      <div v-for="(imei, index) of imeis" :key="index">
+                        {{ imei.imei }}
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
-        <div class="uk-margin">
-          <h3>Documents</h3>
-          <table
-            class="uk-table uk-table-divider uk-table-hover uk-table-small"
-          >
-            <tbody>
-              <tr v-if="device.documents.length === 0">
-                <td>Nodocuments</td>
-              </tr>
-              <template v-else>
-                <tr
-                  v-for="doc of device.documents"
-                  :key="doc.id"
-                  class="uk-position-relative"
+          <div id="device-details-inner" uk-height-viewport="expand: true">
+            <div class="uk-margin">
+              <h3>Documents</h3>
+              <table
+                class="uk-table uk-table-divider uk-table-hover uk-table-small"
+              >
+                <tbody>
+                  <tr v-if="device.documents.length === 0">
+                    <td>No documents</td>
+                  </tr>
+                  <template v-else>
+                    <tr
+                      v-for="doc of device.documents"
+                      :key="doc.id"
+                      class="uk-position-relative"
+                    >
+                      <td>
+                        <a
+                          :href="'public/' + doc.uri"
+                          target="_blank"
+                          class="uk-position-cover"
+                          :title="doc.name"
+                        ></a>
+                        <font-awesome-icon
+                          :icon="['fas', 'file']"
+                          class="uk-margin-small-right"
+                        />
+                        {{ doc.name }}
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+            <div class="uk-margin">
+              <h3>Links</h3>
+              <ul class="uk-list uk-list-divider">
+                <li
+                  v-if="
+                    ['Smartphone', 'Simple Phone', 'Tablet'].includes(
+                      device.device_type_name
+                    )
+                  "
+                  uk-tooltip="Search Device on kimovil to see technical details"
                 >
-                  <td>
-                    <a
-                      :href="'public/' + doc.uri"
-                      target="_blank"
-                      class="uk-position-cover"
-                      :title="doc.name"
-                    ></a>
+                  <a
+                    target="_blank"
+                    :title="'Search ' + device.name + ' on kimovil'"
+                    :href="buildKimovilLink(device)"
+                  >
                     <font-awesome-icon
-                      :icon="['fas', 'file']"
-                      class="uk-margin-small-right"
+                      :icon="['fas', 'arrow-up-right-from-square']"
                     />
-                    {{ doc.name }}
-                  </td>
-                </tr>
-              </template>
-            </tbody>
-          </table>
-        </div>
-        <div class="uk-margin">
-          <h3>Links</h3>
-          <ul class="uk-list uk-list-divider">
-            <li
-              v-if="
-                ['Smartphone', 'Simple Phone', 'Tablet'].includes(
-                  device.device_type_name
-                )
-              "
-              uk-tooltip="Search Device on kimovil to see technical details"
-            >
-              <a
-                target="_blank"
-                :title="'Search ' + device.name + ' on kimovil'"
-                :href="buildKimovilLink(device)"
+                    Search Device on kimovil</a
+                  >
+                </li>
+                <li
+                  v-for="link of device.weblinks"
+                  :key="link.id"
+                  :uk-tooltip="link.description"
+                >
+                  <a :href="link.uri" target="_blank"
+                    ><font-awesome-icon
+                      :icon="['fas', 'arrow-up-right-from-square']"
+                    />
+                    {{ link.name }}</a
+                  >
+                </li>
+              </ul>
+              <div
+                class="uk-margin-small-top uk-flex uk-flex-right"
+                v-if="authStore.hasPermission('canCreateLinks')"
               >
-                <font-awesome-icon
-                  :icon="['fas', 'arrow-up-right-from-square']"
-                />
-                Search Device on kimovil</a
-              >
-            </li>
-            <li
-              v-for="link of device.weblinks"
-              :key="link.id"
-              :uk-tooltip="link.description"
-            >
-              <a :href="link.uri" target="_blank"
-                ><font-awesome-icon
-                  :icon="['fas', 'arrow-up-right-from-square']"
-                />
-                {{ link.name }}</a
-              >
-            </li>
-          </ul>
-          <div
-            class="uk-margin-small-top uk-flex uk-flex-right"
-            v-if="authStore.hasPermission('canCreateLinks')"
-          >
-            <a href="#" @click="showAddWeblinkModal(device)"
-              ><font-awesome-icon :icon="['fas', 'plus']" /> Add Weblink</a
-            >
+                <a href="#" @click="showAddWeblinkModal(device)"
+                  ><font-awesome-icon :icon="['fas', 'plus']" /> Add Weblink</a
+                >
+              </div>
+            </div>
+            <div class="uk-margin">
+              <h3>GuideMe</h3>
+            </div>
+            <div class="uk-margin" v-if="device.notes">
+              <h3>Notes</h3>
+              <div v-html="device.notes"></div>
+            </div>
           </div>
-        </div>
-        <div class="uk-margin">
-          <h3>GuideMe</h3>
-        </div>
-        <div class="uk-margin" v-if="device.notes">
-          <h3>Notes</h3>
-          <div v-html="device.notes"></div>
-        </div>
-      </div>
-      <div class="uk-position-bottom" v-if="showEditBtn">
-        <div
-          class="uk-padding-small device-controls uk-flex uk-flex-right"
-          uk-scrollspy="cls: uk-animation-slide-bottom; delay: 200; repeat:true;"
-        >
-          <button
-            class="uk-button uk-button-primary"
-            @click="showDeviceEdit(device.id)"
+          <div
+            class="uk-position-fixed uk-position-bottom-right device-edit-container"
+            v-if="canEditDevice"
           >
-            Edit
-          </button>
+            <div
+              class="nxd-background-horizon uk-padding-small uk-flex uk-flex-right"
+              uk-scrollspy="cls: uk-animation-slide-bottom-small; repeat: true; delay:200"
+            >
+              <button
+                class="uk-button uk-button-primary"
+                @click="showDeviceEdit(device.id)"
+              >
+                Edit
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -1,5 +1,8 @@
 @import "../variables.less";
 
+@width-offcanvas: 90vw;
+@width-offcanvas-medium: 50vw;
+
 #device-details {
   color: @color-grey;
 
@@ -18,10 +21,21 @@
     color: @color-grey;
   }
 
+  .device-edit-container {
+    width: @width-offcanvas;
+  }
+  // Remove Scrollbar Chrome / Safari / Edge
+  .uk-offcanvas-bar::-webkit-scrollbar {
+    display: none;
+  }
+  .uk-offcanvas-bar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
   .uk-offcanvas-bar{
     background: @color-white;
     color: @color-grey-dark;
-    width: 90vw;
+    width: @width-offcanvas;
     max-width: 100vw;
     .uk-offcanvas-close {
       color: @color-grey-dark;
@@ -44,11 +58,15 @@
     .device-controls {
       background: @color-horizon;
     }
+
+    #offcanvas-content {
+      padding-bottom: 50px;
+    }
   }
 
   @media (min-width: @screen-medium) {
-    .uk-offcanvas-bar{
-      width: 50vw;
+    .uk-offcanvas-bar, .device-edit-container{
+      width: @width-offcanvas-medium;
     }
   }
 
@@ -64,8 +82,7 @@
   }
 
   #offcanvas-content{
-    margin-top: 20px;
-    padding-bottom: 80px;
+
   }
 
   .uk-table.uk-table-striped tbody tr:nth-child(odd) {
