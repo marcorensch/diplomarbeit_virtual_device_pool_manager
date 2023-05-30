@@ -1,14 +1,14 @@
 {
   "name": "virtual_device_pool_manager",
   "version": "1.0.0",
-  "description": "Diplomarbeit 2023 von Marco Rensch",
-  "main": "index.js",
+  "description": "NDS HF Applikationsentwickler Diplomarbeit 2023 von Marco Rensch",
+  "main": "serve.mjs",
   "scripts": {
     "test": "cd server && npm run test",
     "install_server": "cd server && npm install",
     "install_client": "cd client && npm install",
     "install_setup": "cd setup && npm install",
-    "postinstall": "npm run install_setup && npm run install_server && npm run install_client",
+    "postinstall": "conc -n=\"setup,server,client\" -c=\"yellow,green,blue\" \"cd setup && npm install\" \"cd server && npm install\" \"cd client && npm install\"",
     "devStart": "conc -n=\"server,client\" -c=\"green,blue\" \"cd server && npm run devStart\" \"cd client && npm run serve\"",
     "setup": "cd setup && npm run setup",
     "start": "conc -n=\"server,client\" -c=\"green,blue\" \"cd server && cross-env USE_SSL=false npm run start\" \"node serve.mjs\"",

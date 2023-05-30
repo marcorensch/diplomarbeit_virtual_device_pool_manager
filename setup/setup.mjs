@@ -45,15 +45,6 @@ const questions = [
         },
     },
     {
-        type: 'confirm',
-        name: 'createCertificates',
-        message: 'Create (Self Signed) SSL certificates?',
-        default() {
-            return true
-        },
-        when: (answers) => answers.USE_SSL
-    },
-    {
         type: 'input',
         name: 'DATABASE_HOST',
         message: 'Database host?',
@@ -219,10 +210,6 @@ try {
 } catch (e) {
     console.error(e);
     process.exit(1);
-}
-
-if (answers.createCertificates) {
-    await createSSL(answers.API_HOST);
 }
 
 if (answers.createTestDatabase) {
