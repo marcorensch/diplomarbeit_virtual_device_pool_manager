@@ -123,7 +123,7 @@
                 </tr>
                 <tr>
                   <th>
-                    <span class="nxd-text-navy">Since: </span>
+                    <span class="nxd-text-navy">Added: </span>
                   </th>
                   <td>
                     <span>{{ createDateString(device.added) }}</span>
@@ -190,6 +190,10 @@
         </div>
         <div class="uk-margin">
           <h3>GuideMe</h3>
+        </div>
+        <div class="uk-margin" v-if="device.notes">
+          <h3>Notes</h3>
+          <div>{{ device.notes }}</div>
         </div>
       </div>
       <div class="uk-position-bottom" v-if="showEditBtn">
