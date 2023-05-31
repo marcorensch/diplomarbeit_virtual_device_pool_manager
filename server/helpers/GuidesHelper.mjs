@@ -28,9 +28,6 @@ export default class GuidesHelper {
         query += " ORDER BY id DESC LIMIT ? OFFSET ?";
         values.push(limit, offset);
 
-        console.log(query, values)
-        console.log(countQuery, countValues)
-
         const guides = await database.query(query, values);
         let count = await database.query(countQuery, countValues);
 

@@ -4,6 +4,7 @@ import {guidesSearchValidator, guideValidator, slideValidator} from "../middlewa
 import GuidesHelper from "../helpers/GuidesHelper.mjs";
 
 const router = express.Router();
+router.use(UserValidator.hasPermission("canManageGuides"))
 
 router.get('/', guidesSearchValidator, async (req, res) => {
     const limit = req.query.limit ? parseInt(req.query.limit) : 20;
@@ -43,7 +44,7 @@ router.post('/', UserValidator.hasPermission('canCreateGuides'), guideValidator,
     }
 });
 
-router.put('/:id', UserValidator.hasPermission('canManageGuides'), guideValidator, async (req, res) => {
+router.put('/:id', UserValidator.hasPermission('canUpdateGuides'), guideValidator, async (req, res) => {
     const guideData = req.body;
     guideData.description = guideData.description || "";
     try{
@@ -78,7 +79,7 @@ router.get('/:guide_id/slides', async (req, res) => {
     }
 });
 
-router.post('/:guide_id/slides', UserValidator.hasPermission('canManageGuides'), slideValidator, async (req, res) => {
+router.post('/:guide_id/slides', slideValidator, async (req, res) => {
     const slideData = req.body;
     slideData.content = slideData.content || "";
     try{
