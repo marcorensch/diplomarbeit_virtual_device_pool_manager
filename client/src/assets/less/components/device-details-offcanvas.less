@@ -62,6 +62,17 @@
     #offcanvas-content {
       padding-bottom: 50px;
     }
+
+    table.uk-table-hover tbody {
+      tr {
+        transition: all 0.2s ease-in-out;
+        &:hover {
+          background-color: @color-horizon;
+          color: @color-grey-dark;
+          transition: all 0.2s ease-in-out;
+        }
+      }
+    }
   }
 
   @media (min-width: @screen-medium) {

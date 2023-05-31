@@ -9,33 +9,55 @@
           <li class="uk-text-truncate">
             <div class="uk-display-inline">
               <font-awesome-icon :icon="['fas', 'file']" />
-              <span class="uk-margin-small-left">{{ doc.name }}</span>
-            </div>
-            <div uk-drop>
-              <div
-                class="uk-card uk-card-default uk-padding-small uk-width-auto"
+              <span
+                :uk-tooltip="
+                  !doc.id
+                    ? 'Click Save to link element'
+                    : 'Click to show actions'
+                "
+                class="uk-margin-small-left nxd-cursor-pointer"
+                :class="{
+                  'uk-text-italic uk-text-muted': !doc.id,
+                  'uk-text-danger': doc.id && doc.toDelete,
+                }"
+                >{{ doc.name }}</span
               >
-                <div class="uk-button-group">
+              <div uk-drop="mode:click">
+                <div
+                  class="uk-button-group uk-card uk-card-default uk-card-small"
+                >
                   <a
                     :href="buildDocumentUri(doc)"
                     target="_blank"
                     class="uk-button uk-button-default uk-button-small uk-flex uk-flex-middle"
                   >
-                    <font-awesome-icon :icon="['fas', 'eye']" />
+                    <font-awesome-icon
+                      class="uk-preserve-width"
+                      style="font-size: 1.2em"
+                      :icon="['fas', 'eye']"
+                    />
                   </a>
                   <a
                     :href="buildDocumentUri(doc)"
                     download="true"
                     class="uk-button uk-button-default uk-button-small uk-flex uk-flex-middle"
                   >
-                    <font-awesome-icon :icon="['fas', 'cloud-arrow-down']" />
+                    <font-awesome-icon
+                      class="uk-preserve-width"
+                      style="font-size: 1.2em"
+                      :icon="['fas', 'cloud-arrow-down']"
+                    />
                   </a>
 
                   <button
                     class="uk-button uk-button-default uk-button-small uk-flex uk-flex-middle"
                     @click="handleDocumentUnlink(doc)"
                   >
-                    <font-awesome-icon :icon="['fas', 'unlink']" />
+                    <font-awesome-icon
+                      class="uk-preserve-width"
+                      style="font-size: 1.2em"
+                      :icon="['fas', 'unlink']"
+                    />
                   </button>
                 </div>
               </div>
@@ -85,7 +107,7 @@
             <div>
               <button
                 class="uk-width-1-1 uk-button uk-button-primary uk-modal-close"
-                :class="{ 'uk-disabled': !this.selectedFile }"
+                :class="{ 'uk-disabled': !this.fileFromManager }"
                 @click="handleDocumentSelected"
               >
                 Select
@@ -124,7 +146,7 @@ export default {
   },
   data() {
     return {
-      selectedFile: null,
+      fileFromManager: null,
       updateTriggerCounter: 0,
     };
   },
@@ -136,21 +158,20 @@ export default {
       return `/public/${doc.uri}`;
     },
     handleDocumentUnlink(document) {
-      console.log(document);
       this.$emit("doc-unlinked", document);
     },
     handleFileSelected(file) {
       if (file) {
         file.uri = file.fullPath;
-        this.selectedFile = file;
+        this.fileFromManager = file;
       } else {
-        this.selectedFile = null;
+        this.fileFromManager = null;
       }
     },
     handleDocumentSelected() {
-      this.$emit("doc-linked", this.selectedFile);
+      this.$emit("doc-linked", this.fileFromManager);
+      this.fileFromManager = null;
       this.updateTriggerCounter++;
-      this.selectedFile = null;
     },
   },
 };

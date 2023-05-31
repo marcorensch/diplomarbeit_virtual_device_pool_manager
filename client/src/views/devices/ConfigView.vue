@@ -477,6 +477,10 @@ export default {
           return d;
         });
       } else {
+        if (this.device.documents.find((d) => d.uri === doc.uri)) {
+          toast.warning("Document already linked");
+          return;
+        }
         this.device.documents.push(doc);
       }
     },
@@ -487,6 +491,9 @@ export default {
         }
         return d;
       });
+      this.device.documents = this.device.documents.filter(
+        (d) => !(!d.id && d.toDelete)
+      );
     },
   },
 };
