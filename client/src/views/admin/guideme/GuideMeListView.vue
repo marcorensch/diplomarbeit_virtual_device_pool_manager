@@ -23,9 +23,9 @@
               type="text"
               id="search_guide_mobile"
               class="uk-input"
-              placeholder="Filter Guides"
+              placeholder="Search Guide"
               v-model="search_guide"
-              @keyup="filterGuideList"
+              @keyup="searchTimeOut"
             />
           </div>
         </div>
@@ -47,9 +47,9 @@
                   type="text"
                   id="search_account"
                   class="uk-input"
-                  placeholder="Filter Guides"
+                  placeholder="Search Guide"
                   v-model="search_guide"
-                  @keyup="filterGuideList"
+                  @keyup="searchTimeOut"
                 />
                 <div
                   v-if="search_guide.length > 0"
@@ -71,9 +71,14 @@
           v-for="guide of guides"
           :key="guide.id"
         >
-          <div class="uk-card uk-card-default uk-position-relative">
+          <div
+            class="uk-card uk-card-default uk-position-relative"
+            :uk-tooltip="
+              guide.visible === 1 ? 'Guide is visible' : 'Guide is hidden'
+            "
+          >
             <router-link
-              :to="{ name: 'admin-guide-item', params: { id: guide.id } }"
+              :to="{ name: 'admin-guide-slides', params: { id: guide.id } }"
               class="uk-position-cover"
             ></router-link>
             <div class="uk-position-top-right uk-padding-small edit-div">
@@ -88,7 +93,16 @@
             <div class="uk-grid-small uk-flex-middle" uk-grid>
               <div class="uk-width-expand">
                 <div class="uk-card-header">
-                  <h3 class="uk-card-title">{{ guide.name }}</h3>
+                  <h3 class="uk-card-title">
+                    {{ guide.name }}
+                    <span class="uk-text-small uk-text-middle">
+                      <font-awesome-icon
+                        :icon="['fas', 'eye']"
+                        v-if="guide.visible"
+                      />
+                      <font-awesome-icon :icon="['fas', 'eye-slash']" v-else />
+                    </span>
+                  </h3>
                 </div>
                 <div class="uk-card-body">
                   <div v-html="guide.description"></div>
@@ -107,6 +121,13 @@
         </div>
       </div>
     </div>
+    <PaginationWidget
+      :total_count="guides_total_count"
+      :default_page_size="page_size"
+      :updateTrigger="triggerCounter"
+      @pageSizeChange="handlePageSizeChange"
+      @pageChange="handlePageChange"
+    />
   </div>
 </template>
 
@@ -114,10 +135,11 @@
 import { useAuthStore } from "@/stores/auth";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import PaginationWidget from "@/components/widgets/PaginationWidget.vue";
 
 export default {
   name: "GuideMeListView",
-  components: { FontAwesomeIcon },
+  components: { PaginationWidget, FontAwesomeIcon },
   setup() {
     const auth = useAuthStore();
     return { auth };
@@ -126,34 +148,54 @@ export default {
     return {
       guides: [],
       search_guide: "",
+      guides_total_count: 0,
+      page_size: 20,
+      page: 1,
+      triggerCounter: 0,
     };
   },
   mounted() {
     this.getGuides();
   },
   methods: {
+    searchTimeOut(e) {
+      if (e.key === "Enter") {
+        clearTimeout(this.timer);
+        this.timer = null;
+        this.getGuides();
+        return;
+      }
+      if (this.timer) {
+        clearTimeout(this.timer);
+        this.timer = null;
+      }
+      this.timer = setTimeout(() => {
+        this.getGuides();
+      }, 500);
+    },
     async getGuides() {
-      const response = await axios.get("/api/admin/guides");
-      console.log(response.data.guides);
+      let query = `?limit=${this.page_size}&page=${this.page}`;
+      query += this.search_guide.length ? `&search=${this.search_guide}` : "";
+      const response = await axios.get(`/api/admin/guides${query}`);
       this.guides = response.data.guides;
+      this.guides_total_count = response.data.total_count;
+      console.log(this.guides_total_count);
+    },
+    handlePageSizeChange(page_size) {
+      this.triggerCounter++;
+      this.page_size = page_size;
+      this.getGuides();
+    },
+    handlePageChange(page) {
+      this.page = page;
+      this.getGuides();
     },
     handleCreateGuideClicked() {
       this.$router.push({ name: "admin-guide-create" });
     },
     handleClearSearchGuideClicked() {
       this.search_guide = "";
-      this.filterGuideList();
-    },
-    filterGuideList() {
-      let search = this.search_guide.toLowerCase();
-      this.guides = this.guides.map((guide) => {
-        if (!search) {
-          guide.isVisible = true;
-        } else {
-          guide.isVisible = guide.name.toLowerCase().includes(search);
-        }
-        return guide;
-      });
+      this.getGuides();
     },
   },
 };

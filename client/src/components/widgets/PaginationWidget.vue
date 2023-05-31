@@ -65,6 +65,7 @@ export default {
       this.updateAvailablePages();
     },
     updateTrigger: function () {
+      console.log("updateTrigger");
       this.pages = Math.ceil(this.total_count / this.selected_page_size);
       this.updateAvailablePages();
     },
@@ -75,7 +76,7 @@ export default {
       pages: 0,
       available_pages: [],
       selected_page_size: this.default_page_size,
-      page_sizes: [10, 20, 50, 100],
+      page_sizes: [1, 10, 20, 50, 100],
     };
   },
   methods: {

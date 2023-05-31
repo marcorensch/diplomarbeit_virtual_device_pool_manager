@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS `guides`
     name        varchar(255) NOT NULL,
     description text         NOT NULL,
     sorting     int(11)      NOT NULL DEFAULT 0,
+    visible     tinyint(1)   NOT NULL DEFAULT 0,
     created_at  timestamp    NOT NULL DEFAULT NOW(),
     PRIMARY KEY (id)
 )

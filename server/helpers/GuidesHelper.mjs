@@ -1,12 +1,40 @@
 import DatabaseModel from "../models/DatabaseModel.mjs";
 
 export default class GuidesHelper {
-    static async getGuides() {
+    static async getGuides(limit, page, search, visibility) {
+        const offset = (page - 1) * limit;
+        let values = [];
+        let countValues = [];
+
         const database = new DatabaseModel();
-        const query = "SELECT * FROM guides";
-        const guides = await database.query(query);
-        console.log(guides)
-        return guides
+        let query = "SELECT * FROM guides";
+        let countQuery = "SELECT COUNT(*) AS count FROM guides";
+
+        if (search !== null) {
+            const string = " WHERE name LIKE ?";
+            query += string;
+            countQuery += string;
+            values.push(`%${search}%`);
+            countValues.push(`%${search}%`);
+        }
+
+        if (visibility !== null) {
+            const string = search === null ? " WHERE visible = ?" : " AND visible = ?";
+            query += string;
+            countQuery += string;
+            values.push(visibility);
+            countValues.push(visibility);
+        }
+        query += " ORDER BY id DESC LIMIT ? OFFSET ?";
+        values.push(limit, offset);
+
+        console.log(query, values)
+        console.log(countQuery, countValues)
+
+        const guides = await database.query(query, values);
+        let count = await database.query(countQuery, countValues);
+
+        return {guides, count: count[0].count};
     }
 
     static async getGuide(id) {
@@ -19,22 +47,27 @@ export default class GuidesHelper {
 
     static async createGuide(guide) {
         const database = new DatabaseModel();
-        const query = "INSERT INTO guides (name, description) VALUES (?, ?)";
-        const result = await database.query(query, [guide.name, guide.description]);
+        const query = "INSERT INTO guides (name, description, visible) VALUES (?, ?, ?)";
+        const result = await database.query(query, [guide.name, guide.description, guide.visible]);
         return result.affectedRows === 1 ? result.insertId : null;
     }
 
     static async updateGuide(id, guide) {
-        return await Guides.findByIdAndUpdate(id, guide);
+        const database = new DatabaseModel();
+        const query = "UPDATE guides SET name = ?, description = ?, visible = ? WHERE id = ?";
+        const result = await database.query(query, [guide.name, guide.description, guide.visible, id]);
     }
 
     static async deleteGuide(id) {
-        return await Guides.findByIdAndDelete(id);
+        const database = new DatabaseModel();
+        const query = "DELETE FROM guides WHERE id = ?";
+        const result = await database.query(query, [id]);
+        return result.affectedRows === 1;
     }
 
     static async getSlides(guide_id) {
         const database = new DatabaseModel();
-        const query = "SELECT * FROM guide_slides WHERE guide_id = ?";
+        const query = "SELECT * FROM guide_slides WHERE guide_id = ? ORDER BY sorting ASC";
         return await database.query(query, [guide_id]);
     }
 

@@ -305,7 +305,7 @@ const routes = [
         children: [
           {
             path: "",
-            name: "guideme-list",
+            name: "guides",
             component: () =>
               import("../views/admin/guideme/GuideMeListView.vue"),
           },
@@ -323,8 +323,9 @@ const routes = [
           },
           {
             path: ":id",
-            name: "admin-guide-item",
-            component: () => import("../views/admin/guideme/GuideView.vue"),
+            name: "admin-guide-slides",
+            component: () =>
+              import("../views/admin/guideme/SlidesManagerView.vue"),
           },
         ],
       },

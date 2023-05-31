@@ -1,7 +1,7 @@
 <template>
   <div class="uk-section user-list-view uk-padding-remove">
     <div class="uk-container nxd-padding-xlarge-bottom">
-      <h1>Configure Guide</h1>
+      <h1>Configure Slides</h1>
 
       <div class="uk-margin">
         <div v-if="!slides.length">
@@ -16,7 +16,12 @@
             </div>
           </div>
         </div>
-        <div v-else class="uk-position-relative" id="slides" uk-sortable>
+        <div
+          class="uk-position-relative"
+          id="slides"
+          :class="{ 'uk-hidden': !slides.length }"
+          uk-sortable
+        >
           <div v-for="(slide, index) of slides" :key="slide.id" :id="slide.id">
             <div class="">
               <div
@@ -28,7 +33,7 @@
             </div>
           </div>
         </div>
-        <div class="uk-margin-small">
+        <div class="uk-margin-small" :class="{ 'uk-hidden': !slides.length }">
           <div
             class="uk-card uk-card-body nx-card-add uk-card-hover uk-flex uk-flex-center"
             @click="handleAddSlideClicked"
@@ -59,7 +64,7 @@ import UIkit from "uikit";
 import axios from "axios";
 
 export default {
-  name: "GuideView",
+  name: "SlidesManagerView",
   components: { FontAwesomeIcon, ControlsFooterWidget },
   data() {
     return {
@@ -84,15 +89,16 @@ export default {
     });
   },
   methods: {
+    registerEvents() {},
     async loadSlides() {
       const response = await axios.get(`/api/admin/guides/${this.id}/slides`);
       this.slides = response.data.slides;
     },
     handleCancelClicked() {
-      this.$router.push({ name: "guideme-list" });
+      this.$router.push({ name: "guides" });
     },
     handleSaveClicked() {
-      this.$router.push({ name: "guideme-list" });
+      this.$router.push({ name: "guides" });
     },
     async handleAddSlideClicked() {
       const slide = new GuideMeSlideItem();
@@ -106,7 +112,6 @@ export default {
       this.slides.push(slide);
     },
     updateSlide(slide) {
-      console.log("updateCalled");
       axios.put(`/api/admin/guides/${this.id}/slides/${slide.id}`, slide);
     },
   },

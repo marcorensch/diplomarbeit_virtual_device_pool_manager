@@ -1,15 +1,30 @@
 import express from "express";
 import UserValidator from "../middlewares/UserValidator.mjs";
-import {guideValidator, slideValidator} from "../middlewares/inputValidators.mjs";
+import {guidesSearchValidator, guideValidator, slideValidator} from "../middlewares/inputValidators.mjs";
 import GuidesHelper from "../helpers/GuidesHelper.mjs";
 
 const router = express.Router();
 
-router.get('/', async (req, res) => {
+router.get('/', guidesSearchValidator, async (req, res) => {
+    const limit = req.query.limit ? parseInt(req.query.limit) : 20;
+    const page = req.query.page ? parseInt(req.query.page) : 1;
+    const search = req.query.search && req.query.search.length ? req.query.search : null;
+    const visibility = req.query.visibility && req.query.visibility.length ? req.query.visibility === "true" : null;
+
     try {
-        const guides = await GuidesHelper.getGuides();
-        if (guides === null) return res.status(500).json({success: false, message: "Failed to get guides"});
-        return res.status(200).json({success: true, message: "Guides retrieved successfully", guides});
+        const data = await GuidesHelper.getGuides(limit, page, search, visibility);
+        if (data.guides === null) return res.status(500).json({success: false, message: "Failed to get guides"});
+        return res.status(200).json({success: true, message: "Guides retrieved successfully", guides:data.guides, total_count: data.count});
+    }catch (e) {
+        return res.status(500).json({success: false, message: e.message});
+    }
+});
+
+router.get('/:id', async (req, res) => {
+    try {
+        const guide = await GuidesHelper.getGuide(req.params.id);
+        if (guide === null) return res.status(500).json({success: false, message: "Failed to get guide"});
+        return res.status(200).json({success: true, message: "Guide retrieved successfully", guide});
     }catch (e) {
         return res.status(500).json({success: false, message: e.message});
     }
@@ -23,6 +38,29 @@ router.post('/', UserValidator.hasPermission('canCreateGuides'), guideValidator,
         const guide = await GuidesHelper.createGuide(guideData);
         if (guide === null) return res.status(500).json({success: false, message: "Failed to create guide"});
         return res.status(200).json({success: true, message: "Guide created successfully", guide});
+    } catch (e) {
+        return res.status(500).json({success: false, message: e.message});
+    }
+});
+
+router.put('/:id', UserValidator.hasPermission('canManageGuides'), guideValidator, async (req, res) => {
+    const guideData = req.body;
+    guideData.description = guideData.description || "";
+    try{
+        const guide = await GuidesHelper.updateGuide(req.params.id, guideData);
+        if (guide === null) return res.status(500).json({success: false, message: "Failed to update guide"});
+        return res.status(200).json({success: true, message: "Guide updated successfully", guide});
+    } catch (e) {
+        return res.status(500).json({success: false, message: e.message});
+    }
+});
+
+router.delete('/:id', UserValidator.hasPermission('canDeleteGuides'), async (req, res) => {
+    console.log(req.params.id)
+    try{
+        const status = await GuidesHelper.deleteGuide(req.params.id);
+        if (!status) return res.status(500).json({success: false, message: "Failed to delete guide"});
+        return res.status(200).json({success: true, message: "Guide deleted successfully"});
     } catch (e) {
         return res.status(500).json({success: false, message: e.message});
     }

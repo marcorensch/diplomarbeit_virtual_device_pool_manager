@@ -77,6 +77,7 @@ import {
   faEye,
   faCloudArrowDown,
   faUnlink,
+  faEyeSlash,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
@@ -111,7 +112,8 @@ library.add(
   faSearch,
   faRotate,
   faFile,
-  faEye
+  faEye,
+  faEyeSlash
 );
 library.add(faSort, faSortUp, faSortDown, faSlash);
 library.add(

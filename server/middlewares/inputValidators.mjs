@@ -91,7 +91,32 @@ const slideValidator = [
     }
 ];
 
+const guidesSearchValidator = [
+    query('search').optional().escape().trim(),
+    query('limit').optional().isNumeric().withMessage("Limit is optional must be a number"),
+    query('page').optional().isNumeric().withMessage("Offset is optional but must be a number"),
+    query('visibility').optional().custom((value) => {
+        if (value === "true" || value === "false") return true;
+        return false;
+    }).withMessage("Visibility is optional but must be a boolean"),
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) return res.status(400).send({success: false, message: errors.array()[0].msg});
+        next()
+    }
+];
+
 
 const msisdnValidator = [];
 
-export {deviceDataValidator, poolBuilderValidator, msisdnValidator, weblinkValidator, checkoutValidator, deviceSearchValidator, guideValidator, slideValidator};
+export {
+    deviceDataValidator,
+    poolBuilderValidator,
+    msisdnValidator,
+    weblinkValidator,
+    checkoutValidator,
+    deviceSearchValidator,
+    guideValidator,
+    slideValidator,
+    guidesSearchValidator
+};
