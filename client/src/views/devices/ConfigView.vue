@@ -176,6 +176,7 @@
                       <input
                         type="date"
                         class="uk-input"
+                        style="margin-top: 2px"
                         v-model="device.added"
                         :class="{
                           'form-invalid': v$.device.added.$errors.length,
@@ -192,16 +193,15 @@
                   </div>
                   <div>
                     <div class="uk-margin">
-                      <label for="pool-location">Pool Location</label>
                       <div>
-                        <span>{{
+                        <label for="pool-location">Pool Location</label
+                        ><span class="uk-margin-left">{{
                           device.slot_id && device.slot?.label
                             ? device.slot.label
                             : "Not set"
                         }}</span>
-
                         <button
-                          class="uk-button uk-button-danger uk-button-small uk-width-auto"
+                          class="uk-margin-small-left uk-display-inline-block uk-button uk-button-danger uk-button-small uk-width-auto"
                           v-if="device.slot_id"
                           @click="handleRemoveLocationLinkClicked"
                         >
