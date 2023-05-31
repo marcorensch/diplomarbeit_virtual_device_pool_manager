@@ -139,9 +139,9 @@ export default class FileManagerHelper {
                          WHERE image LIKE ?`;
                 break;
             case "documents":
-                query = `UPDATE documents
-                         SET path = REPLACE(path, ?, ?)
-                         WHERE path LIKE ?`;
+                query = `UPDATE device_documents
+                         SET uri = REPLACE(uri, ?, ?)
+                         WHERE uri LIKE ?`;
                 break;
             case "test":
                     return;

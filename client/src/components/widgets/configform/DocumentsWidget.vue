@@ -4,11 +4,18 @@
       <h3 class="uk-card-title">Documents</h3>
     </div>
     <div class="uk-card-body">
-      <ul class="uk-list uk-list-small uk-list-divider">
+      <ul
+        id="documents-list"
+        class="uk-list uk-list-small uk-list-divider"
+        uk-sortable="handler: .document-icon"
+      >
         <template v-for="doc of documents" :key="doc.id">
-          <li class="uk-text-truncate">
+          <li class="uk-text-truncate" :data-uri="doc.uri">
             <div class="uk-display-inline">
-              <font-awesome-icon :icon="['fas', 'file']" />
+              <font-awesome-icon
+                class="document-icon uk-drag"
+                :icon="['fas', 'file']"
+              />
               <span
                 :uk-tooltip="
                   !doc.id
@@ -57,6 +64,16 @@
                       class="uk-preserve-width"
                       style="font-size: 1.2em"
                       :icon="['fas', 'unlink']"
+                    />
+                  </button>
+                  <button
+                    class="uk-button uk-button-default uk-button-small uk-flex uk-flex-middle"
+                    @click="handleDocumentRename(doc)"
+                  >
+                    <font-awesome-icon
+                      class="uk-preserve-width"
+                      style="font-size: 1.2em"
+                      :icon="['fas', 'pencil']"
                     />
                   </button>
                 </div>
@@ -128,7 +145,7 @@ import FileManager from "@/components/FileManager.vue";
 
 export default {
   name: "DocumentsWidget",
-  emits: ["doc-linked", "doc-unlinked"],
+  emits: ["doc-linked", "doc-unlinked", "update-value"],
   props: {
     documents: {
       type: Array,
@@ -148,7 +165,28 @@ export default {
     return {
       fileFromManager: null,
       updateTriggerCounter: 0,
+      saveClicked: false,
     };
+  },
+  mounted() {
+    UIkit.util.on("#documents-manager-modal", "hidden", () => {
+      if (this.saveClicked) {
+        this.saveClicked = false;
+        this.$emit("update-value", this.fileFromManager);
+      } else {
+        this.$emit("update-value", null);
+      }
+      this.fileFromManager = null;
+      this.updateTriggerCounter++;
+    });
+    UIkit.util.on("#documents-list", "moved", (e, sortable) => {
+      for (let i = 0; i < sortable.items.length; i++) {
+        const doc = this.documents.find(
+          (doc) => doc.uri === UIkit.util.data(sortable.items[i], "uri")
+        );
+        if (doc) doc.sorting = i + 1;
+      }
+    });
   },
   methods: {
     show() {
@@ -172,9 +210,14 @@ export default {
       }
     },
     handleDocumentSelected() {
-      this.$emit("doc-linked", this.fileFromManager);
-      this.fileFromManager = null;
-      this.updateTriggerCounter++;
+      this.saveClicked = true;
+    },
+    handleDocumentRename(document) {
+      UIkit.modal.prompt("Rename document", document.name).then((name) => {
+        if (name) {
+          document.name = name;
+        }
+      });
     },
   },
 };

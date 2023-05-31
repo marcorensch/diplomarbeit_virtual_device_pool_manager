@@ -248,7 +248,7 @@
         <div class="uk-width-1-1 uk-width-1-3@s">
           <DocumentsWidget
             :documents="device.documents"
-            @doc-linked="handleDocLinked($event)"
+            @update-value="updateDocList($event)"
             @doc-unlinked="handleDocUnlinked($event)"
           />
         </div>
@@ -469,20 +469,23 @@ export default {
       }
       console.log(this.device.weblinks);
     },
-    handleDocLinked(doc) {
-      if (doc.id) {
-        this.device.documents = this.device.documents.map((d) => {
-          if (d.uri === doc.uri) {
-            d = doc;
+    async updateDocList(doc) {
+      await this.refreshData("documents");
+      if (doc) {
+        if (doc.id) {
+          this.device.documents = this.device.documents.map((d) => {
+            if (d.uri === doc.uri) {
+              d = doc;
+            }
+            return d;
+          });
+        } else {
+          if (this.device.documents.find((d) => d.uri === doc.uri)) {
+            toast.warning("Document already linked");
+            return;
           }
-          return d;
-        });
-      } else {
-        if (this.device.documents.find((d) => d.uri === doc.uri)) {
-          toast.warning("Document already linked");
-          return;
+          this.device.documents.push(doc);
         }
-        this.device.documents.push(doc);
       }
     },
     handleDocUnlinked(doc) {
