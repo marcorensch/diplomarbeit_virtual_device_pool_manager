@@ -152,7 +152,10 @@ export default {
   },
   methods: {
     show() {
-      UIkit.modal("#documents-manager-modal").show();
+      this.updateTriggerCounter++;
+      this.$nextTick(() => {
+        UIkit.modal("#documents-manager-modal").show();
+      });
     },
     buildDocumentUri(doc) {
       return `/public/${doc.uri}`;

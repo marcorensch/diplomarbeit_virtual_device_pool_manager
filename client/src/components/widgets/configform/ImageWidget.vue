@@ -112,15 +112,18 @@ export default {
   methods: {
     registerEvents() {
       UIkit.util.on("#image-manager-modal", "hide", () => {
-        this.$emit("update-value");
+        if (!this.selectedFile) this.$emit("update-value");
       });
+      UIkit.util.on("#image-manager-modal", "show", () => {});
     },
     handleImageChanged() {
       this.$emit("image-changed", this.selectedFile.fullPath);
     },
     handleOpenFileManagerModal() {
       this.updateTriggerCounter++;
-      UIkit.modal("#image-manager-modal").show();
+      this.$nextTick(() => {
+        UIkit.modal("#image-manager-modal").show();
+      });
     },
     handleFileSelected(selectedFile) {
       this.selectedFile = selectedFile;

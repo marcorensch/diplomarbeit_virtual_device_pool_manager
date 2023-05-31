@@ -493,12 +493,7 @@ export default {
   },
   watch: {
     updateTriggerCounter() {
-      this.allSelected = false;
-      this.anyChoosen = false;
-      this.selectedFile = null;
-      this.files.forEach((file) => {
-        file.choosen = false;
-      });
+      this.handleDeSelectAll();
     },
   },
   data() {

@@ -125,7 +125,6 @@ export default class FileManagerHelper {
             throw({status: 500, message: "Error renaming filesystem element"})
         }
         const target = parentFolder.split("/")[0];
-
         let query;
         switch (target) {
             case "images":
@@ -154,7 +153,8 @@ export default class FileManagerHelper {
 
         const databaseModel = new DatabaseModel();
         try {
-            await databaseModel.query(query, values);
+            const status = await databaseModel.query(query, values);
+            return status.affectedRows;
         } catch (e) {
             console.log(e)
             throw({status: 500, message: "Error updating database"})

@@ -385,12 +385,13 @@ export default {
       console.log(this.device);
     },
     handleImageChanged(imageRelativePath) {
+      console.log(imageRelativePath);
       this.device.image = imageRelativePath.length
         ? "/public/" + imageRelativePath
         : "";
     },
     async refreshData(key) {
-      // This method is required to refresh the data in the device object on possible changes in the filemanager
+      // This method is required to refresh the data in the device object on possible renames in the filemanager
       if (!this.id) return;
       const deviceData = await DeviceHelper.loadDevice(this.id);
       if (!deviceData || !deviceData[key]) return;
