@@ -13,9 +13,10 @@
 
 .file-manager {
   .uk-button, .uk-button-small {
-      min-width: 44px;
-      min-height: 40px;
+    min-width: 44px;
+    min-height: 40px;
   }
+
   background-color: #fff;
   border-radius: 0;
   border: 1px solid @color-grey-light;
@@ -27,7 +28,7 @@
   .uk-card-media {
     color: @color-grey-lighter;
 
-    img{
+    img {
       max-width: 50px;
       max-height: 50px;
     }
@@ -119,6 +120,7 @@
   .folder-content {
     height: 70vh !important;
   }
+
   #media-tree-container {
     max-height: calc(70vh + 34px);
     overflow-y: scroll;
@@ -279,26 +281,32 @@ ul.media-tree {
 .folder-controls {
   background: @color-horizon;
 }
-.actions {
-  padding: 4px;
-  .uk-button-group {
-    &:not(:last-of-type) {
-      margin-right: 10px;
 
-      &:after {
-        content: "";
-        display: inline-block;
-        width: 1px;
-        top: 4px;
-        height: 40px;
-        background-color: @color-grey-lighter;
-        margin-left: 10px;
+.file-manager {
+  .actions {
+    padding: 4px;
+
+    .uk-button-group {
+      &:not(:last-of-type) {
+        margin-right: 10px;
+
+        &:after {
+          content: "";
+          display: inline-block;
+          width: 1px;
+          top: 4px;
+          height: 40px;
+          background-color: @color-grey-lighter;
+          margin-left: 10px;
+        }
       }
-    }
-    &:not(:first-of-type) {
+
+      &:not(:first-of-type) {
+      }
     }
   }
 }
+
 .uk-lightbox-items {
   img {
     max-width: 80vw;
@@ -308,24 +316,30 @@ ul.media-tree {
 #mobile-options {
   z-index: 9999;
   color: @color-grey-dark;
+
   .uk-nav-header {
     color: @color-grey-dark;
   }
+
   .uk-nav > li > a,
   .uk-nav .uk-nav-sub > li > a {
     color: @color-primary;
+
     &:hover {
       color: @color-primary;
     }
+
     span {
       color: @color-grey-dark;
     }
   }
+
   .uk-nav > li > a.uk-disabled,
   .uk-nav .uk-nav-sub > li > a.uk-disabled {
     color: @color-grey-light;
   }
 }
+
 @media (min-width: 640px) {
   .nxd-padding-remove-small {
     padding: 0;

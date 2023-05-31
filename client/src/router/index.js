@@ -286,6 +286,48 @@ const routes = [
           }
         },
       },
+      {
+        path: "guideme-manager",
+        name: "guideme-manager",
+        component: () => import("../views/admin/GuideMeView.vue"),
+        beforeEnter: () => {
+          const authStore = useAuthStore();
+          if (
+            authStore.hasPermission("canAccessAdmin") &&
+            authStore.hasPermission("canAccessGuideMeManager")
+          ) {
+            return true;
+          } else {
+            toast.error("You are not allowed to access this page");
+            return { path: "" };
+          }
+        },
+        children: [
+          {
+            path: "",
+            name: "guideme-list",
+            component: () =>
+              import("../views/admin/guideme/GuideMeListView.vue"),
+          },
+          {
+            path: "create",
+            name: "admin-guide-create",
+            component: () =>
+              import("../views/admin/guideme/GuideMeEditorView.vue"),
+          },
+          {
+            path: "edit/:id",
+            name: "admin-guide-edit",
+            component: () =>
+              import("../views/admin/guideme/GuideMeEditorView.vue"),
+          },
+          {
+            path: ":id",
+            name: "admin-guide-item",
+            component: () => import("../views/admin/guideme/GuideView.vue"),
+          },
+        ],
+      },
     ],
   },
 

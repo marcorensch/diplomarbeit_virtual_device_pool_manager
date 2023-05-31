@@ -66,6 +66,32 @@ const deviceSearchValidator = [
     }
 ];
 
+const guideValidator = [
+    body('name').exists().withMessage("Name is required").escape().trim(),
+    body('description').optional().escape().trim(),
+    body('notes').optional().escape().trim(),
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) return res.status(400).send({success: false, message: errors.array()[0].msg});
+        next()
+    }
+];
+
+const slideValidator = [
+    body('name').exists().withMessage("Name is required").escape().trim(),
+    body('uri').exists().withMessage("Content is required").escape().trim(),
+    body('content').exists().withMessage("Content is required").escape().trim(),
+    body('notes').optional().escape().trim(),
+    body('guide_id').exists().withMessage("Guide ID is required").isNumeric().withMessage("Guide ID must be a number"),
+    body('sorting').exists().withMessage("Sorting is required").isNumeric().withMessage("Sorting must be a number"),
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) return res.status(400).send({success: false, message: errors.array()[0].msg});
+        next()
+    }
+];
+
+
 const msisdnValidator = [];
 
-export {deviceDataValidator, poolBuilderValidator, msisdnValidator, weblinkValidator, checkoutValidator, deviceSearchValidator};
+export {deviceDataValidator, poolBuilderValidator, msisdnValidator, weblinkValidator, checkoutValidator, deviceSearchValidator, guideValidator, slideValidator};
