@@ -4,6 +4,7 @@ import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
 import "./registerServiceWorker";
 import router from "./router";
+import VueKonva from "vue-konva";
 
 import { createPinia } from "pinia";
 
@@ -155,6 +156,7 @@ const pinia = createPinia();
 pinia.use(({ store }) => {
   store.router = markRaw(router);
 });
+
 const toastOptions = {
   position: "top-right",
   timeout: 5000,
@@ -167,6 +169,7 @@ createApp(App)
   .component("font-awesome-icon", FontAwesomeIcon)
   .use(router)
   .use(pinia)
+  .use(VueKonva)
   .use(Toast, toastOptions)
   .provide("PWDMINLENGTH", process.env.VUE_APP_USER_PWD_MIN_LENGTH)
   .provide("USERNAMEMINLENGTH", process.env.VUE_APP_USER_NAME_MIN_LENGTH)
