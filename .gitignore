@@ -1,7 +1,7 @@
 uploads
-server/public/documents
-server/public/images
-server/public/guides
+/server/public/documents/
+/server/public/images/
+/server/public/guides/
 .idea
 node_modules
 
@@ -109,3 +109,5 @@ dist
 
 # TernJS port file
 .tern-port
+
+
