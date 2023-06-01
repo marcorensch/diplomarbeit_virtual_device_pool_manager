@@ -40,6 +40,7 @@
                 <div class="uk-margin">
                   <input
                     class="uk-input"
+                    tabindex="2"
                     type="password"
                     name="password"
                     placeholder="Password"
@@ -55,7 +56,7 @@
               >
                 <div>
                   <button
-                    class="uk-button uk-button-secondary uk-width-1-1"
+                    class="uk-button uk-button-secondary uk-width-1-1 uk-hidden"
                     @click="handleRequestAccountClicked"
                     type="button"
                   >
@@ -64,6 +65,7 @@
                 </div>
                 <div>
                   <button
+                    tabindex="3"
                     class="uk-button uk-button-primary uk-width-1-1"
                     type="submit"
                   >

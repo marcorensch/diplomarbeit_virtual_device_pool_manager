@@ -11,7 +11,7 @@
           'uk-active active': isActive || isExactActive,
         }"
       >
-        <a :href="href" @click="navigate"><span>Devices</span></a>
+        <a tabindex="10" :href="href" @click="navigate"><span>Devices</span></a>
       </li>
     </router-link>
     <router-link
@@ -26,7 +26,9 @@
           'uk-active active': isActive || isExactActive,
         }"
       >
-        <a :href="href" @click="navigate"><span>Manufacturers</span></a>
+        <a tabindex="11" :href="href" @click="navigate"
+          ><span>Manufacturers</span></a
+        >
       </li>
     </router-link>
     <router-link
@@ -41,7 +43,9 @@
           'uk-active active': isActive || isExactActive,
         }"
       >
-        <a :href="href" @click="navigate"><span>Administration</span></a>
+        <a tabindex="12" :href="href" @click="navigate"
+          ><span>Administration</span></a
+        >
       </li>
     </router-link>
   </ul>

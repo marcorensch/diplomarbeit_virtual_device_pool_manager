@@ -39,7 +39,7 @@
             <ul
               class="uk-navbar-nav main-nav uk-height-1-1 uk-flex uk-flex-middle"
             >
-              <li id="user-icon-link" v-if="auth.isLoggedIn">
+              <li id="user-icon-link" v-if="auth.isLoggedIn" tabindex="20">
                 <div class="user-icon-container">
                   <div class="uk-position-center">
                     <font-awesome-icon
@@ -66,18 +66,17 @@
                             'uk-active active': isExactActive,
                           }"
                         >
-                          <a :href="href" @click="navigate">
+                          <a :href="href" @click="navigate" tabindex="21">
                             <div class="arrow"></div>
                             <span>Settings</span>
                           </a>
                         </li>
                       </router-link>
                       <li id="logout-link">
-                        <a href="#" @click.prevent="logout">
+                        <a href="#" @click.prevent="logout" tabindex="22">
                           <span>Logout</span>
                         </a>
                       </li>
-                      <li><a href="#">Item</a></li>
                     </ul>
                   </div>
                 </div>
