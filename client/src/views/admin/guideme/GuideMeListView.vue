@@ -176,10 +176,13 @@ export default {
     async getGuides() {
       let query = `?limit=${this.page_size}&page=${this.page}`;
       query += this.search_guide.length ? `&search=${this.search_guide}` : "";
-      const response = await axios.get(`/api/admin/guides${query}`);
-      this.guides = response.data.guides;
-      this.guides_total_count = response.data.total_count;
-      console.log(this.guides_total_count);
+      try {
+        const response = await axios.get(`/api/admin/guides${query}`);
+        this.guides = response.data.guides;
+        this.guides_total_count = response.data.total_count;
+      } catch (error) {
+        console.log(error);
+      }
     },
     handlePageSizeChange(page_size) {
       this.triggerCounter++;

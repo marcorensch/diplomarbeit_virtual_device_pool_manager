@@ -102,13 +102,15 @@ import ControlsFooterWidget from "@/components/ControlsFooterWidget.vue";
 import axios from "axios";
 import { useAuthStore } from "@/stores/auth";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { useToast } from "vue-toastification";
 
 export default {
   name: "GuideMeEditorView",
   components: { FontAwesomeIcon, ControlsFooterWidget },
   setup() {
     const auth = useAuthStore();
-    return { auth };
+    const toast = useToast();
+    return { auth, toast };
   },
   data() {
     return {
@@ -133,17 +135,26 @@ export default {
     },
     async handleDeleteClicked() {
       if (!this.guide.id) return;
-      const result = await axios.delete(`/api/admin/guides/${this.guide.id}`);
-      console.log("handleDeleteClicked", result);
-      this.$router.push({ name: "guides" });
+      try {
+        await axios.delete(`/api/admin/guides/${this.guide.id}`);
+        this.$router.push({ name: "guides" });
+      } catch (error) {
+        this.toast.error("Unable to delete guide");
+        console.log("handleDeleteClicked", error);
+      }
     },
     async handleSaveClicked() {
-      if (this.guide.id) {
-        await axios.put(`/api/admin/guides/${this.guide.id}`, this.guide);
-      } else {
-        await axios.post("/api/admin/guides", this.guide);
+      try {
+        if (this.guide.id) {
+          await axios.put(`/api/admin/guides/${this.guide.id}`, this.guide);
+        } else {
+          await axios.post("/api/admin/guides", this.guide);
+        }
+        this.$router.push({ name: "guides" });
+      } catch (error) {
+        this.toast.error("Unable to save guide");
+        console.log("handleSaveClicked", error);
       }
-      this.$router.push({ name: "guides" });
     },
   },
 };

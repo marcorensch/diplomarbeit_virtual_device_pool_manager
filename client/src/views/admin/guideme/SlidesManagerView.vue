@@ -91,8 +91,12 @@ export default {
   methods: {
     registerEvents() {},
     async loadSlides() {
-      const response = await axios.get(`/api/admin/guides/${this.id}/slides`);
-      this.slides = response.data.slides;
+      try {
+        const response = await axios.get(`/api/admin/guides/${this.id}/slides`);
+        this.slides = response.data.slides;
+      } catch (err) {
+        console.log(err);
+      }
     },
     handleCancelClicked() {
       this.$router.push({ name: "guides" });
@@ -104,15 +108,24 @@ export default {
       const slide = new GuideMeSlideItem();
       slide.guide_id = this.id;
       slide.name = `Slide ${this.slides.length + 1}`;
-      const response = await axios.post(
-        `/api/admin/guides/${this.id}/slides`,
-        slide
-      );
-      slide.id = response.data.id;
-      this.slides.push(slide);
+      try {
+        const response = await axios.post(
+          `/api/admin/guides/${this.id}/slides`,
+          slide
+        );
+        slide.id = response.data.id;
+        this.slides.push(slide);
+      } catch (err) {
+        this.toast.error("Failed to create new slide");
+        console.log(err);
+      }
     },
     updateSlide(slide) {
-      axios.put(`/api/admin/guides/${this.id}/slides/${slide.id}`, slide);
+      try {
+        axios.put(`/api/admin/guides/${this.id}/slides/${slide.id}`, slide);
+      } catch (err) {
+        console.log(err);
+      }
     },
   },
 };
