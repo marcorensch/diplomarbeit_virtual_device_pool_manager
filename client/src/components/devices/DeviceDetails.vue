@@ -234,7 +234,7 @@
           </div>
           <div
             class="uk-position-fixed uk-position-bottom-right device-edit-container"
-            v-if="canEditDevice"
+            v-if="showEditBtn"
           >
             <div
               class="nxd-background-horizon uk-padding-small uk-flex uk-flex-right"
@@ -502,12 +502,13 @@ export default {
       UIkit.modal(modalRef).hide();
     },
     canEditDevice() {
-      return (
-        (this.authStore.hasPermission("canUpdateDevices") &&
-          this.device.slot_id) ||
-        (this.authStore.hasPermission("canUpdateVirtualDevices") &&
-          !this.device.slot_id)
-      );
+      if (this.device.slot_id) {
+        console.log(!!this.authStore.hasPermission("canUpdateDevices"));
+        return !!this.authStore.hasPermission("canUpdateDevices");
+      } else {
+        console.log(!!this.authStore.hasPermission("canUpdateVirtualDevices"));
+        return !!this.authStore.hasPermission("canUpdateVirtualDevices");
+      }
     },
     createDateString(date) {
       return new Date(date).toLocaleDateString(navigator.language, {
