@@ -226,7 +226,6 @@ export default {
         times = 1;
       }
       for (let i = 0; i < times; ) {
-        console.log("addRow", i);
         await this.addRow(i);
         i++;
       }
