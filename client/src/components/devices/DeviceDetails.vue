@@ -533,7 +533,6 @@ export default {
       });
     },
     show(device) {
-      console.log(device);
       this.checkedOutByString =
         device.checkout_fullname.trim().length > 0
           ? device.checkout_fullname.trim()
