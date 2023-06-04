@@ -97,13 +97,11 @@ export const useBuilderItemStore = defineStore("builderItem", {
       try {
         await axios.delete(`/api/admin/poolbuilder/items/${item.id}`);
         toast.success(`${itemCategoryName} deleted`);
-        return true;
       } catch (error) {
         toast.error(
           `Something went wrong while deleting the ${itemCategoryName}`
         );
         console.log(error);
-        return false;
       }
     },
 

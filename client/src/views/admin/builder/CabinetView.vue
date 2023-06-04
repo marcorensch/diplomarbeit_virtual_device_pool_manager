@@ -247,6 +247,7 @@ export default {
     },
     async handleModalDeleteClicked() {
       await this.builderItemStore.deleteItem(this.currentSelectedItem);
+      this.rows = await this.builderItemStore.getChildItems(this.rowCategoryId);
       UIkit.modal("#config-modal").hide();
       this.currentSelectedItem = null;
     },

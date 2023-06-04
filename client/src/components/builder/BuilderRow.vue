@@ -269,9 +269,9 @@ export default {
     },
     async handleModalDeleteClicked() {
       await this.builderItemStore.deleteItem(this.currentSelectedItem);
+      await this.getSlots();
       this.currentSelectedItem = null;
       UIkit.modal("#slot-config-modal-" + this.builderRow.id).hide();
-      await this.getSlots();
     },
   },
 };

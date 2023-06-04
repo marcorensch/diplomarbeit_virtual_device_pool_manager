@@ -314,13 +314,11 @@ export default {
           "<h3>Sure?</h3>Are you sure you want to delete this location and all its structure? This cannot be undone. Linked devices will be kept but unlinked from this location.",
           { stack: true }
         )
-        .then(() => {
-          const status = this.builderItemStore.deleteItem(this.currentLocation);
-          if (status) {
-            this.locations = this.locations.filter(
-              (location) => location.id !== this.currentLocation.id
-            );
-          }
+        .then(async () => {
+          await this.builderItemStore.deleteItem(this.currentLocation);
+          this.locations = await this.builderItemStore.loadItems(
+            this.locationCategoryId
+          );
           this.modalSaveOrDeleteClicked = true;
           UIkit.modal("#location-config-modal").hide();
         });
