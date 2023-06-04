@@ -22,7 +22,14 @@ const poolBuilderValidator = [
     body('parent_id').optional({checkFalsy: true}).isNumeric().withMessage("Parent must be a number"),
     body('description').optional().escape().trim(),
     body('hidden').optional().escape().trim(),
-    body('params').optional().escape().trim(),
+    body('params').optional().trim().custom((value) => {
+        try {
+            JSON.parse(value);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }).withMessage("Params must be a valid JSON string"),
     (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) return res.status(400).send({success: false, message: errors.array()[0].msg});

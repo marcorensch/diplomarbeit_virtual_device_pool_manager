@@ -4,7 +4,7 @@ export default class BuilderItem {
         this.name = null;
         this.description = "";
         this.hidden = "";
-        this.params = "";
+        this.params = {};
         this.sorting = 0;
         this.category_id = null;
         this.parent_id = null;
@@ -20,7 +20,7 @@ export default class BuilderItem {
             try {
                 this.params = JSON.parse(this.params);
             }catch (e) {
-                console.log(e)
+                console.log(e);
             }
         }
     }
