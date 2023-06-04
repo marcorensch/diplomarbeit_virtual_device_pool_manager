@@ -50,7 +50,7 @@
                         >
                           <span class="uk-text-meta">Checked out by you</span>
                           <button
-                            class="uk-button uk-button-small uk-button-secondary uk-display-inline-block uk-width-auto"
+                            class="uk-margin-small-left uk-button uk-button-small uk-button-secondary uk-display-inline-block uk-width-auto"
                             @click="showCheckInConfirm"
                           >
                             CheckIn
@@ -79,10 +79,7 @@
                             >
                               <div class="uk-text-bold nxd-text-navy">
                                 Checked out by
-                                {{
-                                  device.checkout_fullname ||
-                                  device.checkout_username
-                                }}
+                                {{ checkedOutByString }}
                               </div>
                               <div>
                                 {{ createDateTimeString(device.checkout_time) }}
@@ -118,6 +115,7 @@
                           >Available</span
                         >
                         <button
+                          v-if="canSeeCheckoutOption()"
                           class="uk-button uk-button-small uk-button-secondary uk-display-inline-block uk-width-auto"
                           @click="showCheckoutModal"
                         >
@@ -419,6 +417,7 @@ export default {
       device: null,
       imeis: [],
       showEditBtn: false,
+      checkedOutByString: "",
       linkForm: {
         name: "",
         uri: "",
@@ -457,6 +456,10 @@ export default {
   },
   mounted() {},
   methods: {
+    canSeeCheckoutOption() {
+      if (!this.authStore.getUser) return false;
+      return !!this.authStore.hasPermission("canCheckoutInDevices");
+    },
     showCheckInConfirm() {
       UIkit.modal
         .confirm(
@@ -466,9 +469,14 @@ export default {
             stack: true,
           }
         )
-        .then(() => {
-          this.handleCheckInConfirmed();
-        });
+        .then(
+          () => {
+            this.handleCheckInConfirmed();
+          },
+          () => {
+            //cancel confirmation
+          }
+        );
     },
     showCheckoutModal() {
       const modalRef = this.$refs[`checkout-modal-${this.device.id}`];
@@ -525,6 +533,11 @@ export default {
       });
     },
     show(device) {
+      console.log(device);
+      this.checkedOutByString =
+        device.checkout_fullname.trim().length > 0
+          ? device.checkout_fullname.trim()
+          : device.checkout_username;
       this.imeis = [];
       this.device = device;
       this.showEditBtn = this.canEditDevice();
