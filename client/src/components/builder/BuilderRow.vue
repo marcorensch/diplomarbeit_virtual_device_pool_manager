@@ -219,7 +219,6 @@ export default {
   },
   methods: {
     async getSlots() {
-      console.log(this.builderRow.id, this.builderRow.category_id);
       this.slots = await this.builderItemStore.getChildItems(
         this.slotCategoryId,
         this.builderRow.id

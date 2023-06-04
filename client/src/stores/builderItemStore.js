@@ -63,7 +63,6 @@ export const useBuilderItemStore = defineStore("builderItem", {
       }
     },
     async saveItem(item = null) {
-      console.log(item);
       if (!item) item = this.item;
       const itemCategoryName =
         builderCategoriesStore.findCategoryNameById(item.category_id) || "item";
