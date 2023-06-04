@@ -503,10 +503,8 @@ export default {
     },
     canEditDevice() {
       if (this.device.slot_id) {
-        console.log(!!this.authStore.hasPermission("canUpdateDevices"));
         return !!this.authStore.hasPermission("canUpdateDevices");
       } else {
-        console.log(!!this.authStore.hasPermission("canUpdateVirtualDevices"));
         return !!this.authStore.hasPermission("canUpdateVirtualDevices");
       }
     },
@@ -535,7 +533,6 @@ export default {
       } catch (e) {
         console.log(e);
       }
-      console.log(device);
       this.$nextTick(() => {
         UIkit.offcanvas("#device-details").show();
       });
@@ -565,7 +562,6 @@ export default {
     async handleSaveLinkClicked() {
       const formIsValid = await this.v$.$validate();
       if (!formIsValid) return;
-      console.log(this.device.weblinks);
       const storeWeblink = await axios.post(
         `/api/devices/${this.device.id}/weblinks`,
         this.linkForm
