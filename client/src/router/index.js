@@ -287,8 +287,8 @@ const routes = [
         },
       },
       {
-        path: "guideme-manager",
-        name: "guideme-manager",
+        path: "guides",
+        name: "",
         component: () => import("../views/admin/GuideMeView.vue"),
         beforeEnter: () => {
           const authStore = useAuthStore();
@@ -326,6 +326,11 @@ const routes = [
             name: "admin-guide-slides",
             component: () =>
               import("../views/admin/guideme/SlidesManagerView.vue"),
+          },
+          {
+            path: "slides/:id",
+            name: "admin-guide-slide-edit",
+            component: () => import("../views/admin/guideme/EditSlide.vue"),
           },
         ],
       },

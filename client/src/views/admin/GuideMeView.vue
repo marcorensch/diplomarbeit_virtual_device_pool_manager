@@ -2,7 +2,7 @@
   <div class="uk-section uk-section-small builder-view">
     <div class="uk-container">
       <div>
-        <h4 class="uk-margin-remove-bottom">GuideMe Manager</h4>
+        <h1 class="uk-h4 uk-margin-remove-bottom">GuideMe Manager</h1>
       </div>
       <div>
         <router-view v-slot="{ Component, route }">

@@ -1,7 +1,17 @@
 <template>
   <div class="uk-section user-list-view uk-padding-remove">
     <div class="uk-container nxd-padding-xlarge-bottom">
-      <h1>Configure Slides</h1>
+      <div class="uk-grid-small uk-flex uk-flex-middle" uk-grid>
+        <div>
+          <router-link :to="{ name: 'guides' }" class="go-back-link">
+            <font-awesome-icon
+              class="uk-h2 uk-preserve-width uk-margin-remove-bottom"
+              :icon="['fas', 'arrow-left']"
+            />
+          </router-link>
+        </div>
+        <div><h2 class="uk-h2">Configure Slides</h2></div>
+      </div>
 
       <div class="uk-margin">
         <div v-if="!slides.length">
@@ -25,10 +35,18 @@
           <div v-for="(slide, index) of slides" :key="slide.id" :id="slide.id">
             <div class="">
               <div
-                class="uk-margin-small-top uk-card uk-card-default uk-card-body"
+                class="uk-margin-small-top uk-card uk-card-default uk-card-body uk-position-relative"
               >
                 {{ index }}
                 {{ slide }}
+                <router-link
+                  :to="{
+                    name: 'admin-guide-slide-edit',
+                    params: { id: slide.id },
+                    query: { gid: id },
+                  }"
+                  class="uk-position-cover"
+                ></router-link>
               </div>
             </div>
           </div>

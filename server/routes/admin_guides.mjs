@@ -4,7 +4,8 @@ import {guidesSearchValidator, guideValidator, slideValidator} from "../middlewa
 import GuidesHelper from "../helpers/GuidesHelper.mjs";
 
 const router = express.Router();
-router.use(UserValidator.hasPermission("canManageGuides"))
+router.use(UserValidator.hasPermission("canManageGuides"));
+
 
 router.get('/', guidesSearchValidator, async (req, res) => {
     const limit = req.query.limit ? parseInt(req.query.limit) : 20;
@@ -74,6 +75,19 @@ router.get('/:guide_id/slides', async (req, res) => {
         const slides = await GuidesHelper.getSlides(req.params.guide_id);
         if (slides === null) return res.status(500).json({success: false, message: "Failed to get slides"});
         return res.status(200).json({success: true, message: "Slides retrieved successfully", slides});
+    }catch (e) {
+        return res.status(500).json({success: false, message: e.message});
+    }
+});
+
+router.get('/:guide_id/slides/:id', async (req, res) => {
+    console.log("GET SLIDE")
+    const guideId = req.params.guide_id; // Guide ID wird aktuell nicht verwendet
+    const slideId = req.params.id;
+    try {
+        const slide = await GuidesHelper.getSlide(slideId);
+        if (slide === null) return res.status(500).json({success: false, message: "Failed to get slide"});
+        return res.status(200).json({success: true, message: "Slide retrieved successfully", slide});
     }catch (e) {
         return res.status(500).json({success: false, message: e.message});
     }

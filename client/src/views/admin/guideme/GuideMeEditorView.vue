@@ -1,8 +1,20 @@
 <template>
   <div class="uk-section user-list-view uk-padding-remove">
     <div class="uk-container nxd-padding-xlarge-bottom">
-      <h1 v-if="guide.id">Edit Guide {{ guide.name }}</h1>
-      <h1 v-else>Create New Guide</h1>
+      <div class="uk-grid-small uk-flex uk-flex-middle" uk-grid>
+        <div>
+          <router-link :to="{ name: 'guides' }" class="go-back-link">
+            <font-awesome-icon
+              class="uk-h2 uk-preserve-width uk-margin-remove-bottom"
+              :icon="['fas', 'arrow-left']"
+            />
+          </router-link>
+        </div>
+        <div>
+          <h2 class="uk-h1" v-if="guide.id">Edit Guide {{ guide.name }}</h2>
+          <h2 class="uk-h1" v-else>Create New Guide</h2>
+        </div>
+      </div>
       <div class="uk-margin uk-card uk-card-default">
         <div class="uk-card-header">
           <h3 class="uk-card-title">Information</h3>

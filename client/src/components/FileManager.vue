@@ -665,7 +665,7 @@ export default {
             file.data.type.toLowerCase()
           );
       } catch (e) {
-        console.log(e);
+        // console.log(e);
       }
       return isImage;
     },

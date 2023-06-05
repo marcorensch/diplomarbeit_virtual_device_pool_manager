@@ -68,6 +68,14 @@ export default class GuidesHelper {
         return await database.query(query, [guide_id]);
     }
 
+    static async getSlide(id) {
+        const database = new DatabaseModel();
+        const query = "SELECT * FROM guide_slides WHERE id = ? LIMIT 1";
+        const slide = await database.query(query, [id]);
+        if (slide.length === 0) return null;
+        return slide[0];
+    }
+
     static async createSlide(slide) {
         const database = new DatabaseModel();
         const query = "INSERT INTO guide_slides (guide_id, name, content, notes, uri, sorting) VALUES (?, ?, ?, ?, ?, ?)";

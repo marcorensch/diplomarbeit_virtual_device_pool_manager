@@ -83,7 +83,7 @@ export default {
         },
         {
           label: "GuideMe Manager",
-          path: "/admin/guideme-manager",
+          path: "/admin/guides",
           icon: "book",
           permission: "canAccessGuideMeManager",
         },

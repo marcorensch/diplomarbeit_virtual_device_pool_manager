@@ -53,7 +53,7 @@ export default {
         {
           label: "GuideMe Manager",
           icon: "fas fa-book",
-          path: "/admin/guideme-manager",
+          path: "/admin/guides",
           requiredPermissions: ["canAccessGuideMeManager"],
         },
       ],
