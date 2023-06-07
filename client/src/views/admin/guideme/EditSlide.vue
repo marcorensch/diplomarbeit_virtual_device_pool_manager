@@ -3,7 +3,7 @@
     class="uk-section user-list-view uk-padding-remove"
     v-if="guide && slide"
   >
-    <div class="uk-container">
+    <div class="uk-container nxd-no-select">
       <div class="uk-grid-small uk-flex uk-flex-middle" uk-grid>
         <div>
           <router-link
@@ -22,18 +22,84 @@
         </div>
       </div>
 
-      <div class="uk-margin">
-        <div
-          id="stage-container"
-          uk-height-viewport="expand:true"
-          class="uk-position-relative"
-          style="background: transparent"
+      <div class="uk-button-group">
+        <button
+          class="uk-button uk-button-default"
+          :class="{ 'uk-button-primary': stageSize === 'small' }"
+          @click="handleChangeStageSize('small')"
         >
-          <div class="uk-position-cover">
-            <img :src="'/public' + slide.uri" alt="Slide Image" />
+          33%
+        </button>
+        <button
+          class="uk-button uk-button-default"
+          :class="{ 'uk-button-primary': stageSize === 'half' }"
+          @click="handleChangeStageSize('half')"
+        >
+          50%
+        </button>
+        <button
+          class="uk-button uk-button-default"
+          :class="{ 'uk-button-primary': stageSize === 'full' }"
+          @click="handleChangeStageSize('full')"
+        >
+          100%
+        </button>
+      </div>
+      <div class="uk-margin">
+        <div id="stage-container" class="uk-position-relative">
+          <div
+            id="stage-inner"
+            ref="stageInner"
+            class="uk-position-relative"
+            :class="[
+              { 'uk-width-1-1': stageSize === 'full' },
+              { 'uk-width-1-2': stageSize === 'half' },
+              { 'uk-width-1-3': stageSize === 'small' },
+            ]"
+          >
+            <img
+              :src="'/public' + slide.uri"
+              alt=""
+              ref="slideImage"
+              id="slideImage"
+            />
+            <div
+              class="uk-position-cover"
+              style="background: rgba(183, 128, 28, 0.5)"
+            >
+              <v-stage
+                ref="stage"
+                :config="configKonva"
+                @mousedown="handleStageMouseDown"
+                @touchstart="handleStageMouseDown"
+              >
+                <v-layer ref="layer">
+                  <template v-for="item in stageItems" :key="item.id">
+                    <v-circle
+                      v-if="item.type === 'circle'"
+                      :config="item"
+                      @transformend="handleTransformEnd"
+                      @dragstart="handleDragStart($event, item)"
+                      @dragend="handleDragEnd($event, item)"
+                    ></v-circle>
+                    <v-rect
+                      v-if="item.type === 'rectangle'"
+                      :config="item"
+                      @transformend="handleTransformEnd"
+                      @dragstart="handleDragStart($event, item)"
+                      @dragend="handleDragEnd($event, item)"
+                    ></v-rect>
+                  </template>
+                  <v-transformer ref="transformer" />
+                </v-layer>
+              </v-stage>
+            </div>
           </div>
-          <div class="uk-position-top-right uk-box-shadow-large nxd-no-select">
-            <div class="uk-card uk-card-default uk-card-small uk-width-medium">
+          <div class="uk-position-top-right">
+            <div
+              class="uk-card uk-card-default uk-card-small uk-width-medium uk-box-shadow-large"
+              uk-sticky="end: !#stage-container; offset: 80"
+            >
               <div
                 class="uk-padding-small uk-position-relative nxd-cursor-pointer"
                 @click="showControls = !showControls"
@@ -67,19 +133,29 @@
                         <div id="sliderVisualElements">
                           <div
                             class="uk-margin-small-top"
-                            v-for="(el, index) of elements"
+                            v-for="(el, index) of stageItems"
                             :key="index"
                           >
                             {{ el.name }}
                           </div>
                         </div>
                         <div class="uk-margin-small-top uk-flex uk-flex-right">
-                          <button
-                            class="uk-button uk-button-small uk-button-secondary"
-                            @click="handleAddVisualElementClicked"
-                          >
-                            Add Element
-                          </button>
+                          <div class="uk-button-group">
+                            <button
+                              class="uk-button uk-button-small uk-button-secondary"
+                              @click="handleAddVisualElementClicked('circle')"
+                            >
+                              Add Circle
+                            </button>
+                            <button
+                              class="uk-button uk-button-small uk-button-secondary"
+                              @click="
+                                handleAddVisualElementClicked('rectangle')
+                              "
+                            >
+                              Add Rectangle
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </li>
@@ -159,16 +235,8 @@ import axios from "axios";
 import { useToast } from "vue-toastification";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import FileManager from "@/components/FileManager.vue";
-
-class sliderVisualElement {
-  constructor() {
-    this.id = null;
-    this.sorting = null;
-    this.description = "";
-    this.type = "";
-    this.name = "Element";
-  }
-}
+import Konva from "konva";
+import { v4 as uuidv4 } from "uuid";
 
 export default {
   name: "EditSlide",
@@ -179,12 +247,20 @@ export default {
   },
   data() {
     return {
+      stageSize: "full",
+      selectedShapeName: "",
+      stageItems: [],
+      configKonva: {
+        width: 900,
+        height: 900,
+        fill: "rgba(131,35,35,0.5)",
+      },
       guide: null,
       slide: null,
       showControls: true,
-      elements: [],
       updateTriggerCounter: 0,
       fm_file: null,
+      isDragging: false,
     };
   },
   mounted() {
@@ -198,18 +274,39 @@ export default {
     }
     this.getGuide();
     this.getSlide();
+    this.load();
   },
   methods: {
     handleImageSelected() {
-      console.log("Image Selected");
-      const path = this.fm_file.fullPath;
-      this.slide.uri = path;
+      this.slide.uri = this.fm_file.fullPath;
     },
     handleFileSelected(file) {
       this.fm_file = file;
     },
-    handleAddVisualElementClicked() {
-      this.elements.push(new sliderVisualElement());
+    handleAddVisualElementClicked(type) {
+      console.log("Add Visual Element Clicked " + type);
+      const name = uuidv4().replace(/-/g, "");
+      const label = `${type.charAt(0).toUpperCase() + type.slice(1)} ${
+        this.stageItems.length + 1
+      }`;
+      const config = {
+        type,
+        name,
+        label,
+        fill: Konva.Util.getRandomColor(),
+        x: 100,
+        y: 100,
+        draggable: true,
+      };
+      if (type === "rectangle") {
+        config.width = 100;
+        config.height = 100;
+        config.cornerRadius = 6;
+      }
+      if (type === "circle") {
+        config.radius = 50;
+      }
+      this.stageItems.push(config);
     },
     handleSelectImageClicked() {
       console.log("Select Image Clicked");
@@ -236,22 +333,135 @@ export default {
         console.log(err);
       }
     },
+    load() {
+      const data = localStorage.getItem("storage");
+      if (data) this.stageItems = JSON.parse(data);
+      console.log(this.stageItems);
+    },
     async saveSlide() {
-      try {
-        await axios.put(
-          `/api/admin/guides/${this.$route.query.gid}/slides/${this.$route.params.id}`,
-          this.slide
-        );
-        this.$router.push({
-          name: "admin-guide-slides",
-          params: { id: this.$route.query.gid },
-        });
-      } catch (err) {
-        console.log(err);
+      localStorage.setItem("storage", JSON.stringify(this.stageItems));
+      // try {
+      //   await axios.put(
+      //     `/api/admin/guides/${this.$route.query.gid}/slides/${this.$route.params.id}`,
+      //     this.slide
+      //   );
+      //   this.$router.push({
+      //     name: "admin-guide-slides",
+      //     params: { id: this.$route.query.gid },
+      //   });
+      // } catch (err) {
+      //   console.log(err);
+      // }
+    },
+    // Transformer
+    handleTransformEnd(e) {
+      console.log("handleTransformEnd");
+      // shape is transformed, let us save new attrs back to the node
+      // find element in our state
+      const si = this.stageItems.find(
+        (item) => item.name === this.selectedShapeName
+      );
+
+      const newScaleX = e.target.scaleX();
+      const newScaleY = e.target.scaleY();
+      e.target.scaleX(1);
+      e.target.scaleY(1);
+      const newWidth = Math.floor(e.target.width() * newScaleX);
+      const newHeight = Math.floor(e.target.height() * newScaleY);
+
+      // update the state
+      si.x = e.target.x();
+      si.y = e.target.y();
+      si.rotation = e.target.rotation();
+      si.scaleX = 1;
+      si.scaleY = 1;
+      si.width = newWidth;
+      si.height = newHeight;
+      si.cornerRadius = 10;
+      si.percentages = this.calculatePercentages(si);
+
+      // change fill
+      si.fill = Konva.Util.getRandomColor();
+    },
+    handleStageMouseDown(e) {
+      // clicked on stage - clear selection
+      if (e.target === e.target.getStage()) {
+        this.selectedShapeName = "";
+        this.updateTransformer();
+        return;
       }
+
+      // clicked on transformer - do nothing
+      const clickedOnTransformer =
+        e.target.getParent().className === "Transformer";
+      if (clickedOnTransformer) {
+        return;
+      }
+
+      // find clicked rect by its name
+      const name = e.target.name();
+      const rect = this.stageItems.find((r) => r.name === name);
+      if (rect) {
+        this.selectedShapeName = name;
+      } else {
+        this.selectedShapeName = "";
+      }
+      this.updateTransformer();
+    },
+    updateTransformer() {
+      // here we need to manually attach or detach Transformer node
+      const transformerNode = this.$refs.transformer.getNode();
+      const stage = transformerNode.getStage();
+      const { selectedShapeName } = this;
+
+      const selectedNode = stage.findOne("." + selectedShapeName);
+      // do nothing if selected node is already attached
+      if (selectedNode === transformerNode.node()) {
+        return;
+      }
+
+      if (selectedNode) {
+        // attach to another node
+        transformerNode.nodes([selectedNode]);
+      } else {
+        // remove transformer
+        transformerNode.nodes([]);
+      }
+    },
+    handleDragStart(e, item) {},
+    handleDragEnd(e, item) {
+      // find item
+      const si = this.stageItems.find((si) => si.name === item.name);
+      si.x = e.target.x();
+      si.y = e.target.y();
+    },
+    handleChangeStageSize(keyword) {
+      this.stageSize = keyword; // Set keyword to trigger change in GUI
+      this.$nextTick(() => {
+        // Wait for DOM update and get new size
+        const imageDom = document.getElementById("slideImage");
+        this.configKonva.width = imageDom.offsetWidth;
+        this.configKonva.height = imageDom.offsetHeight;
+      });
+    },
+    calculatePercentages(stageItem) {
+      if (!stageItem) {
+        this.toast.error("Error calculating percentages");
+        return;
+      }
+      return {
+        x: (stageItem.x / this.configKonva.width) * 100,
+        y: (stageItem.y / this.configKonva.height) * 100,
+        width: (stageItem.width / this.configKonva.width) * 100,
+        height: (stageItem.height / this.configKonva.height) * 100,
+      };
     },
   },
 };
 </script>
 
-<style scoped></style>
+<style lang="less" scoped>
+img {
+  width: 100%;
+}
+</style>
