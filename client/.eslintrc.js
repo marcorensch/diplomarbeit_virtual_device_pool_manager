@@ -24,6 +24,11 @@ module.exports = {
       env: {
         mocha: true,
       },
+      rules: {
+        "no-unused-expressions": "off",
+        "chai-friendly/no-unused-expressions": "error",
+        "max-len": "off",
+      },
     },
   ],
 };
