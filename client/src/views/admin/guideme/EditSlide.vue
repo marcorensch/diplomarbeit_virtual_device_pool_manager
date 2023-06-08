@@ -23,16 +23,13 @@
       </div>
 
       <div class="uk-margin">
-        <div id="stage-container" class="uk-position-relative uk-padding uk-background-muted uk-border-rounded nxd-min-height-large">
-          <div class="uk-position-top-right">
-            <div
-                class="uk-card uk-card-default uk-card-small uk-width-medium uk-box-shadow-large"
-                uk-sticky="end: !#stage-container; offset: 80"
-            >
-              <div
-                  class="uk-padding-small uk-position-relative nxd-cursor-pointer"
-                  @click="showControls = !showControls"
-              >
+        <div id="stage-container"
+             class="uk-position-relative uk-padding uk-background-muted uk-border-rounded nxd-min-height-large">
+          <div id="controls-container" class="uk-position-top-right">
+            <div class="uk-card uk-card-default uk-card-small uk-width-medium uk-box-shadow-large"
+                 uk-sticky="end: !#stage-container; offset: 80">
+              <div class="uk-padding-small uk-position-relative nxd-cursor-pointer"
+                   @click="showControls = !showControls">
                 <h4 class="uk-h4 uk-margin-remove-bottom">Controls</h4>
                 <div class="uk-position-center-right uk-margin-right">
                   <font-awesome-icon
@@ -50,22 +47,15 @@
                       <a class="uk-accordion-title" href="#">Stage</a>
                       <div class="uk-accordion-content uk-flex uk-flex-center">
                         <div class="uk-button-group">
-                          <button
-                              class="uk-button uk-button-default uk-button-small"
-                              :class="{
-                              'uk-button-primary': stageSize === '1-4',
-                            }"
-                              @click="handleChangeStageSize('1-4')"
+                          <button class="uk-button uk-button-default uk-button-small"
+                                  :class="{'uk-button-primary': stageSize === '1-4',}"
+                                  @click="handleChangeStageSize('1-4')"
                           >
                             25%
                           </button>
-                          <button
-                              class="uk-button uk-button-default uk-button-small"
-                              :class="{
-                              'uk-button-primary': stageSize === '1-3',
-                            }"
-                              @click="handleChangeStageSize('1-3')"
-                          >
+                          <button class="uk-button uk-button-default uk-button-small"
+                                  :class="{'uk-button-primary': stageSize === '1-3'}"
+                                  @click="handleChangeStageSize('1-3')">
                             33%
                           </button>
                           <button
@@ -141,8 +131,23 @@
                         </div>
                       </div>
                     </li>
-                    <li>a.uk-accordion.tile</li>
                   </ul>
+                  <div v-if="selectedShape">
+                    <div class="uk-border-rounded uk-padding-small" style="border:1px solid grey;">
+                      <div style="background:#fff; margin-top: -31px; padding:5px; width:auto">Element Settings</div>
+                      <div>{{ selectedShape.label }}</div>
+                      <div class="uk-margin-small-top">
+                        <textarea class="uk-textarea" v-model="selectedShape.description" placeholder="Describe Step Procedures here"></textarea>
+                      </div>
+                      <div class="uk-margin-small-top">
+                        <span>Fill: </span><color-picker v-model:pureColor="selectedShape.fill" />
+                      </div>
+                      <div class="uk-margin-small-top">
+                        <span>Border: </span><color-picker v-model:pureColor="selectedShape.fill" />
+                      </div>
+
+                    </div>
+                  </div>
                 </div>
                 <div class="uk-card-footer">
                   <div class="uk-grid-small uk-flex uk-flex-right" uk-grid>
@@ -222,6 +227,7 @@
         </div>
       </div>
     </div>
+
     <div id="filemanager-modal" class="uk-flex-top uk-modal-container" uk-modal>
       <div class="uk-modal-dialog uk-margin-auto-vertical">
         <button class="uk-modal-close-default" uk-close type="button"></button>
@@ -266,10 +272,11 @@ import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import FileManager from "@/components/FileManager.vue";
 import Konva from "konva";
 import {v4 as uuidv4} from "uuid";
+import {ColorPicker} from "vue3-colorpicker";
 
 export default {
   name: "EditSlide",
-  components: {FileManager, FontAwesomeIcon},
+  components: {ColorPicker, FileManager, FontAwesomeIcon},
   setup() {
     const toast = useToast();
     return {toast};
@@ -305,6 +312,11 @@ export default {
     await this.getSlide();
   },
   methods: {
+    handleColorChanged(picker) {
+      console.log(picker.color)
+      this.selectedShape.fill = picker.color;
+
+    },
     registerKeyboardEvents() {
       document.addEventListener("keydown", (e) => {
         if (e.key === "Delete" || e.key === "Backspace") {
@@ -376,9 +388,9 @@ export default {
       try {
         const result = await axios.get(`/api/admin/guides/${this.$route.query.gid}/slides/${this.$route.params.id}`);
         this.slide = result.data.slide;
-        try{
+        try {
           this.stageItems = JSON.parse(this.slide.content) || [];
-        }catch (err) {
+        } catch (err) {
           console.log(err);
         }
         this.setStageSize();
@@ -422,13 +434,13 @@ export default {
       si.scaleX = 1;
       si.scaleY = 1;
 
-      if(si.type === "rectangle") {
+      if (si.type === "rectangle") {
         si.width = Math.floor(e.target.width() * newScaleX);
         si.height = Math.floor(e.target.height() * newScaleY);
         si.cornerRadius = 10;
       }
 
-      if(si.type === "circle") {
+      if (si.type === "circle") {
         si.radius = Math.floor(e.target.radius() * newScaleX);
       }
 
@@ -446,17 +458,16 @@ export default {
       }
 
       // clicked on transformer - do nothing
-      const clickedOnTransformer =
-          e.target.getParent().className === "Transformer";
-      if (clickedOnTransformer) {
+      if (e.target.getParent().className === "Transformer") {
         return;
       }
 
-      // find clicked rect by its name
+      // find clicked shape by its name
       const name = e.target.name();
-      const rect = this.stageItems.find((r) => r.name === name);
-      if (rect) {
+      const shape = this.stageItems.find((r) => r.name === name);
+      if (shape) {
         this.selectedShapeName = name;
+        this.selectedShape = shape;
       } else {
         this.selectedShapeName = "";
         this.selectedShape = null;
@@ -511,7 +522,7 @@ export default {
     },
     updateItemsByPercentages() {
       console.log("Canvas", this.configKonva.width, this.configKonva.height);
-      if(!this.stageItems || !this.stageItems.length) return;
+      if (!this.stageItems || !this.stageItems.length) return;
       for (const item of this.stageItems) {
         if (item.type === "rectangle") {
           item.width = (this.configKonva.width / 100) * item.percentages.width;
