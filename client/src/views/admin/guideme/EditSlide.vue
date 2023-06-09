@@ -6,146 +6,141 @@
     <div class="uk-container nxd-no-select">
       <div class="uk-grid-small uk-flex uk-flex-middle" uk-grid>
         <div>
-          <router-link
-              class="go-back-link"
-              :to="{ name: 'admin-guide-slides', params: { id: guide.id } }"
-          >
-            <font-awesome-icon
-                class="uk-h2 uk-preserve-width uk-margin-remove"
-                :icon="['fas', 'arrow-left']"
-            />
+          <router-link class="go-back-link" :to="{ name: 'admin-guide-slides', params: { id: guide.id } }">
+            <font-awesome-icon class="uk-h2 uk-preserve-width uk-margin-remove" :icon="['fas', 'arrow-left']" />
           </router-link>
         </div>
         <div>
           <h2 v-if="guide" class="uk-h3 uk-margin-remove">{{ guide.name }}</h2>
-          <h3 class="uk-h2 uk-margin-remove">Edit Slide {{ slide.name }}</h3>
+          <h3 class="uk-h2 uk-margin-remove">Edit Slide "{{ slide.name }}"</h3>
         </div>
       </div>
 
       <div class="uk-margin">
-        <div id="stage-container"
-             class="uk-position-relative uk-padding uk-background-muted uk-border-rounded nxd-min-height-large">
+        <div id="stage-container" ref="stageContainer" class="uk-position-relative uk-padding uk-background-muted uk-border-rounded nxd-min-height-large">
           <div id="controls-container" class="uk-position-top-right">
-            <div class="uk-card uk-card-default uk-card-small uk-width-medium uk-box-shadow-large"
-                 uk-sticky="end: !#stage-container; offset: 80">
-              <div class="uk-padding-small uk-position-relative nxd-cursor-pointer"
-                   @click="showControls = !showControls">
+            <div class="uk-card uk-card-default uk-card-small uk-width-medium uk-box-shadow-large" uk-sticky="end: !#stage-container; offset: 80">
+              <div class="uk-padding-small uk-position-relative nxd-cursor-pointer" @click="showControls = !showControls">
                 <h4 class="uk-h4 uk-margin-remove-bottom">Controls</h4>
                 <div class="uk-position-center-right uk-margin-right">
-                  <font-awesome-icon
-                      v-if="!showControls"
-                      :icon="['fas', 'chevron-down']"
-                  />
-                  <font-awesome-icon v-else :icon="['fas', 'chevron-up']"/>
+                  <font-awesome-icon v-if="!showControls" :icon="['fas', 'chevron-down']" />
+                  <font-awesome-icon v-else :icon="['fas', 'chevron-up']" />
                 </div>
               </div>
               <div id="stage-controls" :class="{ 'uk-hidden': !showControls }">
                 <div class="uk-card-body">
-                  <div></div>
-                  <ul uk-accordion="multiple: true; active:0">
-                    <li>
-                      <a class="uk-accordion-title" href="#">Stage</a>
-                      <div class="uk-accordion-content uk-flex uk-flex-center">
-                        <div class="uk-button-group">
-                          <button class="uk-button uk-button-default uk-button-small"
-                                  :class="{'uk-button-primary': stageSize === '1-4',}"
-                                  @click="handleChangeStageSize('1-4')"
-                          >
-                            25%
-                          </button>
-                          <button class="uk-button uk-button-default uk-button-small"
-                                  :class="{'uk-button-primary': stageSize === '1-3'}"
-                                  @click="handleChangeStageSize('1-3')">
-                            33%
-                          </button>
-                          <button
-                              class="uk-button uk-button-default uk-button-small"
-                              :class="{
+                  <div class="uk-margin-small-top">
+                    <h5>Stage</h5>
+                    <div class="uk-flex uk-flex-center">
+                      <div class="uk-button-group">
+                        <button class="uk-button uk-button-default uk-button-small"
+                                :class="{'uk-button-primary': stageSize === '1-4',}"
+                                @click="handleChangeStageSize('1-4')"
+                        >
+                          25%
+                        </button>
+                        <button class="uk-button uk-button-default uk-button-small"
+                                :class="{'uk-button-primary': stageSize === '1-3'}"
+                                @click="handleChangeStageSize('1-3')">
+                          33%
+                        </button>
+                        <button
+                            class="uk-button uk-button-default uk-button-small"
+                            :class="{
                               'uk-button-primary': stageSize === '1-2',
                             }"
-                              @click="handleChangeStageSize('1-2')"
-                          >
-                            50%
-                          </button>
-                          <button
-                              class="uk-button uk-button-default uk-button-small"
-                              :class="{
+                            @click="handleChangeStageSize('1-2')"
+                        >
+                          50%
+                        </button>
+                        <button
+                            class="uk-button uk-button-default uk-button-small"
+                            :class="{
                               'uk-button-primary': stageSize === '3-4',
                             }"
-                              @click="handleChangeStageSize('3-4')"
-                          >
-                            75%
-                          </button>
-                          <button
-                              class="uk-button uk-button-default uk-button-small"
-                              :class="{
+                            @click="handleChangeStageSize('3-4')"
+                        >
+                          75%
+                        </button>
+                        <button
+                            class="uk-button uk-button-default uk-button-small"
+                            :class="{
                               'uk-button-primary': stageSize === '1-1',
                             }"
-                              @click="handleChangeStageSize('1-1')"
-                          >
-                            100%
-                          </button>
-                        </div>
-                      </div>
-                    </li>
-                    <li>
-                      <a class="uk-accordion-title" href="#">Image</a>
-                      <div class="uk-accordion-content uk-flex uk-flex-right">
-                        <button
-                            class="uk-button uk-button-secondary uk-button-small"
-                            uk-toggle="target: #filemanager-modal"
+                            @click="handleChangeStageSize('1-1')"
                         >
-                          {{ slide.uri ? "Change" : "Select" }} Image
+                          100%
                         </button>
                       </div>
-                    </li>
-                    <li>
-                      <a class="uk-accordion-title" href="#">Elements</a>
-                      <div class="uk-accordion-content">
-                        <div id="sliderVisualElements">
-                          <div
-                              class="uk-margin-small-top"
-                              v-for="(el, index) of stageItems"
-                              :key="index"
-                          >
-                            {{ el.name }}
+                    </div>
+                  </div>
+                  <div class="uk-margin-small-top">
+                    <h5>Label</h5>
+                    <input type="text" class="uk-input uk-width-1-1" id="slide-name-input" v-model="slide.name">
+                  </div>
+                  <div class="uk-margin-small-top">
+                    <h5>Image</h5>
+                    <button
+                        class="uk-button uk-button-secondary uk-button-small uk-width-1-1"
+                        uk-toggle="target: #filemanager-modal">
+                      {{ slide.uri ? "Change" : "Select" }} Image
+                    </button>
+                  </div>
+                  <div class="uk-margin-top">
+                    <h5>Shapes</h5>
+                    <button
+                        class="uk-button uk-button-small uk-button-secondary uk-width-1-1"
+                        :class="{'uk-disabled': !slide.uri}"
+                        @click="handleAddVisualElementClicked('circle')">
+                      Add Circle
+                    </button>
+                    <button
+                        class="uk-button uk-button-small uk-button-secondary uk-width-1-1 uk-margin-small-top"
+                        :class="{'uk-disabled': !slide.uri}"
+                        @click="handleAddVisualElementClicked('rectangle')">
+                      Add Rectangle
+                    </button>
+                    <div class="uk-margin-small-top">
+                      <table class="uk-table uk-table-divider uk-table-small uk-table-middle">
+                        <tr v-for="shape of stageItems" :key="shape.name">
+                          <td @click="handleSelectStageItem(shape)" class="uk-width-5-6 uk-text-truncate">{{shape.label}}</td>
+                          <td @click="handleDeleteStageItem(shape)"><font-awesome-icon class="uk-text-danger uk-preserve-width" :icon="['fas','close']" /></td>
+                        </tr>
+                      </table>
+                    </div>
+                    <div v-if="selectedShape" class="uk-margin-top">
+                      <div id="shape-edit-container" class="uk-border-rounded uk-padding-small">
+                        <div id="shape-edit-title">
+                          <span><font-awesome-icon class="uk-preserve-width" :icon="['fas','cog']"/> Shape</span>
+                        </div>
+                        <div><input class="uk-input" v-model="selectedShape.label" placeholder="Shape Label" /></div>
+                        <div class="uk-margin-small-top">
+                          <textarea class="uk-textarea" v-model="selectedShape.description"
+                                    placeholder="Describe Step Procedures here"></textarea>
+                        </div>
+                        <div class="uk-margin-small-top">
+                          <span>Fill: </span>
+                          <div class="color-picker-preview-container uk-float-right">
+                            <color-picker v-model:pureColor="selectedShape.fill"/>
                           </div>
                         </div>
-                        <div class="uk-margin-small-top uk-flex uk-flex-right">
-                          <div class="uk-button-group">
-                            <button
-                                class="uk-button uk-button-small uk-button-secondary"
-                                @click="handleAddVisualElementClicked('circle')"
-                            >
-                              Add Circle
-                            </button>
-                            <button
-                                class="uk-button uk-button-small uk-button-secondary"
-                                @click="
-                                handleAddVisualElementClicked('rectangle')
-                              "
-                            >
-                              Add Rectangle
-                            </button>
+                        <div class="uk-margin-small-top">
+                          <span>Stroke: </span>
+                          <div class="color-picker-preview-container uk-float-right">
+                            <color-picker v-model:pureColor="selectedShape.stroke"/>
                           </div>
                         </div>
-                      </div>
-                    </li>
-                  </ul>
-                  <div v-if="selectedShape">
-                    <div class="uk-border-rounded uk-padding-small" style="border:1px solid grey;">
-                      <div style="background:#fff; margin-top: -31px; padding:5px; width:auto">Element Settings</div>
-                      <div>{{ selectedShape.label }}</div>
-                      <div class="uk-margin-small-top">
-                        <textarea class="uk-textarea" v-model="selectedShape.description" placeholder="Describe Step Procedures here"></textarea>
-                      </div>
-                      <div class="uk-margin-small-top">
-                        <span>Fill: </span><color-picker v-model:pureColor="selectedShape.fill" />
-                      </div>
-                      <div class="uk-margin-small-top">
-                        <span>Border: </span><color-picker v-model:pureColor="selectedShape.fill" />
-                      </div>
+                        <div class="uk-margin-small-top">
+                          <div class="uk-width-1-1 uk-flex uk-flex-middle uk-child-width-1-2">
+                            <div><span>Stroke Width: </span></div>
+                            <div class="uk-flex uk-flex-right">
+                              <input type="number" min="0" class="stroke-width-input"
+                                     v-model="selectedShape.strokeWidth" @change="handleStrokeWidthChanged"/>
+                            </div>
+                          </div>
+                        </div>
 
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -154,7 +149,7 @@
                     <div>
                       <button
                           class="uk-button uk-button-secondary uk-button-small"
-                          style="min-width: 100px"
+                          style="min-width: 50px"
                           @click="
                           this.$router.push({
                             name: 'admin-guide-slides',
@@ -168,10 +163,19 @@
                     <div>
                       <button
                           class="uk-button uk-button-primary uk-button-small"
-                          style="min-width: 100px"
-                          @click="saveSlide"
+                          style="min-width: 50px"
+                          @click="saveSlide(false)"
                       >
                         Save
+                      </button>
+                    </div>
+                    <div>
+                      <button
+                          class="uk-button uk-button-success uk-button-small"
+                          style="min-width: 50px"
+                          @click="saveSlide(true)"
+                      >
+                        Save & Close
                       </button>
                     </div>
                   </div>
@@ -179,20 +183,18 @@
               </div>
             </div>
           </div>
-          <div
-              id="stage-inner"
-              ref="stageInner"
-              class="uk-position-relative uk-margin-auto uk-border-rounded uk-overflow-hidden"
-              :class="[
-              { 'uk-width-1-1': stageSize === '1-1' },
-              { 'uk-width-3-4': stageSize === '3-4' },
-              { 'uk-width-1-2': stageSize === '1-2' },
-              { 'uk-width-1-3': stageSize === '1-3' },
-              { 'uk-width-1-4': stageSize === '1-4' },
-              { 'uk-box-shadow-large' : slide.uri.length > 0 }
-            ]"
+          <div id="stage-inner" ref="stageInner"
+               class="uk-position-relative uk-margin-auto uk-border-rounded uk-overflow-hidden"
+               :class="[
+                { 'uk-width-1-1': stageSize === '1-1' },
+                { 'uk-width-3-4': stageSize === '3-4' },
+                { 'uk-width-1-2': stageSize === '1-2' },
+                { 'uk-width-1-3': stageSize === '1-3' },
+                { 'uk-width-1-4': stageSize === '1-4' },
+                { 'uk-box-shadow-large' : slide.uri.length > 0 }
+              ]"
           >
-            <img :src="'/public' + slide.uri" alt="" ref="image"/>
+            <img :src="'/public' + slide.uri" alt="" ref="image" @load="handleImageLoadedEvent"/>
             <div
                 class="uk-position-cover"
             >
@@ -266,6 +268,7 @@
 </template>
 
 <script>
+import UIkit from "uikit";
 import axios from "axios";
 import {useToast} from "vue-toastification";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
@@ -312,16 +315,40 @@ export default {
     await this.getSlide();
   },
   methods: {
-    handleColorChanged(picker) {
-      console.log(picker.color)
-      this.selectedShape.fill = picker.color;
-
+    handleSelectStageItem(item) {
+      this.selectedShapeName = item.name;
+      this.selectedShape = item;
+    },
+    handleDeleteStageItem(item){
+      this.stageItems = this.stageItems.filter(
+          (i) => i.name !== item.name
+      );
+      this.selectedShapeName = "";
+      this.selectedShape = null;
+    },
+    handleImageLoadedEvent(){
+      this.handleChangeStageSize();
     },
     registerKeyboardEvents() {
-      document.addEventListener("keydown", (e) => {
+      document.addEventListener("keydown", async (e) => {
         if (e.key === "Delete" || e.key === "Backspace") {
-          if (this.selectedShapeName) {
-            console.log("Delete Shape");
+          const inputFocused = document.activeElement.tagName === "INPUT";
+          if (this.selectedShapeName && !inputFocused) {
+            const confirmed = await UIkit.modal.confirm(`Do you really want to <b>delete</b> the shape <b>${this.selectedShape.label}</b>?`, {
+              i18n: {
+                cancel: 'No',
+                ok: 'Yes'
+              }
+            }).then(function () {
+              return true;
+            }, function () {
+              return false;
+            });
+
+            if (!confirmed) {
+              return;
+            }
+
             this.stageItems = this.stageItems.filter(
                 (item) => item.name !== this.selectedShapeName
             );
@@ -339,39 +366,10 @@ export default {
     },
     handleImageSelected() {
       this.slide.uri = this.fm_file.fullPath;
+      this.handleChangeStageSize();
     },
     handleFileSelected(file) {
       this.fm_file = file;
-    },
-    handleAddVisualElementClicked(type) {
-      console.log("Add Visual Element Clicked " + type);
-      const name = uuidv4().replace(/-/g, "");
-      const label = `${type.charAt(0).toUpperCase() + type.slice(1)} ${
-          this.stageItems.length + 1
-      }`;
-      const config = {
-        type,
-        name,
-        label,
-        fill: Konva.Util.getRandomColor(),
-        x: 100,
-        y: 100,
-        draggable: true,
-      };
-      if (type === "rectangle") {
-        config.width = 100;
-        config.height = 100;
-        config.cornerRadius = 6;
-      }
-      if (type === "circle") {
-        config.radius = 50;
-      }
-      this.stageItems.push(config);
-      let element = this.stageItems.at(-1);
-      element.percentages = this.calculatePercentages(element);
-    },
-    handleSelectImageClicked() {
-      console.log("Select Image Clicked");
     },
     async getGuide() {
       try {
@@ -388,29 +386,49 @@ export default {
       try {
         const result = await axios.get(`/api/admin/guides/${this.$route.query.gid}/slides/${this.$route.params.id}`);
         this.slide = result.data.slide;
+        if(!this.slide.content){
+          this.slide.content = "[]";
+        }
         try {
           this.stageItems = JSON.parse(this.slide.content) || [];
         } catch (err) {
-          console.log(err);
+          this.stageItems = [];
         }
         this.setStageSize();
-        this.updateItemsByPercentages();
       } catch (err) {
         console.log(err);
       }
     },
-    async saveSlide() {
+    async saveSlide(close) {
       this.slide.content = JSON.stringify(this.stageItems);
       try {
-        await axios.put(`/api/admin/guides/${this.$route.query.gid}/slides/${this.$route.params.id}`, this.slide);
-        // this.$router.push({
-        //   name: "admin-guide-slides",
-        //   params: { id: this.$route.query.gid },
-        // });
+        const result = await axios.put(`/api/admin/guides/${this.$route.query.gid}/slides/${this.$route.params.id}`, this.slide);
+        if(result.data.success){
+          this.toast.success("Slide updated");
+          if(close){
+            this.$router.push({
+              name: "admin-guide-slides",
+              params: { id: this.$route.query.gid },
+            });
+          }
+        }else{
+          this.toast.error("Slide not updated");
+        }
       } catch (err) {
         console.log(err);
       }
     },
+
+    handleDragStart(e, item) {
+    },
+    handleDragEnd(e, item) {
+      // find item
+      const si = this.stageItems.find((si) => si.name === item.name);
+      si.x = e.target.x();
+      si.y = e.target.y();
+      si.percentages = this.calculatePercentages(si);
+    },
+
     // Transformer
     handleTransformEnd(e) {
       console.log("handleTransformEnd");
@@ -446,8 +464,6 @@ export default {
 
       si.percentages = this.calculatePercentages(si);
 
-      // change fill
-      si.fill = Konva.Util.getRandomColor();
     },
     handleStageMouseDown(e) {
       // clicked on stage - clear selection
@@ -495,15 +511,7 @@ export default {
         this.selectedShape = null;
       }
     },
-    handleDragStart(e, item) {
-    },
-    handleDragEnd(e, item) {
-      // find item
-      const si = this.stageItems.find((si) => si.name === item.name);
-      si.x = e.target.x();
-      si.y = e.target.y();
-      si.percentages = this.calculatePercentages(si);
-    },
+
     handleChangeStageSize(keyword) {
       if (keyword) this.stageSize = keyword; // Set keyword to trigger change in GUI
       this.$nextTick(() => {
@@ -516,12 +524,12 @@ export default {
 
           this.configKonva.width = innerStage.offsetWidth;
           this.configKonva.height = stageHeight;
+
           this.updateItemsByPercentages();
         });
       });
     },
     updateItemsByPercentages() {
-      console.log("Canvas", this.configKonva.width, this.configKonva.height);
       if (!this.stageItems || !this.stageItems.length) return;
       for (const item of this.stageItems) {
         if (item.type === "rectangle") {
@@ -533,8 +541,41 @@ export default {
         }
         item.x = (this.configKonva.width / 100) * item.percentages.x;
         item.y = (this.configKonva.height / 100) * item.percentages.y;
+        item.strokeWidth = Math.ceil((this.configKonva.width / 100) * item.percentages.strokeWidth);
       }
-      console.log(this.stageItems);
+    },
+    handleStrokeWidthChanged() {
+      this.selectedShape.percentages = this.calculatePercentages(this.selectedShape)
+    },
+
+    handleAddVisualElementClicked(type) {
+      console.log("Add Visual Element Clicked " + type);
+      const name = uuidv4().replace(/-/g, "");
+      const label = `${type.charAt(0).toUpperCase() + type.slice(1)} ${
+          this.stageItems.length + 1
+      }`;
+      const config = {
+        type,
+        name,
+        label,
+        fill: Konva.Util.getRandomColor(),
+        x: 100,
+        y: 100,
+        strokeWidth: 0,
+        stroke: "#000000",
+        draggable: true,
+      };
+      if (type === "rectangle") {
+        config.width = 100;
+        config.height = 100;
+        config.cornerRadius = 6;
+      }
+      if (type === "circle") {
+        config.radius = 50;
+      }
+      this.stageItems.push(config);
+      let element = this.stageItems.at(-1);
+      element.percentages = this.calculatePercentages(element);
     },
     calculatePercentages(stageItem) {
       if (!stageItem) {
@@ -544,6 +585,7 @@ export default {
       let percentages = {
         x: (stageItem.x / this.configKonva.width) * 100,
         y: (stageItem.y / this.configKonva.height) * 100,
+        strokeWidth: (stageItem.strokeWidth / this.configKonva.width) * 100,
       }
       if (stageItem.type === "circle") {
         percentages.radius = (stageItem.radius / this.configKonva.width) * 100;
@@ -555,11 +597,46 @@ export default {
       }
       return percentages;
     },
+
   },
 };
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
+@import "@/assets/less/variables.less";
+
+
+#shape-edit-container {
+  border: 1px solid @color-grey-light;
+
+  #shape-edit-title {
+    margin-top: -28px;
+
+    span {
+      padding: 5px 10px;
+      background: #fff;
+    }
+  }
+
+  .color-picker-preview-container {
+    .vc-color-wrap {
+      margin: 0;
+      border-radius: @nxd-border-radius;
+    }
+
+    .current-color {
+    }
+  }
+
+  .stroke-width-input {
+    width: 80px;
+    padding: 4px;
+    margin: 0;
+    border-radius: @nxd-border-radius;
+    border: 1px solid @color-grey-light;
+  }
+}
+
 img {
   width: 100%;
 }

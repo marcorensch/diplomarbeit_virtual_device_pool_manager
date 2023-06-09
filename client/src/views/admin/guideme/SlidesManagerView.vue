@@ -10,7 +10,9 @@
             />
           </router-link>
         </div>
-        <div><h2 class="uk-h2">Configure Slides</h2></div>
+        <div>
+          <h2 class="uk-h2 uk-margin-remove">{{ guide.name }} Slides</h2>
+        </div>
       </div>
 
       <div class="uk-margin">
@@ -34,11 +36,34 @@
         >
           <div v-for="(slide, index) of slides" :key="slide.id" :id="slide.id">
             <div class="">
-              <div
-                class="uk-margin-small-top uk-card uk-card-default uk-card-body uk-position-relative"
-              >
-                {{ index }}
-                {{ slide }}
+              <div class="uk-margin-small-top uk-card uk-card-default uk-card-body uk-position-relative">
+                <div class="uk-position-top-left">
+                  <div class="uk-padding-small">
+                    <font-awesome-icon v-if="!slide.uri || !slide.uri.length" class="uk-text-danger uk-preserve-width uk-margin-small-right " :icon="['fas', 'exclamation-triangle']" />
+                    <font-awesome-icon v-if="!slide.content || !slide.content.length" class="uk-text-warning uk-preserve-width" :icon="['fas', 'exclamation-triangle']" />
+                  </div>
+                </div>
+                <div class="uk-flex uk-flex-middle uk-grid-small" uk-grid>
+                  <div class="uk-width-expand">
+                    <div>
+                      <h4 class="uk-h3 uk-margin-remove">{{ slide.name }}</h4>
+                    </div>
+                    <div v-if="slide.content && slide.content.length">
+                      <h6 class="uk-margin-small-top uk-margin-remove-bottom">Steps in this Slide:</h6>
+                      <table class="uk-table uk-list-divider uk-margin-remove uk-table-middle">
+                        <tr v-for="shape of slide.content">
+                          <td class="uk-table-shrink"><span class="uk-text-small">{{ shape.label }}: </span></td>
+                          <td><span class="uk-text-muted uk-text-small">{{ shape.description || "no Description Text" }}</span></td>
+                        </tr>
+                      </table>
+
+                    </div>
+                  </div>
+                  <div class="uk-width-small uk-flex uk-flex-right">
+                    <font-awesome-icon :icon="['fas', 'chevron-right']" />
+                  </div>
+                </div>
+
                 <router-link
                   :to="{
                     name: 'admin-guide-slide-edit',
@@ -46,6 +71,7 @@
                     query: { gid: id },
                   }"
                   class="uk-position-cover"
+                  :uk-tooltip="buildMessage(slide)"
                 ></router-link>
               </div>
             </div>
@@ -87,11 +113,15 @@ export default {
   data() {
     return {
       id: this.$route.params.id,
+      guide: {name: ''},
       slides: [],
     };
   },
-  async mounted() {
+  async beforeMount() {
+    await this.loadGuide();
     await this.loadSlides();
+  },
+  async mounted() {
     UIkit.util.on("#slides", "moved", (e, sortable) => {
       for (let i = 0; i < sortable.items.length; i++) {
         const id = sortable.items[i].id;
@@ -107,11 +137,39 @@ export default {
     });
   },
   methods: {
-    registerEvents() {},
+    buildMessage(slide) {
+      let msg = "";
+      if(!slide.uri || !slide.uri.length){
+        msg += "This slide has no image and will not be shown in Frontend! ";
+      }
+      if (!slide.content || !slide.content.length) {
+        msg += "This slide has no shapes. ";
+      }
+
+      msg += "Click to edit";
+      return msg;
+    },
+    async loadGuide() {
+      try {
+        const response = await axios.get(`/api/admin/guides/${this.id}`);
+        this.guide = response.data.guide;
+      } catch (err) {
+        console.log(err);
+      }
+    },
     async loadSlides() {
       try {
         const response = await axios.get(`/api/admin/guides/${this.id}/slides`);
         this.slides = response.data.slides;
+        for (const slide of this.slides) {
+          if(slide.content){
+            try{
+              slide.content = JSON.parse(slide.content);
+            }catch (err) {
+              console.log(err);
+            }
+          }
+        }
       } catch (err) {
         console.log(err);
       }
