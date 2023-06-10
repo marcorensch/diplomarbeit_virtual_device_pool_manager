@@ -305,6 +305,7 @@ export default {
   },
   async mounted() {
     this.registerKeyboardEvents();
+    this.registerWindowEvents();
     if (!this.$route.params.id) {
       this.toast.error("Invalid Slide ID");
       this.$router.push({name: "guides"});
@@ -330,6 +331,9 @@ export default {
     },
     handleImageLoadedEvent(){
       this.handleChangeStageSize();
+    },
+    registerWindowEvents() {
+      window.addEventListener("resize", () => this.handleChangeStageSize(this.stageSize));
     },
     registerKeyboardEvents() {
       document.addEventListener("keydown", async (e) => {
