@@ -55,11 +55,9 @@
                   <h3 class="uk-card-title">
                     {{ guide.name }}
                     <span class="uk-text-small uk-text-middle">
-                      <font-awesome-icon
-                        :icon="['fas', 'eye']"
-                        v-if="guide.visible"
+                      <font-awesome-icon class="uk-preserve-width uk-text-success" :icon="['fas', 'eye']" v-if="guide.visible"
                       />
-                      <font-awesome-icon :icon="['fas', 'eye-slash']" v-else />
+                      <font-awesome-icon class="uk-preserve-width uk-text-warning" :icon="['fas', 'eye-slash']" v-else />
                     </span>
                   </h3>
                 </div>
