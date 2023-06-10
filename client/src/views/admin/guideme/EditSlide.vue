@@ -1,5 +1,5 @@
 <template>
-  <div
+  <div id="slide-editor" ref="slideEditor"
       class="uk-section user-list-view uk-padding-remove uk-position-relative"
       v-if="guide && slide"
   >
@@ -7,7 +7,7 @@
       <div class="uk-grid-small uk-flex uk-flex-middle" uk-grid>
         <div>
           <router-link class="go-back-link" :to="{ name: 'admin-guide-slides', params: { id: guide.id } }">
-            <font-awesome-icon class="uk-h2 uk-preserve-width uk-margin-remove" :icon="['fas', 'arrow-left']" />
+            <font-awesome-icon class="uk-h2 uk-preserve-width uk-margin-remove" :icon="['fas', 'arrow-left']"/>
           </router-link>
         </div>
         <div>
@@ -16,9 +16,10 @@
         </div>
       </div>
 
-      <NotAvailableMobile :message="'GuideMe Stage Editor is not available<br />on Small Screen Devices'" />
+      <NotAvailableMobile :message="'GuideMe Stage Editor is not available<br />on Small Screen Devices'"/>
       <div id="stage-outter" class="uk-margin uk-visible@m uk-position-relative" ref="stageOutter">
-        <div id="stage-container" ref="stageContainer" class="uk-position-relative uk-padding uk-background-muted uk-border-rounded nxd-min-height-large">
+        <div id="stage-container" ref="stageContainer"
+             class="uk-position-relative uk-padding uk-background-muted uk-border-rounded nxd-min-height-large">
           <div id="stage-inner" ref="stageInner"
                class="uk-position-relative uk-margin-auto uk-border-rounded uk-overflow-hidden"
                :class="[
@@ -66,10 +67,11 @@
         <div id="controls-container" class="uk-position-top-right uk-position-z-index" ref="draggableContainer">
           <div class="uk-card uk-card-default uk-card-small uk-width-medium nxd-min-width-medium uk-box-shadow-large">
             <div class="uk-padding-small uk-position-relative nxd-cursor-pointer">
-              <h4 id="controls-header" class="uk-h4 uk-margin-remove-bottom uk-drag" @dblclick.exact="showControls = !showControls" @mousedown="dragMouseDown">Controls</h4>
+              <h4 id="controls-header" class="uk-h4 uk-margin-remove-bottom uk-drag"
+                  @dblclick.exact="showControls = !showControls" @mousedown="dragMouseDown">Controls</h4>
               <div class="uk-position-center-right uk-margin-right" @click="showControls = !showControls">
-                <font-awesome-icon v-if="!showControls" :icon="['fas', 'chevron-down']" />
-                <font-awesome-icon v-else :icon="['fas', 'chevron-up']" />
+                <font-awesome-icon v-if="!showControls" :icon="['fas', 'chevron-down']"/>
+                <font-awesome-icon v-else :icon="['fas', 'chevron-up']"/>
               </div>
             </div>
             <div id="stage-controls" :class="{ 'uk-hidden': !showControls }">
@@ -147,10 +149,26 @@
                   </button>
                   <div class="uk-margin-small-top">
                     <table class="uk-table uk-table-divider uk-table-small uk-table-middle">
-                      <tr v-for="shape of stageItems" :key="shape.name">
-                        <td @click="handleSelectStageItemFromCtrls(shape)" class="nxd-cursor-pointer uk-width-5-6 uk-text-truncate">{{shape.label}}</td>
-                        <td @click="handleDeleteStageItemFromCtrls(shape)"><font-awesome-icon class="nxd-cursor-pointer uk-text-danger uk-preserve-width" :icon="['fas','close']" /></td>
-                      </tr>
+                      <draggable
+                          v-model="stageItems"
+                          group="shapes"
+                          @start="drag=true"
+                          @end="drag=false"
+                          item-key="id"
+                          tag="tbody"
+                      >
+                        <template #item="{element}">
+                          <tr class="uk-width-1-1">
+                            <td @click="handleSelectStageItemFromCtrls(element)"
+                                class="nxd-cursor-pointer uk-width-5-6 uk-text-truncate">{{ element.label }}
+                            </td>
+                            <td @click="handleDeleteStageItemFromCtrls(element)">
+                              <font-awesome-icon class="nxd-cursor-pointer uk-text-danger uk-preserve-width"
+                                                 :icon="['fas','close']"/>
+                            </td>
+                          </tr>
+                        </template>
+                      </draggable>
                     </table>
                   </div>
                   <div v-if="selectedShape" class="uk-margin-top">
@@ -158,7 +176,7 @@
                       <div id="shape-edit-title">
                         <span><font-awesome-icon class="uk-preserve-width" :icon="['fas','cog']"/> Shape</span>
                       </div>
-                      <div><input class="uk-input" v-model="selectedShape.label" placeholder="Shape Label" /></div>
+                      <div><input class="uk-input" v-model="selectedShape.label" placeholder="Shape Label"/></div>
                       <div class="uk-margin-small-top">
                           <textarea class="uk-textarea" v-model="selectedShape.description"
                                     placeholder="Describe Step Procedures here"></textarea>
@@ -279,10 +297,11 @@ import Konva from "konva";
 import {v4 as uuidv4} from "uuid";
 import {ColorPicker} from "vue3-colorpicker";
 import NotAvailableMobile from "@/components/NotAvailableMobile.vue";
+import draggable from 'vuedraggable'
 
 export default {
   name: "EditSlide",
-  components: {NotAvailableMobile, ColorPicker, FileManager, FontAwesomeIcon},
+  components: {NotAvailableMobile, ColorPicker, FileManager, FontAwesomeIcon, draggable},
   setup() {
     const toast = useToast();
     return {toast};
@@ -307,8 +326,9 @@ export default {
     };
   },
   async mounted() {
-    this.registerKeyboardEvents();
-    this.registerWindowEvents();
+    document.addEventListener("keydown", this.handleKeyDown);
+    window.addEventListener("resize", this.handleResize);
+
     if (!this.$route.params.id) {
       this.toast.error("Invalid Slide ID");
       this.$router.push({name: "guides"});
@@ -319,6 +339,11 @@ export default {
     }
     await this.getGuide();
     await this.getSlide();
+  },
+
+  beforeUnmount() {
+    document.removeEventListener("keydown", this.handleKeyDown);
+    window.removeEventListener("resize", this.handleResize);
   },
   methods: {
 
@@ -349,7 +374,7 @@ export default {
     },
 
     handleSelectStageItemFromCtrls(item) {
-      if(this.selectedShapeName === item.name){
+      if (this.selectedShapeName === item.name) {
         this.selectedShapeName = "";
         this.selectedShape = null;
         return;
@@ -358,19 +383,16 @@ export default {
       this.selectedShape = item;
       this.updateTransformer();
     },
-    handleDeleteStageItemFromCtrls(item){
+    handleDeleteStageItemFromCtrls(item) {
       this.selectedShapeName = item.name;
       this.selectedShape = item;
       this.deleteShape();
       this.updateTransformer();
     },
-    handleImageLoadedEvent(){
+    handleImageLoadedEvent() {
       this.handleChangeStageSize();
     },
-    registerWindowEvents() {
-      window.addEventListener("resize", () => this.handleChangeStageSize(this.stageSize));
-    },
-    async deleteShape(){
+    async deleteShape() {
       const confirmed = await UIkit.modal.confirm(`Do you really want to <b>delete</b> the shape <b>${this.selectedShape.label}</b>?`, {
         i18n: {
           cancel: 'No',
@@ -394,47 +416,52 @@ export default {
       const transformerNode = this.$refs.transformer.getNode();
       transformerNode.nodes([]);
     },
-    registerKeyboardEvents() {
-      document.addEventListener("keydown", async (e) => {
-        if (e.key === "Delete" || e.key === "Backspace") {
-          const inputFocused = document.activeElement.tagName === "INPUT";
-          if (this.selectedShapeName && !inputFocused) {
-            await this.deleteShape();
-          }
-        }
-        if(e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "ArrowLeft" || e.key === "ArrowRight"){
-          if(this.selectedShapeName){
-            e.preventDefault();
-            switch(e.key){
-              case "ArrowUp":
-                this.selectedShape.y = this.selectedShape.y - 1;
-                break;
-              case "ArrowDown":
-                this.selectedShape.y = this.selectedShape.y + 1;
-                break;
-              case "ArrowLeft":
-                this.selectedShape.x = this.selectedShape.x - 1;
-                break;
-              case "ArrowRight":
-                this.selectedShape.x = this.selectedShape.x + 1;
-                break;
-            }
-            this.selectedShape.percentages = this.calculatePercentages(this.selectedShape);
-          }
-        }
-      });
+
+    handleResize() {
+      this.handleChangeStageSize(this.stageSize);
     },
+    async handleKeyDown(e) {
+      if (e.key === "Delete" || e.key === "Backspace") {
+        const inputFocused = document.activeElement.tagName === "INPUT";
+        if (this.selectedShapeName && !inputFocused) {
+          await this.deleteShape();
+        }
+      }
+      if (e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "ArrowLeft" || e.key === "ArrowRight") {
+        if (this.selectedShapeName) {
+          e.preventDefault();
+          switch (e.key) {
+            case "ArrowUp":
+              this.selectedShape.y = this.selectedShape.y - 1;
+              break;
+            case "ArrowDown":
+              this.selectedShape.y = this.selectedShape.y + 1;
+              break;
+            case "ArrowLeft":
+              this.selectedShape.x = this.selectedShape.x - 1;
+              break;
+            case "ArrowRight":
+              this.selectedShape.x = this.selectedShape.x + 1;
+              break;
+          }
+          this.selectedShape.percentages = this.calculatePercentages(this.selectedShape);
+        }
+      }
+    },
+
     setStageSize() {
       this.stageSize = window.innerWidth < 768 ? "1-1" : "3-4";
       this.handleChangeStageSize();
+    },
+
+    handleFileSelected(file) {
+      this.fm_file = file;
     },
     handleImageSelected() {
       this.slide.uri = this.fm_file.fullPath;
       this.handleChangeStageSize();
     },
-    handleFileSelected(file) {
-      this.fm_file = file;
-    },
+
     async getGuide() {
       try {
         const result = await axios.get(
@@ -450,7 +477,7 @@ export default {
       try {
         const result = await axios.get(`/api/admin/guides/${this.$route.query.gid}/slides/${this.$route.params.id}`);
         this.slide = result.data.slide;
-        if(!this.slide.content){
+        if (!this.slide.content) {
           this.slide.content = "[]";
         }
         try {
@@ -467,15 +494,15 @@ export default {
       this.slide.content = JSON.stringify(this.stageItems);
       try {
         const result = await axios.put(`/api/admin/guides/${this.$route.query.gid}/slides/${this.$route.params.id}`, this.slide);
-        if(result.data.success){
+        if (result.data.success) {
           this.toast.success("Slide updated");
-          if(close){
+          if (close) {
             this.$router.push({
               name: "admin-guide-slides",
-              params: { id: this.$route.query.gid },
+              params: {id: this.$route.query.gid},
             });
           }
-        }else{
+        } else {
           this.toast.error("Slide not updated");
         }
       } catch (err) {
