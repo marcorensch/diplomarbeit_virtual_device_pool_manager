@@ -28,14 +28,9 @@
             </div>
           </div>
         </div>
-        <div
-          class="uk-position-relative"
-          id="slides"
-          :class="{ 'uk-hidden': !slides.length }"
-          uk-sortable
-        >
-          <div v-for="(slide, index) of slides" :key="slide.id" :id="slide.id">
-            <div class="">
+        <div id="slides" class="uk-position-relative" :class="{ 'uk-hidden': !slides.length }" uk-sortable>
+          <div v-for="slide of slides" :key="slide.id" :id="slide.id">
+            <div>
               <div class="uk-margin-small-top uk-card uk-card-default uk-card-body uk-position-relative">
                 <div class="uk-position-top-left">
                   <div class="uk-padding-small">
@@ -118,21 +113,22 @@ export default {
     await this.loadSlides();
   },
   async mounted() {
-    UIkit.util.on("#slides", "moved", (e, sortable) => {
-      for (let i = 0; i < sortable.items.length; i++) {
-        const id = sortable.items[i].id;
-        const slide = this.slides.find(
-          (slide) => parseInt(slide.id) === parseInt(id)
-        );
-        if (!slide) continue;
-        if (slide.sorting !== i + 1) {
-          slide.sorting = i + 1;
-          this.updateSlide(slide);
-        }
-      }
-    });
+    this.registerSortingEvent();
   },
   methods: {
+    registerSortingEvent(){
+      UIkit.util.on("#slides", "moved", (e, sortable) => {
+        for (let i = 0; i < sortable.items.length; i++) {
+          const id = sortable.items[i].id;
+          const slide = this.slides.find((slide) => parseInt(slide.id) === parseInt(id));
+          if (!slide) continue;
+          if (slide.sorting !== i + 1) {
+            slide.sorting = i + 1;
+            this.updateSlide(slide, 'sorting');
+          }
+        }
+      });
+    },
     buildMessage(slide) {
       let msg = "";
       if(!slide.uri || !slide.uri.length){
@@ -162,7 +158,7 @@ export default {
             try{
               slide.content = JSON.parse(slide.content);
             }catch (err) {
-              console.log(err);
+              console.error("Failed to parse slide content");
             }
           }
         }
@@ -192,9 +188,19 @@ export default {
         console.log(err);
       }
     },
-    updateSlide(slide) {
+    updateSlide(slide, action) {
+      const slideData = { ...slide };
+      let actionString = '';
+      if(action){
+        actionString = `?action=${action}`;
+      }
       try {
-        axios.put(`/api/admin/guides/${this.id}/slides/${slide.id}`, slide);
+        slideData.content = JSON.stringify(slide.content);
+      }catch (err) {
+        console.error("Failed to stringify slide content");
+      }
+      try {
+        axios.put(`/api/admin/guides/${this.id}/slides/${slide.id}${actionString}`, slideData);
       } catch (err) {
         console.log(err);
       }

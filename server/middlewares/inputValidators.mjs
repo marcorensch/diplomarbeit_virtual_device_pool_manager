@@ -85,6 +85,7 @@ const guideValidator = [
 ];
 
 const slideValidator = [
+    query('action').optional().escape().trim(),
     body('name').exists().withMessage("Name is required").escape().trim(),
     body('uri').exists().withMessage("Content is required").trim(),
     body('content').exists().withMessage("Content is required").trim(),

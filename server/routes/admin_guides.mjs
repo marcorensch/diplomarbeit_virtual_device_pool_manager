@@ -107,9 +107,10 @@ router.post('/:guide_id/slides', slideValidator, async (req, res) => {
 
 router.put('/:guide_id/slides/:id', UserValidator.hasPermission('canManageGuides'), slideValidator, async (req, res) => {
     const slideData = req.body;
+    const action = req.query.action || null;
     slideData.content = slideData.content || "";
     try{
-        const id = await GuidesHelper.updateSlide(slideData);
+        const id = await GuidesHelper.updateSlide(slideData, action);
         if (id === null) return res.status(500).json({success: false, message: "Failed to create slide"});
         return res.status(200).json({success: true, message: "Slide created successfully", id});
     } catch (e) {

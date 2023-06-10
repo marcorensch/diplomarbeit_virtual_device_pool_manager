@@ -372,6 +372,26 @@ export default {
             await this.deleteShape();
           }
         }
+        if(e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "ArrowLeft" || e.key === "ArrowRight"){
+          if(this.selectedShapeName){
+            e.preventDefault();
+            switch(e.key){
+              case "ArrowUp":
+                this.selectedShape.y = this.selectedShape.y - 1;
+                break;
+              case "ArrowDown":
+                this.selectedShape.y = this.selectedShape.y + 1;
+                break;
+              case "ArrowLeft":
+                this.selectedShape.x = this.selectedShape.x - 1;
+                break;
+              case "ArrowRight":
+                this.selectedShape.x = this.selectedShape.x + 1;
+                break;
+            }
+            this.selectedShape.percentages = this.calculatePercentages(this.selectedShape);
+          }
+        }
       });
     },
     setStageSize() {

@@ -83,10 +83,19 @@ export default class GuidesHelper {
         return result.affectedRows === 1 ? result.insertId : null;
     }
 
-    static async updateSlide(slide) {
+    static async updateSlide(slide, action) {
         const database = new DatabaseModel();
-        const query = "UPDATE guide_slides SET name = ?, content = ?, notes = ?, uri = ?, sorting = ? WHERE id = ?";
-        const result = await database.query(query, [slide.name, slide.content, slide.notes, slide.uri, slide.sorting, slide.id]);
+        let query = '';
+        let values = [];
+        if(action === "sorting") {
+            query = "UPDATE guide_slides SET sorting = ? WHERE id = ?";
+            values = [slide.sorting, slide.id];
+        }else{
+            query = "UPDATE guide_slides SET name = ?, content = ?, notes = ?, uri = ?, sorting = ? WHERE id = ?";
+            values = [slide.name, slide.content, slide.notes, slide.uri, slide.sorting, slide.id];
+        }
+
+        const result = await database.query(query, values);
         return result.affectedRows === 1;
     }
 }
