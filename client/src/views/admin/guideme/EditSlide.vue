@@ -593,25 +593,6 @@ export default {
         });
       });
     },
-    updateItemsByPercentages() {
-      if (!this.stageItems || !this.stageItems.length) return;
-      for (const item of this.stageItems) {
-        if (item.type === "rectangle") {
-          item.width = (this.configKonva.width / 100) * item.percentages.width;
-          item.height = (this.configKonva.height / 100) * item.percentages.height;
-          item.cornerRadius = (this.configKonva.width / 100) * item.percentages.cornerRadius;
-        }
-        if (item.type === "circle") {
-          item.radius = (this.configKonva.width / 100) * item.percentages.radius;
-        }
-        item.x = (this.configKonva.width / 100) * item.percentages.x;
-        item.y = (this.configKonva.height / 100) * item.percentages.y;
-        item.strokeWidth = Math.ceil((this.configKonva.width / 100) * item.percentages.strokeWidth);
-      }
-    },
-    handleStrokeWidthChanged() {
-      this.selectedShape.percentages = this.calculatePercentages(this.selectedShape)
-    },
 
     handleAddVisualElementClicked(type) {
       console.log("Add Visual Element Clicked " + type);
@@ -642,6 +623,10 @@ export default {
       let element = this.stageItems.at(-1);
       element.percentages = this.calculatePercentages(element);
     },
+
+    handleStrokeWidthChanged() {
+      this.selectedShape.percentages = this.calculatePercentages(this.selectedShape)
+    },
     calculatePercentages(stageItem) {
       if (!stageItem) {
         this.toast.error("Error calculating percentages");
@@ -662,6 +647,22 @@ export default {
         percentages.cornerRadius = (stageItem.cornerRadius / this.configKonva.width) * 100;
       }
       return percentages;
+    },
+    updateItemsByPercentages() {
+      if (!this.stageItems || !this.stageItems.length) return;
+      for (const item of this.stageItems) {
+        if (item.type === "rectangle") {
+          item.width = (this.configKonva.width / 100) * item.percentages.width;
+          item.height = (this.configKonva.height / 100) * item.percentages.height;
+          item.cornerRadius = (this.configKonva.width / 100) * item.percentages.cornerRadius;
+        }
+        if (item.type === "circle") {
+          item.radius = (this.configKonva.width / 100) * item.percentages.radius;
+        }
+        item.x = (this.configKonva.width / 100) * item.percentages.x;
+        item.y = (this.configKonva.height / 100) * item.percentages.y;
+        item.strokeWidth = Math.ceil((this.configKonva.width / 100) * item.percentages.strokeWidth);
+      }
     },
 
   },
