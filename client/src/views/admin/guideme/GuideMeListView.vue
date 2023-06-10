@@ -2,34 +2,8 @@
   <div class="uk-section uk-padding-remove guideme-list-view">
     <div class="uk-container">
       <h1 class="uk-margin-remove-top">Guides</h1>
-      <div
-        class="actions uk-background-muted uk-border-rounded uk-padding-small"
-      >
-        <div class="uk-hidden@m uk-flex uk-grid-small">
-          <div class="uk-button-group">
-            <button
-              v-if="auth.hasPermission('canCreateGuides')"
-              class="uk-button uk-button-primary"
-              @click="handleCreateGuideClicked"
-            >
-              <font-awesome-icon
-                :icon="['fas', 'plus']"
-                class="uk-preserve-width"
-              />
-            </button>
-          </div>
-          <div>
-            <input
-              type="text"
-              id="search_guide_mobile"
-              class="uk-input"
-              placeholder="Search Guide"
-              v-model="search_guide"
-              @keyup="searchTimeOut"
-            />
-          </div>
-        </div>
-        <div class="uk-flex uk-visible@m">
+      <div class="actions uk-background-muted uk-border-rounded uk-padding-small">
+        <div class="uk-flex">
           <div>
             <button
               v-if="auth.hasPermission('canCreateGuides')"
@@ -66,27 +40,12 @@
         </div>
       </div>
       <div>
-        <div
-          class="uk-margin-small-top"
-          v-for="guide of guides"
-          :key="guide.id"
-        >
-          <div
-            class="uk-card uk-card-default uk-position-relative"
-            :uk-tooltip="
-              guide.visible === 1 ? 'Guide is visible' : 'Guide is hidden'
-            "
-          >
-            <router-link
-              :to="{ name: 'admin-guide-slides', params: { id: guide.id } }"
-              class="uk-position-cover"
-            ></router-link>
+        <div class="uk-margin-small-top" v-for="guide of guides" :key="guide.id">
+          <div class="uk-card uk-card-default uk-position-relative"
+            :uk-tooltip="guide.visible === 1 ? 'Guide is visible' : 'Guide is hidden'">
+            <router-link class="uk-position-cover" :to="{ name: 'admin-guide-slides', params: { id: guide.id } }" />
             <div class="uk-position-top-right uk-padding-small edit-div">
-              <router-link
-                class="uk-position-cover"
-                :to="{ name: 'admin-guide-edit', params: { id: guide.id } }"
-              >
-              </router-link>
+              <router-link class="uk-position-cover" :to="{ name: 'admin-guide-edit', params: { id: guide.id } }" />
               <font-awesome-icon :icon="['fas', 'cog']" />
             </div>
 
@@ -139,7 +98,7 @@ import PaginationWidget from "@/components/widgets/PaginationWidget.vue";
 
 export default {
   name: "GuideMeListView",
-  components: { PaginationWidget, FontAwesomeIcon },
+  components: {PaginationWidget, FontAwesomeIcon },
   setup() {
     const auth = useAuthStore();
     return { auth };

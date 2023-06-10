@@ -1,7 +1,7 @@
 <template>
   <div class="uk-section uk-section-small builder-view">
     <div class="uk-container">
-      <BuilderNotAvailableMobile />
+      <NotAvailableMobile />
       <div class="uk-visible@m">
         <div>
           <h4 class="uk-margin-remove-bottom">Pool Builder</h4>
@@ -19,11 +19,11 @@
 </template>
 
 <script>
-import BuilderNotAvailableMobile from "@/components/builder/BuilderNotAvailableMobile.vue";
+import NotAvailableMobile from "@/components/NotAvailableMobile.vue";
 
 export default {
   name: "BuilderView",
-  components: { BuilderNotAvailableMobile },
+  components: { NotAvailableMobile },
   data() {
     return {
       categories: [],

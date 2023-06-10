@@ -15,7 +15,8 @@
         </h1>
       </div>
     </div>
-    <div id="cabinet" uk-height-viewport="offset-top:true; offset-bottom:60px;">
+    <NotAvailableMobile />
+    <div class="uk-visible@m" id="cabinet" uk-height-viewport="offset-top:true; offset-bottom:60px;">
       <div
         id="nxd-cabinet-placeholder"
         v-if="!rows.length"
@@ -181,10 +182,12 @@ import { useBuilderItemStore } from "@/stores/builderItemStore";
 import { useBuilderCategoriesStore } from "@/stores/builderCategoriesStore";
 import BuilderRow from "@/components/builder/BuilderRow.vue";
 import UIkit from "uikit";
+import NotAvailableMobile from "@/components/NotAvailableMobile.vue";
 
 export default {
   name: "CabinetView",
   components: {
+    NotAvailableMobile,
     BuilderRow,
   },
   setup() {

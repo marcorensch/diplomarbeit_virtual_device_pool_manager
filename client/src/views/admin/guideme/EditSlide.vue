@@ -16,7 +16,8 @@
         </div>
       </div>
 
-      <div class="uk-margin">
+      <NotAvailableMobile :message="'GuideMe Stage Editor is not available<br />on Small Screen Devices'" />
+      <div class="uk-margin uk-visible@m">
         <div id="stage-container" ref="stageContainer" class="uk-position-relative uk-padding uk-background-muted uk-border-rounded nxd-min-height-large">
           <div id="controls-container" class="uk-position-top-right">
             <div class="uk-card uk-card-default uk-card-small uk-width-medium uk-box-shadow-large" uk-sticky="end: !#stage-container; offset: 80">
@@ -276,10 +277,11 @@ import FileManager from "@/components/FileManager.vue";
 import Konva from "konva";
 import {v4 as uuidv4} from "uuid";
 import {ColorPicker} from "vue3-colorpicker";
+import NotAvailableMobile from "@/components/NotAvailableMobile.vue";
 
 export default {
   name: "EditSlide",
-  components: {ColorPicker, FileManager, FontAwesomeIcon},
+  components: {NotAvailableMobile, ColorPicker, FileManager, FontAwesomeIcon},
   setup() {
     const toast = useToast();
     return {toast};

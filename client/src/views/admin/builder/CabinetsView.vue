@@ -12,10 +12,12 @@
         </h1>
       </div>
     </div>
+    <NotAvailableMobile />
     <div
       id="cabinets"
       uk-scrollspy="target: >div; cls:uk-animation-fade;delay:150"
       uk-sortable="handle: >div;"
+      class="uk-visible@m"
     >
       <template v-for="cabinet of cabinets" :key="cabinet.id">
         <div class="cabinet-element uk-margin animate" :data-id="cabinet.id">
@@ -186,10 +188,11 @@ import { useBuilderItemStore } from "@/stores/builderItemStore";
 import { useBuilderCategoriesStore } from "@/stores/builderCategoriesStore";
 import UIkit from "uikit";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import NotAvailableMobile from "@/components/NotAvailableMobile.vue";
 
 export default {
   name: "CabinetsView",
-  components: { FontAwesomeIcon },
+  components: {NotAvailableMobile, FontAwesomeIcon },
   setup() {
     return {
       builderItemStore: useBuilderItemStore(),

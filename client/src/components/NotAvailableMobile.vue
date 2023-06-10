@@ -25,9 +25,7 @@
           </div>
         </div>
 
-        <h3 class="uk-text-muted">
-          The Pool Builder is not available<br />on Small Screen Devices
-        </h3>
+        <h3 class="uk-text-muted" v-html="message"></h3>
       </div>
     </div>
   </div>
@@ -37,8 +35,14 @@
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 export default {
-  name: "BuilderNotAvailableMobile",
+  name: "NotAvailableMobile",
   components: { FontAwesomeIcon },
+  props: {
+    message: {
+      type: String,
+      default: "This Widget is not available<br />on Small Screen Devices",
+    },
+  },
 };
 </script>
 

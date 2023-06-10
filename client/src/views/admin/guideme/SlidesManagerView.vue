@@ -50,9 +50,9 @@
                     </div>
                     <div v-if="slide.content && slide.content.length">
                       <h6 class="uk-margin-small-top uk-margin-remove-bottom">Steps in this Slide:</h6>
-                      <table class="uk-table uk-list-divider uk-margin-remove uk-table-middle">
+                      <table class="uk-table uk-list-divider uk-margin-remove uk-table-middle uk-table-small">
                         <tr v-for="shape of slide.content">
-                          <td class="uk-table-shrink"><span class="uk-text-small">{{ shape.label }}: </span></td>
+                          <td class="uk-text-nowrap uk-table-shrink"><span class="uk-text-small">{{ shape.label }}: </span></td>
                           <td><span class="uk-text-muted uk-text-small">{{ shape.description || "no Description Text" }}</span></td>
                         </tr>
                       </table>
@@ -92,11 +92,7 @@
         </div>
       </div>
     </div>
-
-    <ControlsFooterWidget
-      @cancel="handleCancelClicked"
-      @save="handleSaveClicked"
-    />
+    <ControlsFooterWidget @cancel="handleCancelClicked" @save="handleSaveClicked" />
   </div>
 </template>
 
