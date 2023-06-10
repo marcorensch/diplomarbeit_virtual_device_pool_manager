@@ -11,7 +11,7 @@
           </router-link>
         </div>
         <div>
-          <h2 class="uk-h2 uk-margin-remove">{{ guide.name }} Slides</h2>
+          <h2 class="uk-h2 uk-margin-remove">"{{ guide.name }}" Slides</h2>
         </div>
       </div>
 

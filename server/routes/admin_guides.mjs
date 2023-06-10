@@ -81,7 +81,6 @@ router.get('/:guide_id/slides', async (req, res) => {
 });
 
 router.get('/:guide_id/slides/:id', async (req, res) => {
-    console.log("GET SLIDE")
     const guideId = req.params.guide_id; // Guide ID wird aktuell nicht verwendet
     const slideId = req.params.id;
     try {
@@ -113,6 +112,19 @@ router.put('/:guide_id/slides/:id', UserValidator.hasPermission('canManageGuides
         const id = await GuidesHelper.updateSlide(slideData, action);
         if (id === null) return res.status(500).json({success: false, message: "Failed to create slide"});
         return res.status(200).json({success: true, message: "Slide created successfully", id});
+    } catch (e) {
+        return res.status(500).json({success: false, message: e.message});
+    }
+});
+
+router.delete('/:guide_id/slides/:id', UserValidator.hasPermission('canManageGuides'), async (req, res) => {
+    const guideId = req.params.guide_id; // Guide ID wird aktuell nicht verwendet
+    const slideId = req.params.id;
+    if(!slideId) return res.status(500).json({success: false, message: "Failed to delete slide"});
+    try{
+        const status = await GuidesHelper.deleteSlide(slideId);
+        if (!status) return res.status(500).json({success: false, message: "Failed to delete slide"});
+        return res.status(200).json({success: true, message: "Slide deleted successfully"});
     } catch (e) {
         return res.status(500).json({success: false, message: e.message});
     }

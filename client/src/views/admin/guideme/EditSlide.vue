@@ -211,6 +211,15 @@
                 <div class="uk-grid-small uk-flex uk-flex-right" uk-grid>
                   <div>
                     <button
+                        class="uk-button uk-button-danger uk-button-small"
+                        style="min-width: 50px"
+                        @click="handleDeleteSlideClicked"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                  <div>
+                    <button
                         class="uk-button uk-button-secondary uk-button-small"
                         style="min-width: 50px"
                         @click="
@@ -460,6 +469,30 @@ export default {
     handleImageSelected() {
       this.slide.uri = this.fm_file.fullPath;
       this.handleChangeStageSize();
+    },
+    async handleDeleteSlideClicked(){
+      const confirmed = await UIkit.modal.confirm(`Do you really want to <b>delete</b> this slide?`, {
+        i18n: {
+          cancel: 'No',
+          ok: 'Yes'
+        }
+      }).then(function () {
+        return true;
+      }, function () {
+        return false;
+      });
+
+      if (!confirmed) {
+        return;
+      }
+
+      const result = await axios.delete(`/api/admin/guides/${this.$route.query.gid}/slides/${this.$route.params.id}`);
+      if (result.data.success) {
+        this.$router.push({
+          name: "admin-guide-slides",
+          params: {id: this.$route.query.gid},
+        });
+      }
     },
 
     async getGuide() {

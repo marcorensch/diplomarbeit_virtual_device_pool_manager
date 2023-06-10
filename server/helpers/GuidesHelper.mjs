@@ -98,4 +98,11 @@ export default class GuidesHelper {
         const result = await database.query(query, values);
         return result.affectedRows === 1;
     }
+
+    static async deleteSlide(id) {
+        const database = new DatabaseModel();
+        const query = "DELETE FROM guide_slides WHERE id = ?";
+        const result = await database.query(query, [id]);
+        return result.affectedRows === 1;
+    }
 }

@@ -29,9 +29,7 @@
           this cabinet.
         </h3>
         <div class="uk-text-muted uk-text-light uk-text-center">
-          Hint: you can use
-          <span
-            style="
+          Hint: you can use <span style="
               border: 1px solid grey;
               display: inline-block;
               padding: 3px;
@@ -40,10 +38,7 @@
               font-size: 13px;
               position: relative;
               top: -2px;
-            "
-            >shift</span
-          >
-          + click to add two rows in one go.
+            ">shift</span> + click to add two rows in one go.
         </div>
       </div>
       <template v-else>
