@@ -104,8 +104,8 @@
                     <div class="uk-margin-small-top">
                       <table class="uk-table uk-table-divider uk-table-small uk-table-middle">
                         <tr v-for="shape of stageItems" :key="shape.name">
-                          <td @click="handleSelectStageItem(shape)" class="uk-width-5-6 uk-text-truncate">{{shape.label}}</td>
-                          <td @click="handleDeleteStageItem(shape)"><font-awesome-icon class="uk-text-danger uk-preserve-width" :icon="['fas','close']" /></td>
+                          <td @click="handleSelectStageItemFromCtrls(shape)" class="nxd-cursor-pointer uk-width-5-6 uk-text-truncate">{{shape.label}}</td>
+                          <td @click="handleDeleteStageItemFromCtrls(shape)"><font-awesome-icon class="nxd-cursor-pointer uk-text-danger uk-preserve-width" :icon="['fas','close']" /></td>
                         </tr>
                       </table>
                     </div>
@@ -318,16 +318,21 @@ export default {
     await this.getSlide();
   },
   methods: {
-    handleSelectStageItem(item) {
+    handleSelectStageItemFromCtrls(item) {
+      if(this.selectedShapeName === item.name){
+        this.selectedShapeName = "";
+        this.selectedShape = null;
+        return;
+      }
       this.selectedShapeName = item.name;
       this.selectedShape = item;
+      this.updateTransformer();
     },
-    handleDeleteStageItem(item){
-      this.stageItems = this.stageItems.filter(
-          (i) => i.name !== item.name
-      );
-      this.selectedShapeName = "";
-      this.selectedShape = null;
+    handleDeleteStageItemFromCtrls(item){
+      this.selectedShapeName = item.name;
+      this.selectedShape = item;
+      this.deleteShape();
+      this.updateTransformer();
     },
     handleImageLoadedEvent(){
       this.handleChangeStageSize();
@@ -335,33 +340,36 @@ export default {
     registerWindowEvents() {
       window.addEventListener("resize", () => this.handleChangeStageSize(this.stageSize));
     },
+    async deleteShape(){
+      const confirmed = await UIkit.modal.confirm(`Do you really want to <b>delete</b> the shape <b>${this.selectedShape.label}</b>?`, {
+        i18n: {
+          cancel: 'No',
+          ok: 'Yes'
+        }
+      }).then(function () {
+        return true;
+      }, function () {
+        return false;
+      });
+
+      if (!confirmed) {
+        return;
+      }
+
+      this.stageItems = this.stageItems.filter(
+          (item) => item.name !== this.selectedShapeName
+      );
+      this.selectedShapeName = "";
+      this.selectedShape = null;
+      const transformerNode = this.$refs.transformer.getNode();
+      transformerNode.nodes([]);
+    },
     registerKeyboardEvents() {
       document.addEventListener("keydown", async (e) => {
         if (e.key === "Delete" || e.key === "Backspace") {
           const inputFocused = document.activeElement.tagName === "INPUT";
           if (this.selectedShapeName && !inputFocused) {
-            const confirmed = await UIkit.modal.confirm(`Do you really want to <b>delete</b> the shape <b>${this.selectedShape.label}</b>?`, {
-              i18n: {
-                cancel: 'No',
-                ok: 'Yes'
-              }
-            }).then(function () {
-              return true;
-            }, function () {
-              return false;
-            });
-
-            if (!confirmed) {
-              return;
-            }
-
-            this.stageItems = this.stageItems.filter(
-                (item) => item.name !== this.selectedShapeName
-            );
-            this.selectedShapeName = "";
-            this.selectedShape = null;
-            const transformerNode = this.$refs.transformer.getNode();
-            transformerNode.nodes([]);
+            await this.deleteShape();
           }
         }
       });
