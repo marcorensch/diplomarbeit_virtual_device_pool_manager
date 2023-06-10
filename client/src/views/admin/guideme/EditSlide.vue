@@ -17,173 +17,8 @@
       </div>
 
       <NotAvailableMobile :message="'GuideMe Stage Editor is not available<br />on Small Screen Devices'" />
-      <div class="uk-margin uk-visible@m">
+      <div id="stage-outter" class="uk-margin uk-visible@m uk-position-relative" ref="stageOutter">
         <div id="stage-container" ref="stageContainer" class="uk-position-relative uk-padding uk-background-muted uk-border-rounded nxd-min-height-large">
-          <div id="controls-container" class="uk-position-top-right">
-            <div class="uk-card uk-card-default uk-card-small uk-width-medium uk-box-shadow-large" uk-sticky="end: !#stage-container; offset: 80">
-              <div class="uk-padding-small uk-position-relative nxd-cursor-pointer" @click="showControls = !showControls">
-                <h4 class="uk-h4 uk-margin-remove-bottom">Controls</h4>
-                <div class="uk-position-center-right uk-margin-right">
-                  <font-awesome-icon v-if="!showControls" :icon="['fas', 'chevron-down']" />
-                  <font-awesome-icon v-else :icon="['fas', 'chevron-up']" />
-                </div>
-              </div>
-              <div id="stage-controls" :class="{ 'uk-hidden': !showControls }">
-                <div class="uk-card-body">
-                  <div class="uk-margin-small-top">
-                    <h5>Stage</h5>
-                    <div class="uk-flex uk-flex-center">
-                      <div class="uk-button-group">
-                        <button class="uk-button uk-button-default uk-button-small"
-                                :class="{'uk-button-primary': stageSize === '1-4',}"
-                                @click="handleChangeStageSize('1-4')"
-                        >
-                          25%
-                        </button>
-                        <button class="uk-button uk-button-default uk-button-small"
-                                :class="{'uk-button-primary': stageSize === '1-3'}"
-                                @click="handleChangeStageSize('1-3')">
-                          33%
-                        </button>
-                        <button
-                            class="uk-button uk-button-default uk-button-small"
-                            :class="{
-                              'uk-button-primary': stageSize === '1-2',
-                            }"
-                            @click="handleChangeStageSize('1-2')"
-                        >
-                          50%
-                        </button>
-                        <button
-                            class="uk-button uk-button-default uk-button-small"
-                            :class="{
-                              'uk-button-primary': stageSize === '3-4',
-                            }"
-                            @click="handleChangeStageSize('3-4')"
-                        >
-                          75%
-                        </button>
-                        <button
-                            class="uk-button uk-button-default uk-button-small"
-                            :class="{
-                              'uk-button-primary': stageSize === '1-1',
-                            }"
-                            @click="handleChangeStageSize('1-1')"
-                        >
-                          100%
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="uk-margin-small-top">
-                    <h5>Label</h5>
-                    <input type="text" class="uk-input uk-width-1-1" id="slide-name-input" v-model="slide.name">
-                  </div>
-                  <div class="uk-margin-small-top">
-                    <h5>Image</h5>
-                    <button
-                        class="uk-button uk-button-secondary uk-button-small uk-width-1-1"
-                        uk-toggle="target: #filemanager-modal">
-                      {{ slide.uri ? "Change" : "Select" }} Image
-                    </button>
-                  </div>
-                  <div class="uk-margin-top">
-                    <h5>Shapes</h5>
-                    <button
-                        class="uk-button uk-button-small uk-button-secondary uk-width-1-1"
-                        :class="{'uk-disabled': !slide.uri}"
-                        @click="handleAddVisualElementClicked('circle')">
-                      Add Circle
-                    </button>
-                    <button
-                        class="uk-button uk-button-small uk-button-secondary uk-width-1-1 uk-margin-small-top"
-                        :class="{'uk-disabled': !slide.uri}"
-                        @click="handleAddVisualElementClicked('rectangle')">
-                      Add Rectangle
-                    </button>
-                    <div class="uk-margin-small-top">
-                      <table class="uk-table uk-table-divider uk-table-small uk-table-middle">
-                        <tr v-for="shape of stageItems" :key="shape.name">
-                          <td @click="handleSelectStageItemFromCtrls(shape)" class="nxd-cursor-pointer uk-width-5-6 uk-text-truncate">{{shape.label}}</td>
-                          <td @click="handleDeleteStageItemFromCtrls(shape)"><font-awesome-icon class="nxd-cursor-pointer uk-text-danger uk-preserve-width" :icon="['fas','close']" /></td>
-                        </tr>
-                      </table>
-                    </div>
-                    <div v-if="selectedShape" class="uk-margin-top">
-                      <div id="shape-edit-container" class="uk-border-rounded uk-padding-small">
-                        <div id="shape-edit-title">
-                          <span><font-awesome-icon class="uk-preserve-width" :icon="['fas','cog']"/> Shape</span>
-                        </div>
-                        <div><input class="uk-input" v-model="selectedShape.label" placeholder="Shape Label" /></div>
-                        <div class="uk-margin-small-top">
-                          <textarea class="uk-textarea" v-model="selectedShape.description"
-                                    placeholder="Describe Step Procedures here"></textarea>
-                        </div>
-                        <div class="uk-margin-small-top">
-                          <span>Fill: </span>
-                          <div class="color-picker-preview-container uk-float-right">
-                            <color-picker v-model:pureColor="selectedShape.fill"/>
-                          </div>
-                        </div>
-                        <div class="uk-margin-small-top">
-                          <span>Stroke: </span>
-                          <div class="color-picker-preview-container uk-float-right">
-                            <color-picker v-model:pureColor="selectedShape.stroke"/>
-                          </div>
-                        </div>
-                        <div class="uk-margin-small-top">
-                          <div class="uk-width-1-1 uk-flex uk-flex-middle uk-child-width-1-2">
-                            <div><span>Stroke Width: </span></div>
-                            <div class="uk-flex uk-flex-right">
-                              <input type="number" min="0" class="stroke-width-input"
-                                     v-model="selectedShape.strokeWidth" @change="handleStrokeWidthChanged"/>
-                            </div>
-                          </div>
-                        </div>
-
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="uk-card-footer">
-                  <div class="uk-grid-small uk-flex uk-flex-right" uk-grid>
-                    <div>
-                      <button
-                          class="uk-button uk-button-secondary uk-button-small"
-                          style="min-width: 50px"
-                          @click="
-                          this.$router.push({
-                            name: 'admin-guide-slides',
-                            params: { id: guide.id },
-                          })
-                        "
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                    <div>
-                      <button
-                          class="uk-button uk-button-primary uk-button-small"
-                          style="min-width: 50px"
-                          @click="saveSlide(false)"
-                      >
-                        Save
-                      </button>
-                    </div>
-                    <div>
-                      <button
-                          class="uk-button uk-button-success uk-button-small"
-                          style="min-width: 50px"
-                          @click="saveSlide(true)"
-                      >
-                        Save & Close
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
           <div id="stage-inner" ref="stageInner"
                class="uk-position-relative uk-margin-auto uk-border-rounded uk-overflow-hidden"
                :class="[
@@ -228,6 +63,172 @@
             </div>
           </div>
         </div>
+        <div id="controls-container" class="uk-position-top-right uk-position-z-index" ref="draggableContainer">
+          <div class="uk-card uk-card-default uk-card-small uk-width-medium nxd-min-width-medium uk-box-shadow-large">
+            <div class="uk-padding-small uk-position-relative nxd-cursor-pointer">
+              <h4 id="controls-header" class="uk-h4 uk-margin-remove-bottom uk-drag" @dblclick.exact="showControls = !showControls" @mousedown="dragMouseDown">Controls</h4>
+              <div class="uk-position-center-right uk-margin-right" @click="showControls = !showControls">
+                <font-awesome-icon v-if="!showControls" :icon="['fas', 'chevron-down']" />
+                <font-awesome-icon v-else :icon="['fas', 'chevron-up']" />
+              </div>
+            </div>
+            <div id="stage-controls" :class="{ 'uk-hidden': !showControls }">
+              <div class="uk-card-body">
+                <div class="uk-margin-small-top">
+                  <h5>Stage</h5>
+                  <div class="uk-flex uk-flex-center">
+                    <div class="uk-button-group">
+                      <button class="uk-button uk-button-default uk-button-small"
+                              :class="{'uk-button-primary': stageSize === '1-4',}"
+                              @click="handleChangeStageSize('1-4')"
+                      >
+                        25%
+                      </button>
+                      <button class="uk-button uk-button-default uk-button-small"
+                              :class="{'uk-button-primary': stageSize === '1-3'}"
+                              @click="handleChangeStageSize('1-3')">
+                        33%
+                      </button>
+                      <button
+                          class="uk-button uk-button-default uk-button-small"
+                          :class="{
+                              'uk-button-primary': stageSize === '1-2',
+                            }"
+                          @click="handleChangeStageSize('1-2')"
+                      >
+                        50%
+                      </button>
+                      <button
+                          class="uk-button uk-button-default uk-button-small"
+                          :class="{
+                              'uk-button-primary': stageSize === '3-4',
+                            }"
+                          @click="handleChangeStageSize('3-4')"
+                      >
+                        75%
+                      </button>
+                      <button
+                          class="uk-button uk-button-default uk-button-small"
+                          :class="{
+                              'uk-button-primary': stageSize === '1-1',
+                            }"
+                          @click="handleChangeStageSize('1-1')"
+                      >
+                        100%
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="uk-margin-small-top">
+                  <h5>Label</h5>
+                  <input type="text" class="uk-input uk-width-1-1" id="slide-name-input" v-model="slide.name">
+                </div>
+                <div class="uk-margin-small-top">
+                  <h5>Image</h5>
+                  <button
+                      class="uk-button uk-button-secondary uk-button-small uk-width-1-1"
+                      uk-toggle="target: #filemanager-modal">
+                    {{ slide.uri ? "Change" : "Select" }} Image
+                  </button>
+                </div>
+                <div class="uk-margin-top">
+                  <h5>Shapes</h5>
+                  <button
+                      class="uk-button uk-button-small uk-button-secondary uk-width-1-1"
+                      :class="{'uk-disabled': !slide.uri}"
+                      @click="handleAddVisualElementClicked('circle')">
+                    Add Circle
+                  </button>
+                  <button
+                      class="uk-button uk-button-small uk-button-secondary uk-width-1-1 uk-margin-small-top"
+                      :class="{'uk-disabled': !slide.uri}"
+                      @click="handleAddVisualElementClicked('rectangle')">
+                    Add Rectangle
+                  </button>
+                  <div class="uk-margin-small-top">
+                    <table class="uk-table uk-table-divider uk-table-small uk-table-middle">
+                      <tr v-for="shape of stageItems" :key="shape.name">
+                        <td @click="handleSelectStageItemFromCtrls(shape)" class="nxd-cursor-pointer uk-width-5-6 uk-text-truncate">{{shape.label}}</td>
+                        <td @click="handleDeleteStageItemFromCtrls(shape)"><font-awesome-icon class="nxd-cursor-pointer uk-text-danger uk-preserve-width" :icon="['fas','close']" /></td>
+                      </tr>
+                    </table>
+                  </div>
+                  <div v-if="selectedShape" class="uk-margin-top">
+                    <div id="shape-edit-container" class="uk-border-rounded uk-padding-small">
+                      <div id="shape-edit-title">
+                        <span><font-awesome-icon class="uk-preserve-width" :icon="['fas','cog']"/> Shape</span>
+                      </div>
+                      <div><input class="uk-input" v-model="selectedShape.label" placeholder="Shape Label" /></div>
+                      <div class="uk-margin-small-top">
+                          <textarea class="uk-textarea" v-model="selectedShape.description"
+                                    placeholder="Describe Step Procedures here"></textarea>
+                      </div>
+                      <div class="uk-margin-small-top">
+                        <span>Fill: </span>
+                        <div class="color-picker-preview-container uk-float-right">
+                          <color-picker v-model:pureColor="selectedShape.fill"/>
+                        </div>
+                      </div>
+                      <div class="uk-margin-small-top">
+                        <span>Stroke: </span>
+                        <div class="color-picker-preview-container uk-float-right">
+                          <color-picker v-model:pureColor="selectedShape.stroke"/>
+                        </div>
+                      </div>
+                      <div class="uk-margin-small-top">
+                        <div class="uk-width-1-1 uk-flex uk-flex-middle uk-child-width-1-2">
+                          <div><span>Stroke Width: </span></div>
+                          <div class="uk-flex uk-flex-right">
+                            <input type="number" min="0" class="stroke-width-input"
+                                   v-model="selectedShape.strokeWidth" @change="handleStrokeWidthChanged"/>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="uk-card-footer">
+                <div class="uk-grid-small uk-flex uk-flex-right" uk-grid>
+                  <div>
+                    <button
+                        class="uk-button uk-button-secondary uk-button-small"
+                        style="min-width: 50px"
+                        @click="
+                          this.$router.push({
+                            name: 'admin-guide-slides',
+                            params: { id: guide.id },
+                          })
+                        "
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                  <div>
+                    <button
+                        class="uk-button uk-button-primary uk-button-small"
+                        style="min-width: 50px"
+                        @click="saveSlide(false)"
+                    >
+                      Save
+                    </button>
+                  </div>
+                  <div>
+                    <button
+                        class="uk-button uk-button-success uk-button-small"
+                        style="min-width: 50px"
+                        @click="saveSlide(true)"
+                    >
+                      Save & Close
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -301,6 +302,8 @@ export default {
       showControls: true,
       updateTriggerCounter: 0,
       fm_file: null,
+      initXPosition: 0,
+      initYPosition: 0,
     };
   },
   async mounted() {
@@ -318,6 +321,33 @@ export default {
     await this.getSlide();
   },
   methods: {
+
+    dragMouseDown(e) {
+      e.preventDefault();
+      // get the mouse cursor position at startup:
+      this.initXPosition = e.clientX;
+      this.initYPosition = e.clientY;
+      this.$refs.stageOutter.onmouseup = this.closeDragElement;
+      // call a function whenever the cursor moves:
+      this.$refs.stageOutter.onmousemove = this.elementDrag;
+    },
+    elementDrag(e) {
+      e.preventDefault();
+      // calculate the new cursor position:
+      const movementX = this.initXPosition - e.clientX;
+      const movementY = this.initYPosition - e.clientY;
+      this.initXPosition = e.clientX;
+      this.initYPosition = e.clientY;
+      // set the element's new position:
+      this.$refs.draggableContainer.style.left = (this.$refs.draggableContainer.offsetLeft - movementX) + "px";
+      this.$refs.draggableContainer.style.top = (this.$refs.draggableContainer.offsetTop - movementY) + "px";
+    },
+    closeDragElement() {
+      // stop moving when mouse button is released:
+      this.$refs.stageOutter.onmouseup = null;
+      this.$refs.stageOutter.onmousemove = null;
+    },
+
     handleSelectStageItemFromCtrls(item) {
       if(this.selectedShapeName === item.name){
         this.selectedShapeName = "";
