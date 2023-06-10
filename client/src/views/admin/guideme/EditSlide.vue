@@ -599,6 +599,7 @@ export default {
         if (item.type === "rectangle") {
           item.width = (this.configKonva.width / 100) * item.percentages.width;
           item.height = (this.configKonva.height / 100) * item.percentages.height;
+          item.cornerRadius = (this.configKonva.width / 100) * item.percentages.cornerRadius;
         }
         if (item.type === "circle") {
           item.radius = (this.configKonva.width / 100) * item.percentages.radius;
@@ -658,6 +659,7 @@ export default {
       if (stageItem.type === "rectangle") {
         percentages.width = (stageItem.width / this.configKonva.width) * 100;
         percentages.height = (stageItem.height / this.configKonva.height) * 100;
+        percentages.cornerRadius = (stageItem.cornerRadius / this.configKonva.width) * 100;
       }
       return percentages;
     },
