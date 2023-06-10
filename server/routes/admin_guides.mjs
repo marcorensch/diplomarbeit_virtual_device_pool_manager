@@ -23,23 +23,30 @@ router.get('/', guidesSearchValidator, async (req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
+    let guide;
     try {
-        const guide = await GuidesHelper.getGuide(req.params.id);
+        guide = await GuidesHelper.getGuide(req.params.id);
         if (guide === null) return res.status(500).json({success: false, message: "Failed to get guide"});
-        return res.status(200).json({success: true, message: "Guide retrieved successfully", guide});
     }catch (e) {
         return res.status(500).json({success: false, message: e.message});
     }
+
+    try{
+        guide.linkedDeviceIds = await GuidesHelper.getLinkedDeviceIds(req.params.id);
+    }catch (e) {
+        return res.status(500).json({success: false, message: e.message});
+    }
+
+    return res.status(200).json({success: true, message: "Guide retrieved successfully", guide});
 });
 
 router.post('/', UserValidator.hasPermission('canCreateGuides'), guideValidator, async (req, res) => {
     const guideData = req.body;
     guideData.description = guideData.description || "";
-    console.log(guideData)
     try{
-        const guide = await GuidesHelper.createGuide(guideData);
-        if (guide === null) return res.status(500).json({success: false, message: "Failed to create guide"});
-        return res.status(200).json({success: true, message: "Guide created successfully", guide});
+        const id = await GuidesHelper.createGuide(guideData);
+        if (id === null) return res.status(500).json({success: false, message: "Failed to create guide"});
+        return res.status(200).json({success: true, message: "Guide created successfully", id});
     } catch (e) {
         return res.status(500).json({success: false, message: e.message});
     }

@@ -7,6 +7,8 @@ import path from "path";
 import {fileURLToPath} from "url";
 import {describe} from "mocha";
 
+import GuideMeItem from "../../client/src/models/GuideMeItem.mjs";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -1202,4 +1204,47 @@ describe("Test Device CheckIn / Out Routes", () => {
         expect(response.body.message).to.eql("Device checked in");
     });
 
+});
+
+describe("Test GuideMe Manager administrative Routes", () => {
+    const agent = supertest.agent(app);
+    before(async () => {
+        await agent.post("/api/auth/login").send(adminCredentials);
+    });
+    describe("Test Guides Management", () => {
+        let createdGuideItem;
+        // Create a guide
+        it("should return 200 when creating a guide", async () => {
+            const guideData = new GuideMeItem("GuideMe Test Name", "Test GuideMe Description", 0, 1);
+            const response = await agent.post("/api/admin/guides").send(guideData);
+            expect(response.status).to.eql(200);
+            expect(response.body).to.have.property("id");
+        });
+        // Get all guides
+        it("should return 200 and an array containing exactly one guide when getting all guides", async () => {
+            const response = await agent.get("/api/admin/guides");
+            expect(response.status).to.eql(200);
+            expect(response.body).to.have.property("guides");
+            expect(response.body.guides).to.be.an("array").and.have.lengthOf(1);
+            createdGuideItem = response.body[0];
+        });
+        // Get a guide
+        // Update a guide
+        // Delete a guide
+    });
+
+    describe("Test Guide Slides Management", () => {
+        let createdGuideItem;
+        before(async () => {
+            // Create a guide
+        });
+        after(async () => {
+            // Delete the guide
+        });
+        // Create a slide
+        // Get all slides
+        // Get a slide
+        // Update a slide
+        // Delete a slide
+    });
 });

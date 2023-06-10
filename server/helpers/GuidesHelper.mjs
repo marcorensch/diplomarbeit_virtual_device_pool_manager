@@ -42,6 +42,12 @@ export default class GuidesHelper {
         return guide[0];
     }
 
+    static async getLinkedDeviceIds(id) {
+        const database = new DatabaseModel();
+        const query = "SELECT * FROM guides_devices WHERE guide_id = ?";
+        return await database.query(query, [id]);
+    }
+
     static async createGuide(guide) {
         const database = new DatabaseModel();
         const query = "INSERT INTO guides (name, description, visible) VALUES (?, ?, ?)";
