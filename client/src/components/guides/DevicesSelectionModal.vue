@@ -1,12 +1,17 @@
 <template>
 
-  <div id="modal-device-selection" class="nxd-no-select" ref="deviceSelectionModal" uk-modal>
+  <div id="modal-device-selection" class="nxd-no-select uk-modal-container" ref="deviceSelectionModal" uk-modal>
     <div class="uk-modal-dialog">
       <button class="uk-modal-close-default" type="button" uk-close></button>
       <div class="uk-modal-header">
         <h2 class="uk-modal-title">Select Linked Devices</h2>
       </div>
       <div class="uk-modal-body">
+        <DevicesActionbar
+            :show-add-btn="false"
+            :show-availability-filter="false"
+            @search="handleNewSearchRequest"
+        />
         <table class="uk-table uk-table-small uk-table-divider uk-table-middle uk-table-hover">
           <thead>
           <th>
@@ -26,6 +31,13 @@
           </template>
           </tbody>
         </table>
+        <PaginationWidget
+            :total_count="total_count"
+            :default_page_size="limit"
+            :updateTrigger="updateTrigger"
+            @pageChange="handlePageChange"
+            @pageSizeChange="handlePageSizeChanged"
+        />
       </div>
       <div class="uk-modal-footer uk-text-right">
         <button class="uk-button uk-button-secondary uk-modal-close" type="button">Close</button>
@@ -40,10 +52,13 @@
 import UIkit from 'uikit';
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import axios from "axios";
+import DevicesActionbar from "@/components/devices/devicesActionbar.vue";
+import DeviceHelper from "@/helpers/DeviceHelper.mjs";
+import PaginationWidget from "@/components/widgets/PaginationWidget.vue";
 
 export default {
   name: "DevicesSelectionModal",
-  components: {FontAwesomeIcon},
+  components: {PaginationWidget, DevicesActionbar, FontAwesomeIcon},
   emits: ['update-linked-devices'],
   props: {
     linkedDeviceIds: {
@@ -55,13 +70,56 @@ export default {
     return {
       devices: [],
       total_count: 0,
-      currentLinkedDeviceIds : []
+      offset: 0,
+      limit: 20,
+      currentLinkedDeviceIds : [],
+      filters: {
+        search: '',
+        availability: '',
+        type: '',
+      },
+      updateTrigger: 0,
     }
   },
   mounted() {
 
   },
   methods: {
+    handlePageChange(page) {
+      this.offset = (page - 1) * this.limit;
+      this.getDevices();
+      this.updateTrigger++;
+    },
+    handlePageSizeChanged(pageSize) {
+      this.offset = 0;
+      this.limit = pageSize;
+      this.getDevices();
+      this.updateTrigger++;
+    },
+    async getDevices() {
+      try {
+        const response = await DeviceHelper.getDevices(
+            this.limit,
+            this.offset,
+            this.filters
+        );
+        this.devices = response.devices;
+        this.total_count = response.total_count;
+        this.updateDevicesSelectionState();
+      } catch (e) {
+        console.log(e);
+      }
+    },
+
+    handleNewSearchRequest(filters) {
+      this.offset = 0;
+      this.filters = filters;
+      if (filters.search.trim().length && filters.search.trim().length < 3) {
+        this.toast.warning("Search term should be at least 3 characters long");
+        filters.search = "";
+      }
+      this.getDevices();
+    },
     show() {
       this.currentLinkedDeviceIds = this.linkedDeviceIds;
       this.getDevices();
@@ -69,17 +127,6 @@ export default {
     },
     hide() {
       this.$refs.deviceSelectionModal.hide();
-    },
-    async getDevices() {
-      try{
-        const response = await axios.get('/api/devices');
-        this.devices = response.data.devices;
-        this.total_count = response.data.total_count;
-        this.updateDevicesSelectionState();
-      } catch (e) {
-        console.log(e);
-      }
-
     },
     updateDevicesSelectionState() {
       for(let device of this.devices) {

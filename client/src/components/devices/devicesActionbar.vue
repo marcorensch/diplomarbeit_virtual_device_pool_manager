@@ -8,7 +8,7 @@
     >
       <div>
         <div class="uk-grid-small" uk-grid>
-          <div class="uk-width-1-1 uk-width-medium@m">
+          <div class="uk-width-1-1 uk-width-medium@m" :class="searchFieldCls">
             <form
               class="uk-search uk-search-default uk-width-1-1"
               @submit="handleSearchSubmit"
@@ -25,7 +25,7 @@
               />
             </form>
           </div>
-          <div class="uk-width-1-1 uk-width-medium@m">
+          <div class="uk-width-1-1 uk-width-medium@m" :class="typeSelectionCls">
             <select
               name="type_selection"
               id="type_selection"
@@ -45,7 +45,7 @@
               </option>
             </select>
           </div>
-          <div class="uk-width-1-1 uk-width-small@m">
+          <div class="uk-width-1-1 uk-width-small@m" v-if="showAvailabilityFilter">
             <select
               name="availability_selection"
               id="availability_selection"
@@ -75,21 +75,22 @@
                 @click="handleClrFilterClicked"
                 uk-tooltip="Clear Filter (ctrl + del)"
               >
-                <font-awesome-icon :icon="['fas', 'rotate']" />
+                <font-awesome-icon class="uk-preserve-width" :icon="['fas', 'rotate']" />
               </button>
               <button
                 class="uk-button uk-button-default uk-flex uk-flex-middle"
                 @click="handleSearchSubmit"
                 uk-tooltip="Search (return)"
               >
-                <font-awesome-icon :icon="['fas', 'search']" />
+                <font-awesome-icon class="uk-preserve-width"  :icon="['fas', 'search']" />
               </button>
             </div>
           </div>
           <div
             v-if="
-              authStore.hasPermission('canCreateDevices') ||
-              authStore.hasPermission('canCreateVirtualDevices')
+              (authStore.hasPermission('canCreateDevices') ||
+              authStore.hasPermission('canCreateVirtualDevices'))
+              && showAddBtn
             "
           >
             <button
@@ -97,7 +98,7 @@
               @click="handleAddDeviceClicked"
               uk-tooltip="Add Device (ctrl + n)"
             >
-              <font-awesome-icon :icon="['fas', 'plus']" />
+              <font-awesome-icon class="uk-preserve-width" :icon="['fas', 'plus']" />
             </button>
           </div>
         </div>
@@ -121,6 +122,24 @@ export default {
       authStore,
     };
   },
+  props: {
+    showAddBtn: {
+      type: Boolean,
+      default: true,
+    },
+    showAvailabilityFilter: {
+      type: Boolean,
+      default: true,
+    },
+    searchFieldCls: {
+      type: String,
+      default: "",
+    },
+    typeSelectionCls: {
+      type: String,
+      default: "",
+    },
+  },
   data() {
     return {
       form: {
@@ -137,9 +156,12 @@ export default {
     this.$emit("search", this.form);
     await this.getDeviceTypes();
   },
+  beforeUnmount() {
+    document.body.removeEventListener("keydown", this.handleKeyDown);
+  },
   methods: {
     handleKeyDown(e) {
-      if (e.key === "Backspace" || (e.key === "Delete" && e.ctrlKey)) {
+      if (e.ctrlKey && (e.key === "Backspace" || (e.key === "Delete"))) {
         this.handleClrFilterClicked();
       }
       if (e.key === "Enter") {

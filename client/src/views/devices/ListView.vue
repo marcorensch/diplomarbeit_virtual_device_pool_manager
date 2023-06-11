@@ -147,12 +147,13 @@ export default {
   methods: {
     handlePageChange(page) {
       this.offset = (page - 1) * this.limit;
-      this.getDevices(this.limit, this.offset);
+      this.getDevices();
       this.updateTrigger++;
     },
     handlePageSizeChanged(pageSize) {
+      this.offset = 0;
       this.limit = pageSize;
-      this.getDevices(this.limit, this.offset);
+      this.getDevices();
       this.updateTrigger++;
     },
     async getDevices() {
@@ -172,13 +173,13 @@ export default {
     },
     async handleNewSearchRequest(filters) {
       this.offset = 0;
-      this.filters = filters;
       if (filters.search.trim().length && filters.search.trim().length < 3) {
         this.toast.warning("Search term should be at least 3 characters long");
         filters.search = "";
       }
+      this.filters = filters;
 
-      await this.getDevices(0);
+      await this.getDevices();
     },
   },
 };
