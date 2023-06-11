@@ -6,41 +6,60 @@
     </div>
     <div class="uk-container uk-margin">
       <div class="" uk-slider="center: true; finite:true">
-        <div class="uk-position-relative uk-visible-toggle" tabindex="-1">
-          <ul class="uk-slider-items uk-grid uk-grid-match">
-            <template v-for="(slide, si) of slides" :key="slide.id">
-              <li class="uk-width-1-1">
-                <div class="">
-                  <div class="uk-child-width-expand uk-grid-small" uk-grid>
-                    <div>
-                      <div class="uk-padding" uk-scrollspy="target: > *; cls:uk-animation-slide-left-medium; delay:150; repeat:true;">
-                        <h3 class="uk-margin-remove">{{ si + 1 }}. {{ slide.name }}</h3>
-                        <div v-for="(step, index) of slide.content" :key="index">
-                          <p class="uk-margin-remove uk-text-bold">{{ step.label }}</p>
-                          <p class="uk-margin-remove">{{ step.description }}</p>
-                        </div>
-                        <div class="uk-margin-top">
-                          <button v-if="si < slides.length - 1" class="uk-button uk-button-secondary uk-width-1-1"
-                                  uk-slider-item="next">
-                            Next
-                          </button>
-                          <button v-else class="uk-button uk-button-secondary uk-width-1-1" uk-slider-item="0">
-                            Start Again
-                          </button>
+        <div class="uk-position-relative">
+
+          <div class="uk-slider-container uk-visible-toggle" tabindex="-1">
+            <ul class="uk-slider-items uk-grid uk-grid-match">
+              <template v-for="(slide, si) of slides" :key="slide.id">
+                <li class="uk-width-1-1">
+                  <div class="">
+                    <div class="uk-child-width-expand uk-grid-small" uk-grid>
+                      <div>
+                        <div class="uk-padding" uk-scrollspy="target: > *; cls:uk-animation-slide-left-medium; delay:150; repeat:true;">
+                          <h3 class="uk-margin-remove">{{ si + 1 }}. {{ slide.name }}</h3>
+                          <div v-for="(step, index) of slide.content" :key="index">
+                            <p class="uk-margin-remove uk-text-bold">{{ step.label }}</p>
+                            <p class="uk-margin-remove">{{ step.description }}</p>
+                          </div>
+                          <div class="uk-margin-top">
+                            <button v-if="si < slides.length - 1" class="uk-button uk-button-secondary uk-width-1-1"
+                                    uk-slider-item="next">
+                              Next
+                            </button>
+                            <button v-else class="uk-button uk-button-secondary uk-width-1-1" uk-slider-item="0">
+                              Start Again
+                            </button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div>
-                      <div class="uk-position-relative uk-border-rounded uk-overflow-hidden">
-                        <img class="slide-image" :src="'/public/' + slide.uri" :alt="slide.name" uk-scrollspy="cls:uk-animation-slide-right-medium;delay:100;repeat:true;">
+                      <div>
+                        <div class="uk-position-relative uk-flex uk-flex-center">
+                          <div class="uk-border-rounded uk-overflow-hidden" uk-scrollspy="cls:uk-animation-slide-right-medium;delay:100;repeat:true;">
+                            <img class="slide-image" :src="'/public/' + slide.uri" :alt="slide.name">
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </li>
-            </template>
-          </ul>
+                </li>
+              </template>
+            </ul>
+          </div>
+
+          <div class="uk-hidden@s uk-light">
+            <a class="uk-position-center-left uk-position-small" href="#" uk-slidenav-previous uk-slider-item="previous">
+            </a>
+            <a class="uk-position-center-right uk-position-small" href="#" uk-slidenav-next uk-slider-item="next"></a>
+          </div>
+
+          <div class="uk-visible@s">
+            <a class="uk-position-center-left-out uk-position-small" href="#" uk-slidenav-previous uk-slider-item="previous">
+            </a>
+            <a class="uk-position-center-right-out uk-position-small" href="#" uk-slidenav-next uk-slider-item="next"></a>
+          </div>
+
         </div>
+
       </div>
     </div>
   </div>
