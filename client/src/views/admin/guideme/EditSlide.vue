@@ -501,7 +501,6 @@ export default {
             `/api/admin/guides/${this.$route.query.gid}`
         );
         this.guide = result.data.guide;
-        console.log(this.guide);
       } catch (err) {
         console.log(err);
       }
@@ -555,7 +554,6 @@ export default {
 
     // Transformer
     handleTransformEnd(e) {
-      console.log("handleTransformEnd");
       // shape is transformed, let us save new attrs back to the node
       // find element in our state
       const si = this.stageItems.find(
@@ -655,7 +653,6 @@ export default {
     },
 
     handleAddVisualElementClicked(type) {
-      console.log("Add Visual Element Clicked " + type);
       const name = uuidv4().replace(/-/g, "");
       const label = `${type.charAt(0).toUpperCase() + type.slice(1)} ${
           this.stageItems.length + 1

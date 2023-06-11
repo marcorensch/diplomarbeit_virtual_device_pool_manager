@@ -719,7 +719,6 @@ export default {
     },
 
     triggerFolderSelect(fullPath) {
-      console.log("triggerFolderSelect", fullPath);
       const mediaTreeContainer = this.$refs[this.id + "-media-tree-container"];
       const element = mediaTreeContainer.querySelector(
         `[data-fullpath="${fullPath}"]`
