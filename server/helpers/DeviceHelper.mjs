@@ -6,7 +6,7 @@ import DocumentsHelper from "./DocumentsHelper.mjs";
 export default class DeviceHelper {
     static async getDevices(limit, offset, filters) {
         let total_count = 0;
-        const matchTermWords = filters.search.trim().length ? filters.search.trim().split(' ').map((word, index) => index>0 ? `"*${word}*"`: ` "*${word}*"`).join(' ') : null;
+        const matchTermWords = filters.search.trim().length ? filters.search.trim().split(' ').map((word, index) => index>0 ? `*${word}*`: `*${word}*`).join(' ') : null;
         let devices = [];
         let values = [];
         let countValues = [];
@@ -91,7 +91,7 @@ export default class DeviceHelper {
         }
 
         try {
-            const count = await databaseModel.query(countQuery, values);
+            const count = await databaseModel.query(countQuery, countValues);
             total_count = count[0].total_count;
         }catch (e) {
             console.log(e.message);
