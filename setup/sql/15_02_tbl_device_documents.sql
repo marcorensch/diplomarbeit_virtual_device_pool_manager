@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `device_documents`
     uri        varchar(255) NOT NULL,
     name       varchar(255) NOT NULL,
     sorting    int(11)      NOT NULL DEFAULT 0,
-    created_at timestamp    NOT NULL DEFAULT NOW(),
+    created_at timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     CONSTRAINT fk_device_document_device_id FOREIGN KEY (device_id) REFERENCES `devices` (id) ON DELETE CASCADE
 )

@@ -4,9 +4,9 @@ CREATE TABLE IF NOT EXISTS `weblinks`
     name        varchar(255) NOT NULL,
     uri         varchar(255) NOT NULL,
     description text         NOT NULL,
-    created_at  datetime DEFAULT NOW(),
     device_id   int(11)  DEFAULT NULL,
     sorting     int(11)  DEFAULT 0,
+    created_at  datetime DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     CONSTRAINT `fk_device_id` FOREIGN KEY (device_id) REFERENCES devices (id) ON DELETE CASCADE ON UPDATE CASCADE
 )

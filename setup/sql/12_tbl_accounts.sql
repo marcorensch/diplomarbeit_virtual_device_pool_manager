@@ -9,8 +9,8 @@ CREATE TABLE IF NOT EXISTS `accounts`
     notes           text         NOT NULL,
     hidden          text         NOT NULL,
     role_id         int(11)      NULL,
-    created_at      datetime     NOT NULL DEFAULT NOW(),
-    modified_at     datetime     NOT NULL DEFAULT NOW() ON UPDATE NOW(),
+    created_at      datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    modified_at     datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     CONSTRAINT `user_role_ibfk_1` FOREIGN KEY (role_id) REFERENCES `roles` (id) ON DELETE SET NULL ON UPDATE CASCADE
 )

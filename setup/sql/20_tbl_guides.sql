@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS `guides`
     description text         NOT NULL,
     sorting     int(11)      NOT NULL DEFAULT 0,
     visible     tinyint(1)   NOT NULL DEFAULT 0,
-    created_at  timestamp    NOT NULL DEFAULT NOW(),
+    modified_at timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_at  timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
 )
     ENGINE = InnoDB
