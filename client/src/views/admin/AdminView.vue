@@ -109,7 +109,7 @@ export default {
     setNavPosition() {
       const navLinks = document.querySelectorAll("#horizontal-submenu a");
       for (const navLink of navLinks) {
-        if (navLink.classList.contains("router-link-exact-active")) {
+        if (navLink.classList.contains("router-link-active")) {
           const navElement = navLink.closest("li");
           const navAnimation = document.querySelector(".animation");
           const navAnimationWidth = navElement.offsetWidth;
