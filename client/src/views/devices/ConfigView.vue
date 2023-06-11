@@ -384,9 +384,7 @@ export default {
       this.device.msisdns = msisdns;
     },
     handleImageChanged(imageRelativePath) {
-      this.device.image = imageRelativePath.length
-        ? "/public/" + imageRelativePath
-        : "";
+      this.device.image = imageRelativePath.length ? "/public/" + imageRelativePath : "";
     },
     async refreshData(key) {
       // This method is required to refresh the data in the device object on possible renames in the filemanager

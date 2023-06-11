@@ -75,6 +75,36 @@ router.delete('/:id', UserValidator.hasPermission('canDeleteGuides'), async (req
     }
 });
 
+// Device Linking
+router.get('/:guide_id/devices', async (req, res) => {
+    try {
+        const devices = await GuidesHelper.getLinkedDevices(req.params.guide_id);
+        if (devices === null) return res.status(500).json({success: false, message: "Failed to get linked devices"});
+        return res.status(200).json({success: true, message: "Linked devices retrieved successfully", devices});
+    }catch (e) {
+        return res.status(500).json({success: false, message: e.message});
+    }
+});
+router.post('/:guide_id/devices/:device_id', UserValidator.hasPermission('canUpdateGuides'), async (req, res) => {
+    try{
+        const status = await GuidesHelper.linkDevice(req.params.guide_id, req.params.device_id);
+        if (!status) return res.status(500).json({success: false, message: "Failed to link device"});
+        return res.status(200).json({success: true, message: "Device linked successfully"});
+    } catch (e) {
+        return res.status(500).json({success: false, message: e.message});
+    }
+});
+
+router.delete('/:guide_id/devices/:device_id', UserValidator.hasPermission('canUpdateGuides'), async (req, res) => {
+    try{
+        const status = await GuidesHelper.unlinkDevice(req.params.guide_id, req.params.device_id);
+        if (!status) return res.status(500).json({success: false, message: "Failed to unlink device"});
+        return res.status(200).json({success: true, message: "Device unlinked successfully"});
+    } catch (e) {
+        return res.status(500).json({success: false, message: e.message});
+    }
+});
+
 // Slides
 
 router.get('/:guide_id/slides', async (req, res) => {

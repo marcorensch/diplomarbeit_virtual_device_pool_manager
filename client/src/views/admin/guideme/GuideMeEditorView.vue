@@ -95,12 +95,16 @@
             </div>
             <div class="uk-card-body">
 
-              <div class="linked-devices">
-
+              <div class="uk-flex uk-grid-small linked-devices" uk-grid>
+                <template v-for="d of linkedDevices" :key="d.id">
+                  <div>
+                    <div class="uk-label">{{ d.name }}</div>
+                  </div>
+                </template>
               </div>
             </div>
           </div>
-          <div class="uk-padding uk-text-right">
+          <div class="uk-padding uk-text-right" @click="handleShowDeviceSelectionModal">
             <font-awesome-icon class="uk-text-large uk-preserve-width" :icon="['fas', 'chevron-right']"/>
           </div>
         </div>
@@ -112,6 +116,8 @@
         @delete="handleDeleteClicked"
         @save="handleSaveClicked"
     />
+    <DevicesSelectionModal :linkedDeviceIds="this.guide.linkedDeviceIds" ref="devicesSelectionModal"
+                           @updateLinkedDevices="getLinkedDevices"/>
   </div>
 </template>
 
@@ -121,10 +127,12 @@ import axios from "axios";
 import {useAuthStore} from "@/stores/auth";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import {useToast} from "vue-toastification";
+import DevicesSelectionModal from "@/components/guides/DevicesSelectionModal.vue";
+import GuideMeItem from "@/models/GuideMeItem.mjs";
 
 export default {
   name: "GuideMeEditorView",
-  components: {FontAwesomeIcon, ControlsFooterWidget},
+  components: {DevicesSelectionModal, FontAwesomeIcon, ControlsFooterWidget},
   setup() {
     const auth = useAuthStore();
     const toast = useToast();
@@ -132,21 +140,20 @@ export default {
   },
   data() {
     return {
-      guide: {
-        id: null,
-        name: "",
-        description: "",
-        visible: 0,
-      },
+      guide: new GuideMeItem(),
+      linkedDevices: [],
     };
   },
-  mounted() {
-    if (this.$route.params.id) this.getGuide(this.$route.params.id);
+  async mounted() {
+    if (this.$route.params.id) {
+      await this.getGuide(this.$route.params.id);
+      await this.getLinkedDevices();
+    };
   },
   methods: {
     async getGuide(id) {
       const result = await axios.get(`/api/admin/guides/${id}`);
-      this.guide = result.data.guide;
+      this.guide.setData(result.data.guide)
     },
     handleCancelClicked() {
       this.$router.push({name: "guides"});
@@ -158,7 +165,6 @@ export default {
         this.$router.push({name: "guides"});
       } catch (error) {
         this.toast.error("Unable to delete guide");
-        console.log("handleDeleteClicked", error);
       }
     },
     async handleSaveClicked() {
@@ -171,7 +177,17 @@ export default {
         this.$router.push({name: "guides"});
       } catch (error) {
         this.toast.error("Unable to save guide");
-        console.log("handleSaveClicked", error);
+      }
+    },
+    handleShowDeviceSelectionModal() {
+      this.$refs.devicesSelectionModal.show();
+    },
+    async getLinkedDevices() {
+      try {
+        const response = await axios.get(`/api/admin/guides/${this.guide.id}/devices`);
+        this.linkedDevices = response.data.devices;
+      } catch (error) {
+        console.log(error);
       }
     },
   },

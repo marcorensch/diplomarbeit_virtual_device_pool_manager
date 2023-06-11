@@ -45,7 +45,32 @@ export default class GuidesHelper {
     static async getLinkedDeviceIds(id) {
         const database = new DatabaseModel();
         const query = "SELECT * FROM guides_devices WHERE guide_id = ?";
+        const results = await database.query(query, [id]);
+        const deviceIds = [];
+        for (const result of results) {
+            deviceIds.push(result.device_id);
+        }
+        return deviceIds;
+    }
+
+    static async getLinkedDevices(id) {
+        const database = new DatabaseModel();
+        const query = "SELECT m.name AS manufacturer_name, d.* FROM guides_devices AS gd LEFT JOIN devices as d ON gd.device_id = d.id LEFT JOIN manufacturers m on d.manufacturer_id = m.id WHERE guide_id = ?";
         return await database.query(query, [id]);
+    }
+
+    static async linkDevice(guide_id, device_id) {
+        const database = new DatabaseModel();
+        const query = "INSERT INTO guides_devices (guide_id, device_id) VALUES (?, ?)";
+        const result = await database.query(query, [guide_id, device_id]);
+        return result.affectedRows === 1 ? result.insertId : null;
+    }
+
+    static async unlinkDevice(guide_id, device_id) {
+        const database = new DatabaseModel();
+        const query = "DELETE FROM guides_devices WHERE guide_id = ? AND device_id = ?";
+        const result = await database.query(query, [guide_id, device_id]);
+        return result.affectedRows === 1;
     }
 
     static async createGuide(guide) {

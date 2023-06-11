@@ -1,8 +1,18 @@
 export default class GuideMeItem {
-    constructor(name, description, sorting, visible) {
-        this.name = name;
-        this.description = description;
-        this.sorting = sorting;
-        this.visible = visible;
+    constructor() {
+        this.id = null;
+        this.name = null;
+        this.description = "";
+        this.sorting = 999;
+        this.visible = 0;
+        this.linkedDeviceIds = [];
+    }
+
+    setData(data){
+        for (const prop of Object.keys(this)) {
+            if (prop in data) {
+                this[prop] = data[prop];
+            }
+        }
     }
 }
