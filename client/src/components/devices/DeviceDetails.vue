@@ -57,68 +57,44 @@
                           </button>
                         </template>
                         <template v-else>
-                          <div
-                            class="nxd-no-select"
-                            :class="{
-                              'nxd-cursor-help': authStore.getUser,
-                            }"
-                          >
-                            <font-awesome-icon
-                              :icon="['fas', 'triangle-exclamation']"
-                              class="uk-preserve-width uk-text-warning"
-                            />
-                            <span
-                              class="uk-margin-small-left uk-margin-small-right"
-                            >
-                              Checked out</span
-                            >
+                          <div class="nxd-no-select" :class="{'nxd-cursor-help': authStore.getUser}">
+                            <font-awesome-icon :icon="['fas', 'triangle-exclamation']" class="uk-preserve-width uk-text-warning" />
+                            <span class="uk-margin-small-left uk-margin-small-right">
+                              Checked out
+                            </span>
                           </div>
                           <div v-if="authStore.getUser" uk-drop>
-                            <div
-                              class="uk-card uk-card-default uk-card-body uk-card-small"
-                            >
+                            <div class="uk-card uk-card-default uk-card-body uk-card-small">
                               <div class="uk-text-bold nxd-text-navy">
-                                Checked out by
-                                {{ checkedOutByString }}
+                                Checked out by {{ checkedOutByString }}
                               </div>
                               <div>
-                                {{ createDateTimeString(device.checkout_time) }}
-                                o'clock
+                                {{ createDateTimeString(device.checkout_time) }} o'clock
                               </div>
                               <div class="uk-margin-small-top">
                                 <div class="uk-text-bold nxd-text-navy">
                                   Notes:
                                 </div>
-                                <div
-                                  class="uk-text-break nxd-max-height-small uk-overflow-auto"
-                                >
+                                <div class="uk-text-break nxd-max-height-small uk-overflow-auto">
                                   {{ device.checkout_notes }}
                                 </div>
                               </div>
                             </div>
                           </div>
-                          <button
-                            v-if="canCheckIn"
+                          <button v-if="canCheckIn" @click="showCheckInConfirm"
                             class="uk-button uk-button-small uk-button-secondary uk-display-inline-block uk-width-auto"
-                            @click="showCheckInConfirm"
                           >
                             CheckIn
                           </button>
                         </template>
                       </div>
                       <div v-else>
-                        <font-awesome-icon
-                          :icon="['fas', 'check-circle']"
-                          class="uk-preserve-width uk-text-success"
-                        /><span
-                          class="uk-margin-small-left uk-margin-small-right"
-                          >Available</span
-                        >
-                        <button
-                          v-if="canSeeCheckoutOption()"
-                          class="uk-button uk-button-small uk-button-secondary uk-display-inline-block uk-width-auto"
-                          @click="showCheckoutModal"
-                        >
+                        <font-awesome-icon :icon="['fas', 'check-circle']" class="uk-preserve-width uk-text-success" />
+                        <span class="uk-margin-small-left uk-margin-small-right">
+                          Available
+                        </span>
+                        <button v-if="canSeeCheckoutOption()" @click="showCheckoutModal"
+                          class="uk-button uk-button-small uk-button-secondary uk-display-inline-block uk-width-auto">
                           Checkout
                         </button>
                       </div>
@@ -461,8 +437,7 @@ export default {
       return !!this.authStore.hasPermission("canCheckoutInDevices");
     },
     showCheckInConfirm() {
-      UIkit.modal
-        .confirm(
+      UIkit.modal.confirm(
           "Please confirm that the device is back in the device pool & plugged in.",
           {
             labels: { ok: "Yes", cancel: "No" },
@@ -533,10 +508,7 @@ export default {
       });
     },
     show(device) {
-      this.checkedOutByString =
-        device.checkout_fullname.trim().length > 0
-          ? device.checkout_fullname.trim()
-          : device.checkout_username;
+      this.checkedOutByString = device.checkout_fullname?.trim().length > 0 ? device.checkout_fullname.trim() : device.checkout_username;
       this.imeis = [];
       this.device = device;
       this.showEditBtn = this.canEditDevice();
