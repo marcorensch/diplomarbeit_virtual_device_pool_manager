@@ -5,13 +5,17 @@
       custom
       v-slot="{ href, navigate, isActive, isExactActive }"
     >
-      <li
-        id="devices-link"
-        :class="{
-          'uk-active active': isActive || isExactActive,
-        }"
-      >
+      <li id="devices-link" :class="{ 'uk-active active': isActive || isExactActive }">
         <a tabindex="10" :href="href" @click="navigate"><span>Devices</span></a>
+      </li>
+    </router-link>
+    <router-link
+        :to="{ name: 'guides-front' }"
+        custom
+        v-slot="{ href, navigate, isActive, isExactActive }"
+    >
+      <li id="devices-link" :class="{ 'uk-active active': isActive || isExactActive }">
+        <a tabindex="11" :href="href" @click="navigate"><span>GuideMe</span></a>
       </li>
     </router-link>
     <router-link
@@ -26,7 +30,7 @@
           'uk-active active': isActive || isExactActive,
         }"
       >
-        <a tabindex="11" :href="href" @click="navigate"
+        <a tabindex="12" :href="href" @click="navigate"
           ><span>Manufacturers</span></a
         >
       </li>
@@ -43,7 +47,7 @@
           'uk-active active': isActive || isExactActive,
         }"
       >
-        <a tabindex="12" :href="href" @click="navigate"
+        <a tabindex="13" :href="href" @click="navigate"
           ><span>Administration</span></a
         >
       </li>

@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="uk-section uk-section-small devices-list-view"
-    uk-height-viewport="offset-top:true"
-  >
+  <div class="uk-section uk-section-small devices-list-view" uk-height-viewport="offset-top:true">
     <div class="uk-container">
       <h1>Manufacturers</h1>
       <div

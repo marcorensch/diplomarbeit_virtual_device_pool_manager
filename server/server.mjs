@@ -30,6 +30,7 @@ import devicesRouter from "./routes/devices.mjs";
 import devicesTypesRouter from "./routes/devicetypes.mjs";
 import msisdnsRouter from "./routes/msisdns.mjs";
 import devicePoolRouter from "./routes/devicepool.mjs";
+import guidesRouter from "./routes/guides.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -64,6 +65,7 @@ app.use('/api/devices', devicesRouter);
 app.use('/api/devicetypes', devicesTypesRouter);
 app.use('/api/msisdns', msisdnsRouter);
 app.use('/api/devicepool', devicePoolRouter);
+app.use('/api/guides', guidesRouter);
 
 app.get('/', (req, res) => {
     res.send('Hello there! The Backend is reachable');

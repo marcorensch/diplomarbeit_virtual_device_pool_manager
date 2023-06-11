@@ -4,6 +4,7 @@ import DevicesView from "../views/DevicesView.vue";
 import { useAuthStore } from "@/stores/auth";
 
 import { useToast } from "vue-toastification";
+import GuidesView from "@/views/GuidesView.vue";
 
 const toast = useToast();
 
@@ -68,6 +69,22 @@ const routes = [
         },
       },
     ],
+  },
+  {
+    path: "/guides",
+    component: GuidesView,
+    children: [
+        {
+            path: "",
+            name: "guides-front",
+            component: () => import("../views/guides/GuidesOverview.vue"),
+        },
+        {
+            path: ":id",
+            name: "guide-front",
+            component: () => import("../views/guides/GuideView.vue"),
+        }
+      ]
   },
   {
     path: "/manufacturers",
