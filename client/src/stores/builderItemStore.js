@@ -64,8 +64,8 @@ export const useBuilderItemStore = defineStore("builderItem", {
     },
     async saveItem(item = null) {
       if (!item) item = this.item;
-      const itemCategoryName =
-        builderCategoriesStore.findCategoryNameById(item.category_id) || "item";
+      const itemCategoryName = builderCategoriesStore.findCategoryNameById(item.category_id) || "item";
+      if(!item.params) delete item.params;
       try {
         await axios.post("/api/admin/poolbuilder/items", item);
         toast.success(`${itemCategoryName} added`);
@@ -78,9 +78,8 @@ export const useBuilderItemStore = defineStore("builderItem", {
     },
     async updateItem(item = null) {
       if (!item) item = this.item;
-      const itemCategoryName =
-        builderCategoriesStore.findCategoryNameById(item.category_id) || "item";
-      item.params = JSON.stringify(item.params);
+      const itemCategoryName = builderCategoriesStore.findCategoryNameById(item.category_id) || "item";
+      if(!item.params || !item.params.length) delete item.params;
       try {
         await axios.put(`/api/admin/poolbuilder/items/${item.id}`, item);
         toast.success(`${itemCategoryName} updated`);
