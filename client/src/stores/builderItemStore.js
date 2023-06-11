@@ -80,6 +80,7 @@ export const useBuilderItemStore = defineStore("builderItem", {
       if (!item) item = this.item;
       const itemCategoryName =
         builderCategoriesStore.findCategoryNameById(item.category_id) || "item";
+      item.params = JSON.stringify(item.params);
       try {
         await axios.put(`/api/admin/poolbuilder/items/${item.id}`, item);
         toast.success(`${itemCategoryName} updated`);
