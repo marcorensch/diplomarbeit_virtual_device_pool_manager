@@ -15,42 +15,43 @@
           <h2 class="uk-h1" v-else>Create New Guide</h2>
         </div>
       </div>
-      <div class="uk-margin uk-card uk-card-default">
-        <div class="uk-card-header">
-          <h3 class="uk-card-title">Information</h3>
-        </div>
-        <div class="uk-card-body">
-          <div class="uk-margin">
-            <div class="uk-grid-small uk-flex-middle" uk-grid>
-              <div class="uk-width-1-1 uk-width-3-4@m">
-                <label class="uk-form-label" for="name"> Name </label>
-                <div class="uk-form-controls">
-                  <input id="name"
-                         class="uk-input"
-                         type="text"
-                         placeholder="Guide Name"
-                         v-model="guide.name"
-                  />
+      <div class="uk-margin">
+        <div class="uk-card uk-card-default">
+          <div class="uk-card-header">
+            <h3 class="uk-card-title">Information</h3>
+          </div>
+          <div class="uk-card-body">
+            <div class="uk-margin">
+              <div class="uk-grid-small uk-flex-middle" uk-grid>
+                <div class="uk-width-1-1 uk-width-3-4@m">
+                  <label class="uk-form-label" for="name"> Name </label>
+                  <div class="uk-form-controls">
+                    <input id="name"
+                           class="uk-input"
+                           type="text"
+                           placeholder="Guide Name"
+                           v-model="guide.name"
+                    />
+                  </div>
                 </div>
-              </div>
-              <div class="uk-width-expand">
-                <label class="uk-form-label" for="visible"> Visibility </label>
-                <div class="uk-form-controls">
-                  <select id="visible"
-                          class="uk-select uk-border-rounded"
-                          type="checkbox"
-                          v-model="guide.visible"
-                  >
-                    <option value="0">Hidden</option>
-                    <option value="1">Visible</option>
-                  </select>
+                <div class="uk-width-expand">
+                  <label class="uk-form-label" for="visible"> Visibility </label>
+                  <div class="uk-form-controls">
+                    <select id="visible"
+                            class="uk-select uk-border-rounded"
+                            type="checkbox"
+                            v-model="guide.visible"
+                    >
+                      <option value="0">Hidden</option>
+                      <option value="1">Visible</option>
+                    </select>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div class="uk-margin">
-            <label class="uk-form-label" for="description"> Description </label>
-            <div class="uk-form-controls">
+            <div class="uk-margin">
+              <label class="uk-form-label" for="description"> Description </label>
+              <div class="uk-form-controls">
               <textarea
                   class="uk-textarea"
                   id="description"
@@ -58,54 +59,55 @@
                   placeholder="Guide Description"
                   v-model="guide.description"
               />
-            </div>
-          </div>
-        </div>
-      </div>
-      <div
-          v-if="guide.id"
-          class="uk-margin uk-card uk-card-default uk-position-relative"
-      >
-        <router-link
-            :to="{ name: 'admin-guide-slides', params: { id: guide.id } }"
-            class="uk-position-cover"
-        ></router-link>
-        <div class="uk-grid-small uk-flex-middle uk-grid" uk-grid>
-          <div class="uk-width-expand">
-            <div class="uk-card-header">
-              <h3 class="uk-card-title">Manage Slides</h3>
-            </div>
-            <div class="uk-card-body"></div>
-          </div>
-          <div class="uk-width-small">
-            <div class="uk-padding uk-text-right">
-              <font-awesome-icon
-                  class="uk-text-large uk-preserve-width"
-                  :icon="['fas', 'chevron-right']"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-      <div v-if="guide.id" class="uk-margin uk-card uk-card-default">
-        <div class="uk-flex uk-flex-middle uk-grid-small uk-grid">
-          <div class="uk-width-expand">
-            <div class="uk-card-header">
-              <h3 class="uk-card-title">Linked Devices</h3>
-            </div>
-            <div class="uk-card-body">
-
-              <div class="uk-flex uk-grid-small linked-devices" uk-grid>
-                <template v-for="d of linkedDevices" :key="d.id">
-                  <div>
-                    <div class="uk-label">{{ d.name }}</div>
-                  </div>
-                </template>
               </div>
             </div>
           </div>
-          <div class="uk-padding uk-text-right" @click="handleShowDeviceSelectionModal">
-            <font-awesome-icon class="uk-text-large uk-preserve-width" :icon="['fas', 'chevron-right']"/>
+        </div>
+      </div>
+      <div v-if="guide.id" class="uk-margin">
+        <div class="uk-card uk-card-default uk-position-relative">
+          <router-link
+              :to="{ name: 'admin-guide-slides', params: { id: guide.id } }"
+              class="uk-position-cover"
+          />
+          <div class="uk-grid-small uk-flex-middle uk-grid" uk-grid>
+            <div class="uk-width-expand">
+              <div class="uk-card-header">
+                <h3 class="uk-card-title">Manage Slides</h3>
+              </div>
+              <div class="uk-card-body"></div>
+            </div>
+            <div class="uk-width-small">
+              <div class="uk-padding uk-text-right">
+                <font-awesome-icon
+                    class="uk-text-large uk-preserve-width nxd-link-icon"
+                    :icon="['fas', 'chevron-right']"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="uk-margin">
+        <div class="uk-card uk-card-default nxd-cursor-pointer" @click="handleShowDeviceSelectionModal">
+          <div class="uk-flex uk-flex-middle uk-grid-small uk-grid">
+            <div class="uk-width-expand">
+              <div class="uk-card-header">
+                <h3 class="uk-card-title">Linked Devices</h3>
+              </div>
+              <div class="uk-card-body">
+                <div class="uk-flex uk-grid-small linked-devices" uk-grid>
+                  <template v-for="d of linkedDevices" :key="d.id">
+                    <div>
+                      <div class="uk-label">{{ d.name }}</div>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </div>
+            <div class="uk-padding uk-text-right">
+              <font-awesome-icon class="uk-text-large uk-preserve-width nxd-link-icon" :icon="['fas', 'chevron-right']"/>
+            </div>
           </div>
         </div>
       </div>
@@ -148,7 +150,8 @@ export default {
     if (this.$route.params.id) {
       await this.getGuide(this.$route.params.id);
       await this.getLinkedDevices();
-    };
+    }
+    ;
   },
   methods: {
     async getGuide(id) {
