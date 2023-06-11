@@ -1,16 +1,18 @@
 <template>
   <div class="uk-section uk-padding-remove guideme-list-view">
     <div class="uk-container">
+
       <h1 class="uk-margin-remove-top">Guides</h1>
+
       <div class="actions uk-background-muted uk-border-rounded uk-padding-small">
         <div class="uk-flex">
           <div>
             <button
-              v-if="auth.hasPermission('canCreateGuides')"
-              class="uk-button uk-button-primary"
-              @click="handleCreateGuideClicked"
+                v-if="auth.hasPermission('canCreateGuides')"
+                class="uk-button uk-button-primary"
+                @click="handleCreateGuideClicked"
             >
-              <font-awesome-icon :icon="['fas', 'plus']" />
+              <font-awesome-icon :icon="['fas', 'plus']"/>
               Add Guide
             </button>
           </div>
@@ -18,35 +20,35 @@
             <div class="uk-flex uk-flex-right uk-flex-middle uk-grid-small">
               <div class="uk-width-medium uk-position-relative">
                 <input
-                  type="text"
-                  id="search_account"
-                  class="uk-input"
-                  placeholder="Search Guide"
-                  v-model="search_guide"
-                  @keyup="searchTimeOut"
+                    type="text"
+                    id="search_account"
+                    class="uk-input"
+                    placeholder="Search Guide"
+                    v-model="search_guide"
+                    @keyup="searchTimeOut"
                 />
                 <div
-                  v-if="search_guide.length > 0"
-                  class="uk-position-center-right clear-search-icon"
-                  style="margin-right: 15px"
-                  @click="handleClearSearchGuideClicked"
-                  uk-tooltip="Clear search filter"
+                    v-if="search_guide.length > 0"
+                    class="uk-position-center-right clear-search-icon"
+                    style="margin-right: 15px"
+                    @click="handleClearSearchGuideClicked"
+                    uk-tooltip="Clear search filter"
                 >
-                  <font-awesome-icon :icon="['fas', 'xmark']" />
+                  <font-awesome-icon :icon="['fas', 'xmark']"/>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div>
-        <div class="uk-margin-small-top" v-for="guide of guides" :key="guide.id">
-          <div class="uk-card uk-card-default uk-position-relative"
-            :uk-tooltip="guide.visible === 1 ? 'Guide is visible' : 'Guide is hidden'">
-            <router-link class="uk-position-cover" :to="{ name: 'admin-guide-slides', params: { id: guide.id } }" />
+
+      <div class="uk-width-1-1" v-for="guide of guides" :key="guide.id">
+        <div class="uk-margin-small-top">
+          <div class="uk-card uk-card-default uk-position-relative" :uk-tooltip="guide.visible === 1 ? 'Guide is visible' : 'Guide is hidden'">
+            <router-link class="uk-position-cover" :to="{ name: 'admin-guide-slides', params: { id: guide.id } }"/>
             <div class="uk-position-top-right uk-padding-small edit-div">
-              <router-link class="uk-position-cover" :to="{ name: 'admin-guide-edit', params: { id: guide.id } }" />
-              <font-awesome-icon :icon="['fas', 'cog']" />
+              <router-link class="uk-position-cover" :to="{ name: 'admin-guide-edit', params: { id: guide.id } }"/>
+              <font-awesome-icon :icon="['fas', 'cog']"/>
             </div>
 
             <div class="uk-grid-small uk-flex-middle" uk-grid>
@@ -55,9 +57,10 @@
                   <h3 class="uk-card-title">
                     {{ guide.name }}
                     <span class="uk-text-small uk-text-middle">
-                      <font-awesome-icon class="uk-preserve-width uk-text-success" :icon="['fas', 'eye']" v-if="guide.visible"
+                      <font-awesome-icon class="uk-preserve-width uk-text-success" :icon="['fas', 'eye']"
+                                         v-if="guide.visible"
                       />
-                      <font-awesome-icon class="uk-preserve-width uk-text-warning" :icon="['fas', 'eye-slash']" v-else />
+                      <font-awesome-icon class="uk-preserve-width uk-text-warning" :icon="['fas', 'eye-slash']" v-else/>
                     </span>
                   </h3>
                 </div>
@@ -68,38 +71,39 @@
               <div class="uk-width-small uk-text-right">
                 <div class="uk-padding">
                   <font-awesome-icon
-                    class="uk-preserve-width uk-text-large nxd-link-icon"
-                    :icon="['fas', 'chevron-right']"
+                      class="uk-preserve-width uk-text-large nxd-link-icon"
+                      :icon="['fas', 'chevron-right']"
                   />
                 </div>
               </div>
             </div>
+
           </div>
         </div>
       </div>
     </div>
     <PaginationWidget
-      :total_count="guides_total_count"
-      :default_page_size="page_size"
-      :updateTrigger="triggerCounter"
-      @pageSizeChange="handlePageSizeChange"
-      @pageChange="handlePageChange"
+        :total_count="guides_total_count"
+        :default_page_size="page_size"
+        :updateTrigger="triggerCounter"
+        @pageSizeChange="handlePageSizeChange"
+        @pageChange="handlePageChange"
     />
   </div>
 </template>
 
 <script>
-import { useAuthStore } from "@/stores/auth";
+import {useAuthStore} from "@/stores/auth";
 import axios from "axios";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import PaginationWidget from "@/components/widgets/PaginationWidget.vue";
 
 export default {
   name: "GuideMeListView",
-  components: {PaginationWidget, FontAwesomeIcon },
+  components: {PaginationWidget, FontAwesomeIcon},
   setup() {
     const auth = useAuthStore();
-    return { auth };
+    return {auth};
   },
   data() {
     return {
@@ -151,7 +155,7 @@ export default {
       this.getGuides();
     },
     handleCreateGuideClicked() {
-      this.$router.push({ name: "admin-guide-create" });
+      this.$router.push({name: "admin-guide-create"});
     },
     handleClearSearchGuideClicked() {
       this.search_guide = "";
