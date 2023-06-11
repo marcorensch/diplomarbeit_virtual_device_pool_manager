@@ -382,10 +382,8 @@ export default {
     },
     handleUpdateSelectedMsisdns(msisdns) {
       this.device.msisdns = msisdns;
-      console.log(this.device);
     },
     handleImageChanged(imageRelativePath) {
-      console.log(imageRelativePath);
       this.device.image = imageRelativePath.length
         ? "/public/" + imageRelativePath
         : "";
@@ -427,7 +425,6 @@ export default {
     async handleSaveClicked() {
       const formIsValid = await this.v$.device.$validate();
       if (!formIsValid) return;
-      console.log(this.device);
       await DeviceHelper.store(this.device);
       this.$router.push({ name: "devices" });
     },
@@ -467,7 +464,6 @@ export default {
         this.device.weblinks.find((l) => l.uri === sortingMap[i].uri).sorting =
           i + 1;
       }
-      console.log(this.device.weblinks);
     },
     async updateDocList(doc) {
       await this.refreshData("documents");
