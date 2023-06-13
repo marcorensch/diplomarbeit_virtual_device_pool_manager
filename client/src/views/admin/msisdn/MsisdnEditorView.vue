@@ -164,14 +164,17 @@
       </div>
     </div>
     <ControlsFooterWidget
+      :canDelete="item.id"
       @cancel="handleCancelClicked"
       @save="handleSaveClicked"
+      @delete="handleDeleteClicked"
     />
   </div>
 </template>
 
 <script>
 import { useToast } from "vue-toastification";
+import UIkit from "uikit";
 import ControlsFooterWidget from "@/components/ControlsFooterWidget.vue";
 import axios from "axios";
 import { useVuelidate } from "@vuelidate/core";
@@ -352,6 +355,23 @@ export default {
         .catch((error) => {
           this.handleResponse(error.response);
         });
+    },
+    deleteMsisdn() {
+      axios.delete("/api/admin/msisdns/" + this.id)
+          .then(() => {
+            this.$router.push({ name: "msisdn-manager" });
+          })
+          .catch((error) => {
+            console.log(error)
+            this.toast.error("Error deleting MSISDN");
+          });
+    },
+    handleDeleteClicked() {
+      UIkit.modal
+        .confirm("Are you sure you want to delete this MSISDN?")
+        .then(() => {
+          this.deleteMsisdn();
+        }, () => {});
     },
     handleResponse(response) {
       if (response.status === 200 || response.status === 201) {
