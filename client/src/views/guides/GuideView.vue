@@ -24,25 +24,8 @@
                 <template v-for="(slide, si) of slides" :key="slide.id">
                   <li class="uk-width-1-1">
                     <div class="">
-                      <div class="uk-child-width-expand uk-grid-small" uk-grid>
-                        <div>
-                          <div class="uk-padding">
-                            <h3 class="uk-margin-remove" uk-slider-parallax="x: 300,-300">{{ si + 1 }}. {{ slide.name }}</h3>
-                            <div v-for="(step, index) of slide.content" :key="index" uk-slider-parallax="x: 400,-400">
-                              <p class="uk-margin-remove uk-text-bold">{{ step.label }}</p>
-                              <p class="uk-margin-remove">{{ step.description }}</p>
-                            </div>
-                            <div class="uk-margin-top" uk-slider-parallax="x: 450,-450">
-                              <button v-if="si < slides.length - 1" class="uk-button uk-button-secondary uk-width-1-1"
-                                      uk-slider-item="next">
-                                Next
-                              </button>
-                              <button v-else class="uk-button uk-button-secondary uk-width-1-1" uk-slider-item="0">
-                                Start Again
-                              </button>
-                            </div>
-                          </div>
-                        </div>
+                      <div class="uk-child-width-1-1 uk-child-width-expand@m uk-grid-small" uk-grid>
+
                         <div>
                           <div class="uk-flex uk-flex-center" >
                             <div class="uk-border-rounded uk-overflow-hidden uk-position-relative">
@@ -66,6 +49,24 @@
                             </div>
                           </div>
                         </div>
+                        <div class="uk-width-large@m uk-flex-first@m">
+                          <div class="uk-card uk-card-default uk-card-body">
+                            <h3 class="uk-margin-remove" uk-slider-parallax="x: 300,-300">{{ si + 1 }}. {{ slide.name }}</h3>
+                            <div v-for="(step, index) of slide.content" :key="index" uk-slider-parallax="x: 400,-400">
+                              <p class="uk-margin-remove uk-text-bold">{{ step.label }}</p>
+                              <p class="uk-margin-remove">{{ step.description }}</p>
+                            </div>
+                            <div class="uk-margin-top" uk-slider-parallax="x: 450,-450">
+                              <button v-if="si < slides.length - 1" class="uk-button uk-button-secondary uk-width-1-1"
+                                      uk-slider-item="next">
+                                Next
+                              </button>
+                              <button v-else class="uk-button uk-button-secondary uk-width-1-1" uk-slider-item="0">
+                                Start Again
+                              </button>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </li>
@@ -73,14 +74,14 @@
               </ul>
             </div>
 
-            <div class="uk-hidden@s uk-light">
-              <a class="uk-position-center-left uk-position-small" href="#" uk-slidenav-previous
+            <div class="uk-hidden@l">
+              <a class="uk-position-center-left" href="#" uk-slidenav-previous
                  uk-slider-item="previous">
               </a>
-              <a class="uk-position-center-right uk-position-small" href="#" uk-slidenav-next uk-slider-item="next"></a>
+              <a class="uk-position-center-right" href="#" uk-slidenav-next uk-slider-item="next"></a>
             </div>
 
-            <div class="uk-visible@s">
+            <div class="uk-visible@l">
               <a class="uk-position-center-left-out uk-position-small" href="#" uk-slidenav-previous
                  uk-slider-item="previous">
               </a>
@@ -207,6 +208,11 @@ export default {
 
 <style scoped>
 img.slide-image {
-  max-height: 70vh;
+  max-height: 60vh;
+}
+@media screen and (min-width: 960px) {
+  img.slide-image {
+    max-height: 80vh;
+  }
 }
 </style>
