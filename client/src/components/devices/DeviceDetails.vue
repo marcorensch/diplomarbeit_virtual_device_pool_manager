@@ -156,39 +156,32 @@
             </div>
             <div class="uk-margin">
               <h3>Links</h3>
-              <ul class="uk-list uk-list-divider">
-                <li
-                  v-if="
-                    ['Smartphone', 'Simple Phone', 'Tablet'].includes(
-                      device.device_type_name
-                    )
-                  "
-                  uk-tooltip="Search Device on kimovil to see technical details"
-                >
-                  <a
-                    target="_blank"
-                    :title="'Search ' + device.name + ' on kimovil'"
-                    :href="buildKimovilLink(device)"
-                  >
-                    <font-awesome-icon
-                      :icon="['fas', 'arrow-up-right-from-square']"
-                    />
-                    Search Device on kimovil</a
-                  >
-                </li>
-                <li
-                  v-for="link of device.weblinks"
-                  :key="link.id"
-                  :uk-tooltip="link.description"
-                >
-                  <a :href="link.uri" target="_blank"
-                    ><font-awesome-icon
-                      :icon="['fas', 'arrow-up-right-from-square']"
-                    />
-                    {{ link.name }}</a
-                  >
-                </li>
-              </ul>
+              <table class="uk-table uk-table-divider uk-table-hover">
+                <tbody>
+                  <tr class="uk-position-relative" v-if="['Smartphone', 'Simple Phone', 'Tablet'].includes(device.device_type_name)">
+                    <td class="uk-width-expand">
+                      <span uk-tooltip="Search Device on kimovil to see technical details">
+                        Search Device on kimovil
+                      </span>
+                    </td>
+                    <td class="uk-table-shrink">
+                      <font-awesome-icon class="uk-preserve-width" :icon="['fas', 'arrow-up-right-from-square']" />
+                      <a target="_blank" :title="'Search ' + device.name + ' on kimovil'" class="uk-position-cover" :href="buildKimovilLink(device)"></a>
+                    </td>
+                  </tr>
+                  <template v-for="link of device.weblinks" :key="link.id">
+                    <tr class="uk-position-relative">
+                      <td class="uk-width-expand">
+                        <span :uk-tooltip="link.description">{{ link.name }}</span>
+                      </td>
+                      <td class="uk-table-shrink">
+                        <font-awesome-icon class="uk-preserve-width" :icon="['fas', 'arrow-up-right-from-square']" />
+                        <a :href="link.uri" :title="link.uri" class="uk-position-cover" target="_blank"></a>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
               <div
                 class="uk-margin-small-top uk-flex uk-flex-right"
                 v-if="authStore.hasPermission('canCreateLinks')"
@@ -200,6 +193,17 @@
             </div>
             <div class="uk-margin">
               <h3>GuideMe</h3>
+              <table class="uk-table uk-table-divider uk-table-hover uk-table-small">
+                <tbody>
+                <tr v-for="guide of device.guides" :key="guide.id" class="uk-position-relative">
+                  <td class="uk-width-expand">{{guide.name}}</td>
+                  <td class="uk-table-shrink">
+                    <font-awesome-icon class="uk-preserve-width" :icon="['fas', 'arrow-up-right-from-square']" />
+                    <router-link :to="{'name': 'guide-front', params:{id: guide.id}}" class="uk-position-cover" target="_blank" />
+                  </td>
+                </tr>
+                </tbody>
+              </table>
             </div>
             <div class="uk-margin" v-if="device.notes">
               <h3>Notes</h3>
@@ -366,7 +370,6 @@
 
 <script>
 import UIkit from "uikit";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { useAuthStore } from "@/stores/auth";
 import { useVuelidate } from "@vuelidate/core";
 import { helpers, required, url } from "@vuelidate/validators";
@@ -382,7 +385,7 @@ function nameAlreadySet(value) {
 
 export default {
   name: "DeviceDetails",
-  components: { FontAwesomeIcon },
+  components: {  },
   setup() {
     const authStore = useAuthStore();
     const v$ = useVuelidate();
@@ -520,6 +523,7 @@ export default {
       this.$nextTick(() => {
         UIkit.offcanvas("#device-details").show();
       });
+      console.log(this.device);
     },
     showDeviceEdit(id) {
       this.$router.push({ name: "edit-device", params: { id: id } });

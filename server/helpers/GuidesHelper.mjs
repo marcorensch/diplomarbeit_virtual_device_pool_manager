@@ -64,6 +64,12 @@ export default class GuidesHelper {
         return await database.query(query, [id]);
     }
 
+    static async getGuidesByDeviceId(device_id) {
+        const database = new DatabaseModel();
+        const query = "SELECT g.id, g.name, g.description FROM guides_devices AS gd LEFT JOIN guides as g ON gd.guide_id = g.id WHERE device_id = ?";
+        return await database.query(query, [device_id]);
+    }
+
     static async linkDevice(guide_id, device_id) {
         const database = new DatabaseModel();
         const query = "INSERT INTO guides_devices (guide_id, device_id) VALUES (?, ?)";

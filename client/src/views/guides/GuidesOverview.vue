@@ -1,6 +1,6 @@
 <template>
-  <div class="uk-section uk-section-small devices-list-view" uk-height-viewport="offset-top:true">
-    <div class="uk-container">
+  <div class="uk-section devices-list-view uk-padding-remove">
+    <div class="uk-container uk-padding uk-padding-remove-horizontal">
       <h1>GuideMe</h1>
       <p class="uk-text-lead">On this page you will find helpful step by step guides to support you.</p>
 
@@ -35,9 +35,10 @@
         </form>
       </div>
 
-      <div class="nxd-min-height-medium uk-margin uk-child-width-1-1 uk-child-width-1-2@m uk-child-width-1-3@l uk-grid-small" uk-grid
+      <div class="uk-margin uk-child-width-1-1 uk-child-width-1-2@m uk-child-width-1-3@l uk-grid-small" uk-grid
            uk-height-match="target: .uk-card-body"
-           uk-scrollspy="target: > div > div.uk-card; cls:uk-animation-slide-bottom-small; delay:100;">
+           uk-scrollspy="target: > div > div.uk-card; cls:uk-animation-slide-bottom-small; delay:100;"
+      >
         <template v-for="guide of guides" :key="guide.id">
           <div>
             <div class="uk-card uk-card-default uk-card-small uk-position-relative">
@@ -69,16 +70,15 @@
             </div>
           </div>
         </template>
-
       </div>
+      <PaginationWidget
+          :total_count="total_count"
+          :default_page_size="limit"
+          :updateTrigger="updateTrigger"
+          @pageChange="handlePageChange"
+          @pageSizeChange="handlePageSizeChanged"
+      />
     </div>
-    <PaginationWidget
-        :total_count="total_count"
-        :default_page_size="limit"
-        :updateTrigger="updateTrigger"
-        @pageChange="handlePageChange"
-        @pageSizeChange="handlePageSizeChanged"
-    />
   </div>
 </template>
 

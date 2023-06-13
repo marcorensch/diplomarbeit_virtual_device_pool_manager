@@ -2,6 +2,7 @@ import DatabaseModel from "../models/DatabaseModel.mjs";
 import PoolHelper from "./PoolHelper.mjs";
 import WeblinksHelper from "./WeblinksHelper.mjs";
 import DocumentsHelper from "./DocumentsHelper.mjs";
+import GuidesHelper from "./GuidesHelper.mjs";
 
 export default class DeviceHelper {
     static async getDevices(limit, offset, filters) {
@@ -116,6 +117,12 @@ export default class DeviceHelper {
             try {
                 device.documents = await DocumentsHelper.getDocumentsByDeviceId(device.id);
             }catch (e) {
+                console.log(e.message);
+            }
+
+            try {
+                device.guides = await GuidesHelper.getGuidesByDeviceId(device.id);
+            } catch (e) {
                 console.log(e.message);
             }
         }
