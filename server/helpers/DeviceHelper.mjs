@@ -3,6 +3,7 @@ import PoolHelper from "./PoolHelper.mjs";
 import WeblinksHelper from "./WeblinksHelper.mjs";
 import DocumentsHelper from "./DocumentsHelper.mjs";
 import GuidesHelper from "./GuidesHelper.mjs";
+import MsisdnHelper from "./MsisdnHelper.mjs";
 
 export default class DeviceHelper {
     static async getDevices(limit, offset, filters) {
@@ -125,6 +126,12 @@ export default class DeviceHelper {
             } catch (e) {
                 console.log(e.message);
             }
+
+            try {
+                device.msisdns = await MsisdnHelper.getMsisdnsByDeviceId(device.id);
+            } catch (e) {
+                console.log(e.message);
+            }
         }
 
         return {devices, total_count};
@@ -132,14 +139,17 @@ export default class DeviceHelper {
 
     static async getDeviceById(id) {
         const databaseModel = new DatabaseModel();
-        const query = `SELECT d.*,
-                              GROUP_CONCAT(n.number_id SEPARATOR ', ') AS linked_msisdns
-                       FROM devices d
-                                LEFT JOIN device_number n ON d.id = n.device_id
-                       WHERE d.id = ?
-                       GROUP BY d.id;`;
+        const query = `SELECT d.* FROM devices d WHERE d.id = ? LIMIT 1;`;
         const result = await databaseModel.query(query, [id]);
-        return result[0];
+        const device = result[0];
+        if (device) {
+            try {
+                device.msisdns = await MsisdnHelper.getMsisdnsByDeviceId(device.id);
+            } catch (e) {
+                console.log(e.message);
+            }
+        }
+        return device;
     }
 
     static async store(device) {

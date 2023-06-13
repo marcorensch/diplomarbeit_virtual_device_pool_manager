@@ -10,6 +10,18 @@ export default class MsisdnHelper {
         return this.createMsisdn(numberData[0]);
     }
 
+    static async getMsisdnsByDeviceId(deviceId) {
+        const database  = new DatabaseModel();
+        const query = "SELECT n.*, dn.number_id FROM device_number AS dn LEFT JOIN numbers AS n ON dn.number_id = n.id WHERE device_id = ?";
+        const numbersData = await database.query(query, [deviceId]);
+        if (numbersData.length === 0) return null;
+        const numbers = [];
+        for (const numberData of numbersData) {
+            numbers.push(this.createMsisdn(numberData));
+        }
+        return numbers;
+    }
+
     static async getMsisdnsByParentId(parentId) {
         const database = new DatabaseModel();
         const query = "SELECT a.*, b.name AS simTypeName FROM numbers as a LEFT JOIN sim_types AS b ON a.sim_type_id = b.id WHERE a.parent_id = ? ORDER BY a.abonnement ASC, a.msisdn ASC";

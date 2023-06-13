@@ -68,10 +68,10 @@ export default class DeviceHelper {
 
         try {
             const response = await axios.get(`/api/devices/${id}`);
+            console.log(response.data)
             device.setData(response.data);
             device.added = device.added.split("T")[0];
             device.imei = JSON.parse(device.imei) || [];
-            device.msisdns = response.data.linked_msisdns?.split(",").map((el) => parseInt(el)) || [];
             device.slot = device.slot_id ? await DeviceHelper.getSlot(device.slot_id) : null;
         } catch (e) {
             console.log(e);

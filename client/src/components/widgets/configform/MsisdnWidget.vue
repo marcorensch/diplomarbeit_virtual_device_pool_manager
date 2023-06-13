@@ -175,18 +175,25 @@ export default {
     this.setStoredDeviceMsisdns();
   },
   methods: {
+    findMsisdnByIdInArray(msisdnObj, array) {
+      const foundAsMain = array.find((m) => parseInt(m.id) === parseInt(msisdnObj.id));
+      if (foundAsMain) return foundAsMain;
+      for (const el of array) {
+        const foundAsMd = el.multi_device.find((md) => parseInt(md.id) === parseInt(msisdnObj.id));
+        if (foundAsMd) return foundAsMd;
+      }
+    },
     setStoredDeviceMsisdns() {
-      this.storedDeviceMsisdns.forEach((msisdnId) => {
-        const foundMsisdn = this.availableMsisdns.find(
-          (m) => parseInt(m.id) === msisdnId
-        );
-        console.log(this.availableMsisdns, msisdnId);
-        if (foundMsisdn) {
-          this.handleMsisdnChange(foundMsisdn);
+      this.storedDeviceMsisdns.forEach((stored) => {
+        const found = this.findMsisdnByIdInArray(stored, this.availableMsisdns);
+        console.log(found);
+        console.log(this.availableMsisdns);
+        if (found) {
+          this.handleMsisdnChange(found, false);
         }
       });
     },
-    handleMsisdnChange(msisdn) {
+    handleMsisdnChange(msisdn, emit = true) {
       msisdn.selected = !msisdn.selected;
       if (msisdn.selected) {
         this.selectedMsisdns.push(msisdn);
@@ -195,7 +202,7 @@ export default {
           (m) => m.id !== msisdn.id
         );
       }
-      this.$emit("msisdn-selected", this.selectedMsisdns);
+      if(emit) this.$emit("msisdn-selected", this.selectedMsisdns);
     },
     checkIfSelected(msisdn) {
       return this.selectedMsisdns.includes(msisdn);
