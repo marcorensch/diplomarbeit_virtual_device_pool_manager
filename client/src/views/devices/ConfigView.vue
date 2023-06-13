@@ -258,7 +258,7 @@
       @cancel="handleCancelClicked"
       @save="handleSaveClicked"
       @delete="handleDeleteClicked"
-      :canDelete="authStore.hasPermission('canDeleteDevices')"
+      :canDelete="device?.id && authStore.hasPermission('canDeleteDevices')"
     />
     <PoolSelector ref="poolSelector" @selected="handleSlotSelected($event)" />
   </div>
