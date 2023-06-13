@@ -464,7 +464,6 @@ export default {
       }
     },
     async updateDocList(doc) {
-      await this.refreshData("documents");
       if (doc) {
         if (doc.id) {
           this.device.documents = this.device.documents.map((d) => {
@@ -474,8 +473,9 @@ export default {
             return d;
           });
         } else {
-          if (this.device.documents.find((d) => d.uri === doc.uri)) {
-            toast.warning("Document already linked");
+          const existingDoc = this.device.documents.find((d) => d.uri === doc.uri);
+          if (existingDoc) {
+            toast.warning(`Document already linked as ${existingDoc.name}`);
             return;
           }
           this.device.documents.push(doc);

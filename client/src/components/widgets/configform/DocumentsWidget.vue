@@ -12,27 +12,16 @@
         <template v-for="doc of documents" :key="doc.id">
           <li class="uk-text-truncate" :data-uri="doc.uri">
             <div class="uk-display-inline">
-              <font-awesome-icon
-                class="document-icon uk-drag"
-                :icon="['fas', 'file']"
-              />
-              <span
-                :uk-tooltip="
-                  !doc.id
-                    ? 'Click Save to link element'
-                    : 'Click to show actions'
-                "
+              <font-awesome-icon class="document-icon uk-drag" :icon="['fas', 'file']" />
+              <span :uk-tooltip="!doc.id ? 'Click Save to link element' : 'Click to show actions'"
                 class="uk-margin-small-left nxd-cursor-pointer"
                 :class="{
                   'uk-text-italic uk-text-muted': !doc.id,
                   'uk-text-danger': doc.id && doc.toDelete,
                 }"
-                >{{ doc.name }}</span
-              >
+                >{{ doc.name }}</span>
               <div uk-drop="mode:click">
-                <div
-                  class="uk-button-group uk-card uk-card-default uk-card-small"
-                >
+                <div class="uk-button-group uk-card uk-card-default uk-card-small">
                   <a
                     :href="buildDocumentUri(doc)"
                     target="_blank"
@@ -213,7 +202,7 @@ export default {
       this.saveClicked = true;
     },
     handleDocumentRename(document) {
-      UIkit.modal.prompt("Rename document", document.name).then((name) => {
+      UIkit.modal.prompt("Set document label", document.name).then((name) => {
         if (name) {
           document.name = name;
         }
