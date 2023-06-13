@@ -2,7 +2,16 @@
   <div>
     <div class="uk-section nxd-background-horizon uk-section-small" uk-height-viewport="offset-top:true">
       <div class="uk-container">
-        <h1>{{ guide.name }}</h1>
+        <div class="uk-grid-small uk-child-width-auto uk-flex-middle" uk-grid>
+          <div>
+            <router-link :to="{ name: 'guides-front' }" class="uk-text-lead">
+            <font-awesome-icon :icon="['fas', 'chevron-left']" />
+            </router-link>
+          </div>
+          <div>
+            <h1 class="uk-margin-remove"> {{ guide.name }}</h1>
+          </div>
+        </div>
         <p class="uk-text-lead">{{ guide.description }}</p>
       </div>
 
