@@ -2,9 +2,7 @@
   <div class="uk-section uk-section-small">
     <div class="uk-container">
       <h1>MSISDN Manager</h1>
-      <div
-        class="actions uk-background-muted uk-border-rounded uk-padding-small uk-margin-bottom"
-      >
+      <div class="actions uk-background-muted uk-border-rounded uk-padding-small uk-margin-bottom">
         <div class="uk-flex uk-grid-small">
           <div class="uk-width-auto">
             <button
@@ -145,19 +143,17 @@ export default {
       this.$router.push({ name: "msisdn-add" });
     },
     filterMsisdnList() {
+      console.log(this.search_msisdn)
       this.numbers.map((number) => {
-        number.visible =
-          this.filterMultiDevice(number) || this.filterChecks(number);
+        number.visible = this.filterMultiDevice(number) || this.filterChecks(number);
       });
     },
     filterChecks(number) {
       return (
         number.msisdn.includes(this.search_msisdn) ||
-        number.abonnement
-          .toLowerCase()
-          .includes(this.search_msisdn.toLowerCase()) ||
+        number.abonnement?.toLowerCase().includes(this.search_msisdn.toLowerCase()) ||
         number.sim_number.includes(this.search_msisdn) ||
-        number.scn.includes(this.search_msisdn)
+        number.scn?.includes(this.search_msisdn)
       );
     },
     filterMultiDevice(number) {
