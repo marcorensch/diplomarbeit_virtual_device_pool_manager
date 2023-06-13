@@ -69,6 +69,7 @@ const routes = [
         },
       },
     ],
+    meta: { title: "VDPM | Devices" },
   },
   {
     path: "/guides",
@@ -84,7 +85,8 @@ const routes = [
             name: "guide-front",
             component: () => import("../views/guides/GuideView.vue"),
         }
-      ]
+      ],
+    meta: { title: "VDPM | Guides" },
   },
   {
     path: "/manufacturers",
@@ -147,12 +149,13 @@ const routes = [
         },
       },
     ],
+    meta: { title: "VDPM | Manufacturers" },
   },
   {
     path: "/login",
     name: "login",
     component: () => import("../views/LoginView.vue"),
-    meta: { transition: "fade" },
+    meta: { transition: "fade", title: "VDPM | Login" },
   },
   {
     path: "/user-settings",
@@ -167,6 +170,7 @@ const routes = [
         return { name: "login" };
       }
     },
+    meta: { title: "VDPM | User Settings" },
   },
   {
     path: "/admin",
@@ -352,6 +356,7 @@ const routes = [
         ],
       },
     ],
+    meta: { title: "VDPM | Administration" },
   },
 
   {
@@ -367,6 +372,11 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
+});
+
+router.beforeEach((to, from, next) => {
+  document.title = to.meta.title;
+  next();
 });
 
 export default router;
