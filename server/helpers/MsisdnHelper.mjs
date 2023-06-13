@@ -10,14 +10,6 @@ export default class MsisdnHelper {
         return this.createMsisdn(numberData[0]);
     }
 
-    static async getMsisdnByMsisdn(msisdn) {
-        const database = new DatabaseModel();
-        const query = "SELECT * FROM numbers WHERE msisdn = ? LIMIT 1";
-        const numberData = await database.query(query, [msisdn]);
-        if (numberData.length === 0) return null;
-        return this.createMsisdn(numberData[0]);
-    }
-
     static async getMsisdnsByParentId(parentId) {
         const database = new DatabaseModel();
         const query = "SELECT a.*, b.name AS simTypeName FROM numbers as a LEFT JOIN sim_types AS b ON a.sim_type_id = b.id WHERE a.parent_id = ? ORDER BY a.abonnement ASC, a.msisdn ASC";
