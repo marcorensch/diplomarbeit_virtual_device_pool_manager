@@ -383,7 +383,18 @@ export default {
     async updateAccount() {
       const formIsValid = await this.v$.$validate();
       if (!formIsValid) return;
-      console.log(this.form);
+      if(this.account.id && this.form.password.length){
+        const confirmed = await UIkit.modal.confirm(
+            "<b>Attention</b><br>Are you sure you want to change this user's password?<br>If no empty the password fields &amp; submit again.",
+            {stack: true}
+        ).
+        then(function() {
+          return true;
+        }, function () {
+          return false;
+        });
+        if(!confirmed) return;
+      }
       try {
         await axios.put(`/api/admin/accounts/${this.form.id}`, this.form);
         this.toast.success("Account Updated Successfully");
