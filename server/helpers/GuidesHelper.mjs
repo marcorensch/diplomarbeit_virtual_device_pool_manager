@@ -31,6 +31,11 @@ export default class GuidesHelper {
         const guides = await database.query(query, values);
         let count = await database.query(countQuery, countValues);
 
+        // Get Linked Devices for each Guide
+        for (const guide of guides) {
+            guide.devices = await this.getLinkedDevices(guide.id);
+        }
+
         return {guides, count: count[0].count};
     }
 
