@@ -83,7 +83,6 @@ export default class DeviceHelper {
     static async getSlot(id) {
         try {
             const response = await axios.get(`/api/devicepool/items/${id}`);
-            console.log(response.data)
             return response.data;
         }catch (e) {
             console.log(e.message);

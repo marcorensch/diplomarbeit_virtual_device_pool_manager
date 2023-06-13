@@ -253,7 +253,6 @@ export default {
       this.currentLocation.category_id = this.locationCategoryId;
       this.currentLocation.sorting = this.locations.length + 1;
       this.currentLocation.initLocationParams();
-      console.log(this.currentLocation);
       this.modalSaveOrDeleteClicked = false;
       UIkit.modal("#location-config-modal").show();
     },

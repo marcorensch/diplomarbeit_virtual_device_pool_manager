@@ -56,15 +56,6 @@
               >
                 <div>
                   <button
-                    class="uk-button uk-button-secondary uk-width-1-1 uk-hidden"
-                    @click="handleRequestAccountClicked"
-                    type="button"
-                  >
-                    Request Account
-                  </button>
-                </div>
-                <div>
-                  <button
                     tabindex="3"
                     class="uk-button uk-button-primary uk-width-1-1"
                     type="submit"
@@ -105,9 +96,6 @@ export default {
     handleLoginClicked(e) {
       e.preventDefault();
       this.auth.login(this.form.username, this.form.password);
-    },
-    handleRequestAccountClicked() {
-      console.log("Request Account Clicked");
     },
   },
 };

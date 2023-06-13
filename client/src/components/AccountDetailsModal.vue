@@ -376,7 +376,6 @@ export default {
           this.roleOptions.push(new Role(role.id, role.name));
         });
         this.roleOptions.unshift({ id: 0, label: "Select Role" });
-        console.log(this.roleOptions);
       } catch (error) {
         console.log(error);
       }

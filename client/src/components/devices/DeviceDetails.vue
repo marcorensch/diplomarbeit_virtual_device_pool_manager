@@ -523,7 +523,6 @@ export default {
       this.$nextTick(() => {
         UIkit.offcanvas("#device-details").show();
       });
-      console.log(this.device);
     },
     showDeviceEdit(id) {
       this.$router.push({ name: "edit-device", params: { id: id } });

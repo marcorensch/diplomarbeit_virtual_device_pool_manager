@@ -52,7 +52,6 @@ export default {
     const search = document.getElementById("nxd-device-search");
     search.focus();
     search.addEventListener("keyup", (e) => {
-      console.log(e.target.value);
       if (e.key === "Enter") {
         this.switchToDevicesList(true);
       }

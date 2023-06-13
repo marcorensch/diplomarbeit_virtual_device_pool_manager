@@ -127,8 +127,6 @@ export default {
       const navAnimationLeft = parentListItem.offsetLeft;
       navAnimation.style.width = navAnimationWidth + "px";
       navAnimation.style.left = navAnimationLeft + "px";
-
-      console.log(navAnimation.style.width);
     },
   },
 };

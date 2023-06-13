@@ -64,7 +64,7 @@ export const useAuthStore = defineStore("auth", {
         toast.success("Successfully logged in");
         this.router.push("/");
       } catch (e) {
-        console.log(e.response);
+        console.log(e);
         toast.error("Error while logging in, please try again");
       }
     },
@@ -138,7 +138,7 @@ export const useAuthStore = defineStore("auth", {
           toast.error("Failed to delete account, Reason:\n" + response.text);
         }
       } catch (e) {
-        console.log(e.response);
+        console.log(e);
         toast.error(`Failed to delete account, Reason:\n${e.response.data}`);
       }
     },

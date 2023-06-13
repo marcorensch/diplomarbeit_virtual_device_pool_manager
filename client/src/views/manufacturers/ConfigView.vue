@@ -104,7 +104,6 @@ export default {
       this.manufacturerEditStore.manufacturer.image = path;
     },
     async refreshData(key) {
-      console.log("refreshData for key", key);
       // This method is required to refresh the data in the device object on possible changes in the filemanager
       if (!this.id) return;
       const newData = await this.manufacturerEditStore.getUpdatedData(this.id);

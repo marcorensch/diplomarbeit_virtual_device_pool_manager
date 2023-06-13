@@ -49,7 +49,6 @@ router.get("/items/:id", async (req, res) => {
 
     try {
         item = await PoolHelper.getItem(id, deep);
-        console.log(item)
     } catch (e) {
         if(e.type === "ITEM_NOT_FOUND") return res.status(404).send({message: "Item not found"});
         if(e.type === "NO_ID_SPECIFIED") return res.status(400).send({message: "No ID specified"});

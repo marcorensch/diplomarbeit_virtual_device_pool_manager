@@ -129,7 +129,6 @@ export default {
       this.selectedFile = selectedFile;
     },
     handleImageRemoved() {
-      console.log("handleImageRemoved");
       this.$emit("image-changed", "");
     },
   },
