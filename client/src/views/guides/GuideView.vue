@@ -22,10 +22,9 @@
             <div class="uk-slider-container uk-visible-toggle" tabindex="-1">
               <ul class="uk-slider-items uk-grid uk-grid-match">
                 <template v-for="(slide, si) of slides" :key="slide.id">
-                  <li class="uk-width-1-1">
+                  <li class="uk-width-1-1" v-if="slide.uri.length">
                     <div class="">
                       <div class="uk-child-width-1-1 uk-child-width-expand@m uk-grid-small" uk-grid>
-
                         <div>
                           <div class="uk-flex uk-flex-center" >
                             <div class="uk-border-rounded uk-overflow-hidden uk-position-relative">
