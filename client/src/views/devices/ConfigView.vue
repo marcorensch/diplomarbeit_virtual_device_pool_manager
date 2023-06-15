@@ -110,7 +110,7 @@
                           <input
                             type="number"
                             ref="imei"
-                            class="uk-input"
+                            class="uk-input uk-width-1-1 nxd-min-width-small"
                             @keyup="v$.$validate()"
                             :class="{
                               'form-invalid':
@@ -148,6 +148,25 @@
                       </button>
                     </div>
                   </div>
+                  <div class="uk-margin">
+                    <label for="added">In Pool since</label>
+                    <input
+                        type="date"
+                        class="uk-input"
+                        style="margin-top: 2px"
+                        v-model="device.added"
+                        :class="{
+                          'form-invalid': v$.device.added.$errors.length,
+                        }"
+                    />
+                    <div
+                        v-for="error of v$.device.added.$errors"
+                        :key="error"
+                        class="uk-text-danger"
+                    >
+                      {{ error.$message }}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -162,37 +181,16 @@
             @updateValue="refreshData('image')"
           />
         </div>
-        <div class="uk-width-1-1 uk-width-2-3@s">
+        <div class="uk-width-1-1 uk-width-2-3@s" v-if="canSetPhysicalDevices()">
           <div>
             <div class="uk-card uk-card-default">
               <div class="uk-card-header">
                 <h3 class="uk-card-title">Location</h3>
               </div>
               <div class="uk-card-body">
-                <div class="uk-child-width-1-1 uk-child-width-1-2@s" uk-grid>
+                <div class="uk-child-width-expand" uk-grid>
                   <div>
                     <div class="uk-margin">
-                      <label for="added">In Pool since</label>
-                      <input
-                        type="date"
-                        class="uk-input"
-                        style="margin-top: 2px"
-                        v-model="device.added"
-                        :class="{
-                          'form-invalid': v$.device.added.$errors.length,
-                        }"
-                      />
-                      <div
-                        v-for="error of v$.device.added.$errors"
-                        :key="error"
-                        class="uk-text-danger"
-                      >
-                        {{ error.$message }}
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <div class="uk-margin" v-if="canSetPhysicalDevices()">
                       <div>
                         <label for="pool-location">Pool Location</label
                         ><span class="uk-margin-left">{{
@@ -223,7 +221,7 @@
             </div>
           </div>
         </div>
-        <div class="uk-width-1-1 uk-width-2-3@s">
+        <div class="uk-width-1-1 uk-width-2-3@s" v-if="device.slot_id">
           <MsisdnWidget
             :storedDeviceMsisdns="device.msisdns"
             @msisdnSelected="handleUpdateSelectedMsisdns"

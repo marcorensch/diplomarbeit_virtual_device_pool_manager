@@ -7,7 +7,7 @@ export default class DeviceHelper {
 
     static async store(device) {
         let storageDevice = { ...device };
-        storageDevice.msisdns = device.msisdns.map((m) => m.id);
+        if(storageDevice.msisdns) storageDevice.msisdns = storageDevice.msisdns.map((m) => m.id);
         storageDevice.imei = JSON.stringify(device.imei);
         if (storageDevice.id) {
             try{
