@@ -350,15 +350,19 @@ export default {
     const deviceData = await DeviceHelper.loadDevice(this.id);
 
     if (this.id) {
+      if(!deviceData.id) {
+        toast.error("Device not found");
+        return this.$router.push({ name: "devices" });
+      }
       if (deviceData.slot_id) {
         if (!this.authStore.hasPermission("canUpdateDevices")) {
           toast.error("You do not have permission to update devices");
-          return this.$router.push({ name: "deviceslist" });
+          return this.$router.push({ name: "devices" });
         }
       } else {
         if (!this.authStore.hasPermission("canUpdateVirtualDevices")) {
           toast.error("You do not have permission to update virtual devices");
-          return this.$router.push({ name: "deviceslist" });
+          return this.$router.push({ name: "devices" });
         }
       }
     }
