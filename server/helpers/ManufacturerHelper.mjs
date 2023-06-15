@@ -18,8 +18,7 @@ export default class ManufacturerHelper {
     static async createManufacturer(manufacturer) {
         const databaseModel = new DatabaseModel()
         const query = "INSERT INTO manufacturers (name, image, notes, hidden) VALUES (?, ?, ?, ?)";
-        const result = await databaseModel.query(query, [manufacturer.name, manufacturer.image, manufacturer.notes, manufacturer.hidden]);
-        return result;
+        return await databaseModel.query(query, [manufacturer.name, manufacturer.image, manufacturer.notes, manufacturer.hidden]);
     }
 
     static async updateManufacturer(manufacturer) {
@@ -32,14 +31,12 @@ export default class ManufacturerHelper {
         }
         query +=" WHERE id = ?";
         values.push(manufacturer.id);
-        const result = await databaseModel.query(query, values);
-        return result;
+        return await databaseModel.query(query, values);
     }
 
     static async deleteManufacturer(id) {
         const databaseModel = new DatabaseModel()
         const query = "DELETE FROM manufacturers WHERE id = ?";
-        const result = databaseModel.query(query, [id]);
-        return result;
+        return databaseModel.query(query, [id]);
     }
 }
