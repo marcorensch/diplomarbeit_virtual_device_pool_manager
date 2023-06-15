@@ -32,7 +32,7 @@
                            placeholder="Guide Name"
                            v-model="guide.name"
                            :class="{
-                        'uk-form-invalid':
+                        'form-invalid':
                           v$.guide.name.$errors.length,
                       }"
                     />
