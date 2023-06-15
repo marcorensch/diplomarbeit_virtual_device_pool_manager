@@ -267,11 +267,15 @@ export default {
       },
     };
   },
-  mounted() {
+  async mounted() {
     this.getSimTypes();
     this.getParentMsisdns();
     if (this.id) {
-      this.getMsisdnData();
+      await this.getMsisdnData();
+      if(!this.item || !this.item.id){
+        this.toast.error("MSISDN not found");
+        this.$router.push("/admin");
+      }
     }
   },
   methods: {
