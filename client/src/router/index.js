@@ -36,7 +36,7 @@ const routes = [
             toast.error("You must be logged in to access this page");
             return { name: "login" };
           }
-          if (authStore.hasPermission("canCreateDevices")) {
+          if (authStore.hasPermission("canCreateDevices") || authStore.hasPermission("canCreateVirtualDevices")) {
             return true;
           } else {
             toast.error("You don't have permission to access this page");
