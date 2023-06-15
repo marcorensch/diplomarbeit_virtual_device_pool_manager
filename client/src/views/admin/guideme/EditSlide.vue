@@ -363,14 +363,22 @@ export default {
 
     if (!this.$route.params.id) {
       this.toast.error("Invalid Slide ID");
-      this.$router.push({name: "guides"});
+      this.$router.push({path: "/admin"});
     }
     if (!this.$route.query.gid) {
       this.toast.error("Invalid Guide ID");
-      this.$router.push({name: "guides"});
+      this.$router.push({path: "/admin"});
     }
     await this.getGuide();
     await this.getSlide();
+    if(!this.guide || !this.guide.id){
+      this.toast.error("Invalid Guide ID");
+      this.$router.push({path: "/admin"});
+    }
+    if(!this.slide || !this.slide.id){
+      this.toast.error("Invalid Slide ID");
+      this.$router.push({path: "/admin"});
+    }
   },
 
   beforeUnmount() {
@@ -512,8 +520,7 @@ export default {
       const result = await axios.delete(`/api/admin/guides/${this.$route.query.gid}/slides/${this.$route.params.id}`);
       if (result.data.success) {
         this.$router.push({
-          name: "admin-guide-slides",
-          params: {id: this.$route.query.gid},
+          name: "guides",
         });
       }
     },
@@ -543,6 +550,11 @@ export default {
         this.setStageSize();
       } catch (err) {
         console.log(err);
+        this.toast.error("Error getting slide");
+        this.$router.push({
+          name: "admin-guide-slides",
+          params: {id: this.$route.query.gid},
+        });
       }
     },
     async saveSlide(close) {
