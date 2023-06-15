@@ -212,8 +212,7 @@ export default {
   },
   async mounted() {
     this.categories = await this.categoriesStore.loadCategories();
-    this.cabinetsCategoryId =
-      this.categoriesStore.findCategoryIdByName("Cabinet");
+    this.cabinetsCategoryId = this.categoriesStore.findCategoryIdByName("Cabinet");
     this.locationId = this.$route.params.id;
     this.location = await this.builderItemStore.loadItem(this.locationId);
     await this.updateCabinetsList();

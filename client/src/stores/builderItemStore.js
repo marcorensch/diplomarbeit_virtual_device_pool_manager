@@ -23,7 +23,8 @@ export const useBuilderItemStore = defineStore("builderItem", {
         this.item.setData(response.data);
         return this.getItem;
       } catch (e) {
-        console.log(e);
+        if(e.response.status === 404){toast.error("Item not found")}else{toast.error("Something went wrong while loading item")};
+        this.router.push({path: "/admin"});
         return false;
       }
     },
