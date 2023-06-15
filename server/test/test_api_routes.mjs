@@ -1254,16 +1254,67 @@ describe("Test GuideMe Manager administrative Routes", () => {
 
     describe("Test Guide Slides Management", () => {
         let createdGuideItemId;
+        let createdSlideItemId;
         before(async () => {
             // Create a guide
+            const guideData = {name:"GuideMe Guide for Slides Test", content:{}, visible:1};
+            const guideItem = new GuideMeItem();
+            guideItem.setData(guideData);
+            const response = await agent.post("/api/admin/guides").send(guideData);
+            createdGuideItemId = response.body.id;
         });
         after(async () => {
             // Delete the guide
+            await agent.delete(`/api/admin/guides/${createdGuideItemId}`);
         });
         // Create a slide
+        it("should return 200 when creating a slide", async () => {
+            const slideData = {
+                name:"Test Slide",
+                description:"Test Slide Description",
+                content: "[]",
+                uri: "https://www.example.com/image.jpg",
+                guide_id: createdGuideItemId,
+                sorting: 1
+            };
+            const response = await agent.post(`/api/admin/guides/${createdGuideItemId}/slides`).send(slideData);
+            expect(response.status).to.eql(200);
+            expect(response.body).to.have.property("id");
+            createdSlideItemId = response.body.id;
+
+        });
         // Get all slides
+        it("should return 200 and an array containing exactly one slide when getting all slides", async () => {
+            const response = await agent.get(`/api/admin/guides/${createdGuideItemId}/slides`);
+            expect(response.status).to.eql(200);
+            expect(response.body).to.have.property("slides");
+            expect(response.body.slides).to.be.an("array").and.have.lengthOf(1);
+            expect(response.body.slides[0]).to.have.property("id");
+        });
         // Get a slide
+        it("should return 200 and a slide when getting a slide by its id", async () => {
+            const response = await agent.get(`/api/admin/guides/${createdGuideItemId}/slides/${createdSlideItemId}`);
+            expect(response.status).to.eql(200);
+            expect(response.body).to.have.property("slide");
+            expect(response.body.slide).to.have.property("id");
+        });
         // Update a slide
+        it("should return 200 when updating a slide", async () => {
+            const slideData = {
+                name:"Updated Test Slide",
+                description:"Updated Test Slide Description",
+                content: "[]",
+                uri: "https://www.example.com/image.jpg",
+                guide_id: createdGuideItemId,
+                sorting: 12
+            };
+            const response = await agent.put(`/api/admin/guides/${createdGuideItemId}/slides/${createdSlideItemId}`).send(slideData);
+            expect(response.status).to.eql(200);
+        });
         // Delete a slide
+        it("should return 200 when deleting a slide", async () => {
+            const response = await agent.delete(`/api/admin/guides/${createdGuideItemId}/slides/${createdSlideItemId}`);
+            expect(response.status).to.eql(200);
+        });
     });
 });

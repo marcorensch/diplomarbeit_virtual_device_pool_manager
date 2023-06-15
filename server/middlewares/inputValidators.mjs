@@ -87,7 +87,7 @@ const guideValidator = [
 const slideValidator = [
     query('action').optional().escape().trim(),
     body('name').exists().withMessage("Name is required").isLength({min:5}).withMessage("Name must be at least 5 characters").escape().trim(),
-    body('uri').exists().withMessage("Content is required").trim(),
+    body('uri').exists().withMessage("Image URI is required").trim(),
     body('content').exists().withMessage("Content is required").trim(),
     body('notes').optional().escape().trim(),
     body('guide_id').exists().withMessage("Guide ID is required").isNumeric().withMessage("Guide ID must be a number"),
