@@ -95,12 +95,17 @@
 import ControlsFooterWidget from "@/components/ControlsFooterWidget.vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import GuideMeSlideItem from "@/models/GuideMeSlideItem.mjs";
+import {useToast} from "vue-toastification";
 import UIkit from "uikit";
 import axios from "axios";
 
 export default {
   name: "SlidesManagerView",
   components: { FontAwesomeIcon, ControlsFooterWidget },
+  setup() {
+    const toast = useToast();
+    return { toast };
+  },
   data() {
     return {
       id: this.$route.params.id,
@@ -110,6 +115,11 @@ export default {
   },
   async beforeMount() {
     await this.loadGuide();
+    if(!this.guide.id){
+      this.toast.error("Guide not found");
+      this.$router.push({ name: 'guides' });
+      return;
+    }
     await this.loadSlides();
   },
   async mounted() {
