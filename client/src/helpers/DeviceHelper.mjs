@@ -13,19 +13,22 @@ export default class DeviceHelper {
             try{
                 await axios.put(`/api/devices/${storageDevice.id}`, storageDevice);
                 toast.success("Device saved");
+                return true;
             }catch (e) {
+                console.log(e.response.message);
                 toast.error("Device could not be saved");
-                return [];
+                return false;
             }
         } else {
             try{
                 const response = await axios.post(`/api/devices`, storageDevice);
                 toast.success("Device saved");
                 device.id = response.data.id;
-                return device;
+                return true;
             }catch(e){
+                console.log(e.response.message);
                 toast.error("Device could not be saved");
-                return [];
+                return false;
             }
         }
     }

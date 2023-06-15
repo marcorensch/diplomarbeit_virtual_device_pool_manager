@@ -162,7 +162,7 @@
             @updateValue="refreshData('image')"
           />
         </div>
-        <div class="uk-width-1-1 uk-width-2-3@s" v-if="canSetPhysicalDevices()">
+        <div class="uk-width-1-1 uk-width-2-3@s">
           <div>
             <div class="uk-card uk-card-default">
               <div class="uk-card-header">
@@ -192,7 +192,7 @@
                     </div>
                   </div>
                   <div>
-                    <div class="uk-margin">
+                    <div class="uk-margin" v-if="canSetPhysicalDevices()">
                       <div>
                         <label for="pool-location">Pool Location</label
                         ><span class="uk-margin-left">{{
@@ -424,7 +424,8 @@ export default {
     async handleSaveClicked() {
       const formIsValid = await this.v$.device.$validate();
       if (!formIsValid) return;
-      await DeviceHelper.store(this.device);
+      const success = await DeviceHelper.store(this.device);
+      if (!success) return;
       this.$router.push({ name: "devices" });
     },
 

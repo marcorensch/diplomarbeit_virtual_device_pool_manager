@@ -6,7 +6,7 @@ const deviceDataValidator = [
     body('hidden').optional().escape().trim(),
     body('params').optional().escape().trim(),
     body('device_type_id').exists().withMessage("Device Type is required").isNumeric().withMessage("Device Type must be a number"),
-    body('added').exists().withMessage("Added date is required").isISO8601().withMessage("Added date must be a valid date in ISO8601 format"),
+    body('added').exists().isISO8601().withMessage("Added date must be a valid date in ISO8601 format"),
     (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
