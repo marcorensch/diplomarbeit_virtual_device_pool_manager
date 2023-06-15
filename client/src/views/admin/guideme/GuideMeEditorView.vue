@@ -143,7 +143,7 @@ import {useToast} from "vue-toastification";
 import DevicesSelectionModal from "@/components/guides/DevicesSelectionModal.vue";
 import GuideMeItem from "@/models/GuideMeItem.mjs";
 import { useVuelidate } from "@vuelidate/core";
-import { required } from "@vuelidate/validators";
+import { required, minLength } from "@vuelidate/validators";
 
 export default {
   name: "GuideMeEditorView",
@@ -163,7 +163,7 @@ export default {
   validations() {
     return {
       guide: {
-        name: {required},
+        name: {required, minLength: minLength(5)},
       },
     };
   },

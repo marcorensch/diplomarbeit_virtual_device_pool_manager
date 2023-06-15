@@ -17,7 +17,7 @@ const deviceDataValidator = [
 ];
 
 const poolBuilderValidator = [
-    body('name').exists().withMessage("Name is required").escape().trim(),
+    body('name').exists().withMessage("Name is required").isLength({min:1}).withMessage("Must be at least 1 character").escape().trim(),
     body('category_id').exists().withMessage("Category is required").isNumeric().withMessage("Category must be a number"),
     body('parent_id').optional({checkFalsy: true}).isNumeric().withMessage("Parent must be a number"),
     body('description').optional().escape().trim(),
@@ -74,7 +74,7 @@ const deviceSearchValidator = [
 ];
 
 const guideValidator = [
-    body('name').exists().withMessage("Name is required").escape().trim(),
+    body('name').exists().withMessage("Name is required").isLength({min:5}).withMessage("Must be at least 5 characters").escape().trim(),
     body('description').optional().escape().trim(),
     body('notes').optional().escape().trim(),
     (req, res, next) => {
