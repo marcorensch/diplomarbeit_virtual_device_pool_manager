@@ -1,7 +1,7 @@
 import {body, query, validationResult} from 'express-validator';
 
 const deviceDataValidator = [
-    body('name').exists().withMessage("Name is required").escape().trim(),
+    body('name').exists().withMessage("Name is required").isLength({min:5, max:50}).withMessage("The name must have between 5 and 50 characters").escape().trim(),
     body('notes').optional().escape().trim(),
     body('hidden').optional().escape().trim(),
     body('params').optional().escape().trim(),

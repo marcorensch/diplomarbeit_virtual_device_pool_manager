@@ -271,7 +271,7 @@ import NotesWidget from "@/components/widgets/configform/NotesWidget.vue";
 import ControlsFooterWidget from "@/components/ControlsFooterWidget.vue";
 import MsisdnWidget from "@/components/widgets/configform/MsisdnWidget.vue";
 import { useVuelidate } from "@vuelidate/core";
-import { helpers, numeric, required } from "@vuelidate/validators";
+import {helpers, minLength, numeric, required} from "@vuelidate/validators";
 import DeviceHelper from "@/helpers/DeviceHelper.mjs";
 import PoolSelector from "@/components/PoolSelector.vue";
 import WeblinksWidget from "@/components/widgets/configform/weblinksWidget.vue";
@@ -320,6 +320,7 @@ export default {
             "Name must be less than 50 characters",
             (value) => value.length <= 50
           ),
+          minLength: helpers.withMessage("Name must be at least 5 characters", minLength(5)),
         },
         device_type_id: { required },
         added: { required },
