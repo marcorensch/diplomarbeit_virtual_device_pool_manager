@@ -115,12 +115,22 @@ const guidesSearchValidator = [
 ];
 
 
-const msisdnValidator = [];
+const manufacturerDataValidator = [
+    body('name').exists().withMessage("Name is required").isLength({min:3, max:50}).withMessage("The name must have between 3 and 50 characters").escape().trim(),
+    body('image').optional().trim(),
+    body('notes').optional().escape().trim(),
+    body('hidden').optional().escape().trim(),
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) return res.status(400).send({success: false, message: errors.array()[0].msg});
+        next()
+    }
+];
 
 export {
     deviceDataValidator,
     poolBuilderValidator,
-    msisdnValidator,
+    manufacturerDataValidator,
     weblinkValidator,
     checkoutValidator,
     deviceSearchValidator,

@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 import Manufacturer from "@/models/Manufacturer";
 import axios from "axios";
+import { useToast } from "vue-toastification";
+const toast = useToast();
 export const useManufacturerEditStore = defineStore("manufacturerEdit", {
   state: () => ({
     manufacturer: new Manufacturer(),
@@ -20,6 +22,7 @@ export const useManufacturerEditStore = defineStore("manufacturerEdit", {
         }
         return true;
       } catch (e) {
+        toast.error("Error saving manufacturer: " + e.response.data.message);
         return false;
       }
     },

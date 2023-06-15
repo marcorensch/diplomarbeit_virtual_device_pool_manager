@@ -2,6 +2,7 @@ import express from "express";
 import ManufacturerHelper from "../helpers/ManufacturerHelper.mjs";
 import Manufacturer from "../models/Manufacturer.mjs";
 import UserValidator from "../middlewares/UserValidator.mjs";
+import {manufacturerDataValidator} from "../middlewares/inputValidators.mjs";
 const router = express.Router();
 
 router.get("/", UserValidator.setCanHandleHiddenInformation, async (req, res) => {
@@ -22,7 +23,7 @@ router.get("/:id", UserValidator.setCanHandleHiddenInformation, async (req, res)
     res.json(manufacturer);
 });
 
-router.post("/", UserValidator.validateTokens, UserValidator.setCookies, UserValidator.hasPermission("canCreateManufacturer"), async (req, res) => {
+router.post("/", UserValidator.validateTokens, UserValidator.setCookies, UserValidator.hasPermission("canCreateManufacturer"), manufacturerDataValidator, async (req, res) => {
     const manufacturer = new Manufacturer();
     manufacturer.setData(req.body)
     const result = await ManufacturerHelper.createManufacturer(manufacturer);
