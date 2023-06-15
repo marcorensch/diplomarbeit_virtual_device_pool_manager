@@ -129,11 +129,11 @@
                   type="textarea"
                   class="uk-textarea"
                   v-model="currentCabinet.description"
-                  placeholder="Location Description"
+                  placeholder="Cabinet Description"
                 ></textarea>
               </div>
               <div class="uk-margin">
-                <label for="hidden" class="uk-form-label">Description</label>
+                <label for="hidden" class="uk-form-label">Hidden Notes</label>
                 <textarea
                   type="textarea"
                   id="hidden"

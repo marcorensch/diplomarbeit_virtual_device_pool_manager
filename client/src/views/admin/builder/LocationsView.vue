@@ -127,14 +127,14 @@
                 ></textarea>
               </div>
               <div class="uk-margin">
-                <label for="hidden" class="uk-form-label">Description</label>
+                <label for="hidden" class="uk-form-label">Hidden Notes</label>
                 <textarea
                   type="textarea"
                   id="hidden"
                   name="hidden"
                   class="uk-textarea"
                   v-model="currentLocation.hidden"
-                  placeholder="Hidden Information"
+                  placeholder="Hidden Notes"
                 ></textarea>
               </div>
               <div class="uk-margin">
