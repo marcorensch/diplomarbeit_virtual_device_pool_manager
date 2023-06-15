@@ -77,6 +77,7 @@ import ImageWidget from "@/components/widgets/configform/ImageWidget.vue";
 import ControlsFooterWidget from "@/components/ControlsFooterWidget.vue";
 import {useVuelidate} from "@vuelidate/core";
 import {required, minLength, maxLength} from "@vuelidate/validators";
+import {useToast} from "vue-toastification";
 
 export default {
   name: "ManufacturerConfigView",
@@ -85,6 +86,7 @@ export default {
     return {
       manufacturerEditStore: useManufacturerEditStore(),
       v$: useVuelidate(),
+      toast: useToast(),
       authStore: useAuthStore(),
     };
   },
@@ -105,6 +107,10 @@ export default {
   async beforeMount() {
     if (this.$route.params.id) {
       await this.manufacturerEditStore.load(this.$route.params.id);
+      if(!this.manufacturerEditStore.manufacturer.id){
+        this.toast.error("Manufacturer not found")
+        this.$router.push({name: "manufacturers"});
+      }
     } else {
       this.manufacturerEditStore.reset();
     }
