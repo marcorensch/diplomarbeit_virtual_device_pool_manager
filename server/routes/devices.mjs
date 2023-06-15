@@ -264,8 +264,28 @@ router.put("/:id", UserValidator.validateTokens, UserValidator.setCookies, UserV
 
 });
 
-router.delete("/:id", UserValidator.validateTokens, UserValidator.setCookies, UserValidator.hasPermission("canDeleteDevices"), async (req, res) => {
+router.delete("/:id", UserValidator.validateTokens, UserValidator.setCookies, async (req, res) => {
     if (!req.params.id) return res.status(400).send({success: false, message: "ID cannot be empty"});
+    let device;
+    try {
+        device = await DeviceHelper.getDeviceById(req.params.id);
+        if (!device) return res.status(404).send({success: false, message: "Device not found"});
+    } catch (e) {
+        console.log(e.message);
+        return res.status(500).send({success: false, message: e.message});
+    }
+    if (device.slot_id) {
+        if (!UserValidator.hasPermission("canDeleteDevices")) return res.status(403).send({
+            success: false,
+            message: "You do not have permission to delete devices"
+        });
+    } else {
+        if (!UserValidator.hasPermission("canDeleteVirtualDevices")) return res.status(403).send({
+            success: false,
+            message: "You do not have permission to delete virtual devices"
+        });
+    }
+
     try {
         const result = await DeviceHelper.delete(req.params.id);
         if (!result.affectedRows) return res.status(404).send({success: false, message: "Device not found"});
