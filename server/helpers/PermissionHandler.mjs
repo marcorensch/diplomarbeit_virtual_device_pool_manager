@@ -72,6 +72,7 @@ export const rolePermissions = {
         permissions.UPDATE_OWN_ACCOUNT,
         permissions.CREATE_VIRTUAL_DEVICES,
         permissions.UPDATE_VIRTUAL_DEVICES,
+        permissions.DELETE_VIRTUAL_DEVICES,
         permissions.CHECKOUT_IN_DEVICES,
         permissions.CREATE_LINKS,
         permissions.DELETE_LINKS,
