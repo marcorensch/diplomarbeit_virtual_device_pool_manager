@@ -4,7 +4,7 @@ import Manufacturer from "../models/Manufacturer.mjs";
 import UserValidator from "../middlewares/UserValidator.mjs";
 const router = express.Router();
 
-router.get("/", UserValidator.setCanHandleHiddenInformation, async (req, res) => {
+router.get("/", UserValidator.hasPermission("canAccessManufacturersList"), UserValidator.setCanHandleHiddenInformation, async (req, res) => {
     const manufacturers = await ManufacturerHelper.getManufacturers();
     if(!req.canHandleHiddenInformation) {
         manufacturers.forEach(manufacturer => {
@@ -22,14 +22,14 @@ router.get("/:id", UserValidator.setCanHandleHiddenInformation, async (req, res)
     res.json(manufacturer);
 });
 
-router.post("/", async (req, res) => {
+router.post("/", UserValidator.hasPermission("canCreateManufacturer"), async (req, res) => {
     const manufacturer = new Manufacturer();
     manufacturer.setData(req.body)
     const result = await ManufacturerHelper.createManufacturer(manufacturer);
     res.json({id: result.insertId, message: "Manufacturer created"});
 });
 
-router.put("/", UserValidator.setCanHandleHiddenInformation, async (req, res) => {
+router.put("/", UserValidator.hasPermission("canUpdateManufacturer"), UserValidator.setCanHandleHiddenInformation, async (req, res) => {
     const manufacturer = new Manufacturer();
     if(!req.canHandleHiddenInformation) {
         delete req.body.hidden
@@ -39,7 +39,7 @@ router.put("/", UserValidator.setCanHandleHiddenInformation, async (req, res) =>
     res.json({message: "Manufacturer updated"});
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", UserValidator.hasPermission("canDeleteManufacturer"), async (req, res) => {
     const result = await ManufacturerHelper.deleteManufacturer(req.params.id);
     res.json(result);
 });
