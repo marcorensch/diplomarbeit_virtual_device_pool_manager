@@ -103,17 +103,21 @@ export const rolePermissions = {
         permissions.CREATE_VIRTUAL_DEVICES,
         permissions.UPDATE_VIRTUAL_DEVICES,
         permissions.CHECKOUT_IN_DEVICES,
-        permissions.DELETE_OWN_DEVICES,
-        permissions.UPDATE_OWN_DEVICES,
         permissions.CREATE_LINKS,
         permissions.ACCESS_GUIDES,
 
         permissions.ACCESS_FILE_MANAGER,
         permissions.CREATE_FILE_MANAGER_ITEM,
+
+        permissions.ACCESS_MANUFACTURERS_LIST,
+        permissions.CREATE_MANUFACTURER,
+        permissions.DELETE_MANUFACTURER,
+        permissions.UPDATE_MANUFACTURER,
     ],
     [roles.GUEST]: [
         permissions.ACCESS_DEVICE_LIST,
         permissions.ACCESS_GUIDES,
+        permissions.ACCESS_MANUFACTURERS_LIST,
     ]
 }
 

@@ -58,7 +58,7 @@ router.put('/:id', UserValidator.hasPermission('canUpdateGuides'), guideValidato
     try{
         const guide = await GuidesHelper.updateGuide(req.params.id, guideData);
         if (guide === null) return res.status(500).json({success: false, message: "Failed to update guide"});
-        return res.status(200).json({success: true, message: "Guide updated successfully", guide});
+        return res.status(200).json({success: true, message: "Guide updated successfully"});
     } catch (e) {
         return res.status(500).json({success: false, message: e.message});
     }

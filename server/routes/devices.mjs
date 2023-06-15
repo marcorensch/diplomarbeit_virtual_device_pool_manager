@@ -183,15 +183,9 @@ router.put("/:id", UserValidator.validateTokens, UserValidator.setCookies, UserV
 
     const device = new Device();
     device.setData({id: req.params.id, ...req.body})
+
     if(!req.canHandleHiddenInformation) {
         delete device.hidden;
-    }
-
-    try {
-        const deviceFromDb = await DeviceHelper.getDeviceById(device.id);
-        if (!deviceFromDb) return res.status(404).send({success: false, message: "Device not found"});
-    } catch (e) {
-        return res.status(500).send({success: false, message: "Error checking if device exists"});
     }
 
     if (device.slot_id) {
@@ -206,7 +200,7 @@ router.put("/:id", UserValidator.validateTokens, UserValidator.setCookies, UserV
         });
     }
 
-    if (device.msisdns.length > 0) {
+    if (device.msisdns?.length > 0) {
         try {
             for (const msisdn of device.msisdns) {
                 const result = await DeviceHelper.setOrUpdateMsisdnLink(device.id, msisdn);
@@ -219,13 +213,13 @@ router.put("/:id", UserValidator.validateTokens, UserValidator.setCookies, UserV
             console.log(e.message);
             return res.status(500).send({success: false, message: e.message});
         }
-    }
 
-    try {
-        await DeviceHelper.deleteInactiveMsisdnLinks(device.id, device.msisdns);
-    } catch (e) {
-        console.log(e.message);
-        return res.status(500).send({success: false, message: e.message});
+        try {
+            await DeviceHelper.deleteInactiveMsisdnLinks(device.id, device.msisdns);
+        } catch (e) {
+            console.log(e.message);
+            return res.status(500).send({success: false, message: e.message});
+        }
     }
 
     if (device.weblinks.length > 0) {
@@ -260,7 +254,7 @@ router.put("/:id", UserValidator.validateTokens, UserValidator.setCookies, UserV
 
     try {
         const result = await DeviceHelper.update(device);
-        if (!result.affectedRows) return res.status(500).send({success: false, message: "Device could not be updated"});
+        if (!result.affectedRows) return res.status(404).send({success: false, message: "Device not found"});
         const dbData = await DeviceHelper.getDeviceById(req.params.id);
         return res.status(200).send(dbData);
     } catch (e) {

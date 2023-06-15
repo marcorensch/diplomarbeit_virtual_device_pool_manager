@@ -150,9 +150,9 @@ export default class UserValidator {
 
     static hasPermission(action) {
         return function (req, res, next) {
-            if (!req.user?.role) return res.status(403).send({message: "Unauthorized"});
+            const role = req.user?.role || "GUEST";
             const permissionHandler = new PermissionHandler();
-            const permissionsMap = permissionHandler.getPermissions(req.user.role);
+            const permissionsMap = permissionHandler.getPermissions(role);
             if (!permissionsMap.has(action)) return res.status(403).send({message: "Forbidden"});
 
             next();
@@ -162,9 +162,9 @@ export default class UserValidator {
     static async hasPermissions(actions) {
         if (!Array.isArray(actions)) actions = [actions];
         return function (req, res, next) {
-            if (!req.user?.role) return res.status(403).send({message: "Forbidden"});
+            const role = req.user?.role || "GUEST";
             const permissionHandler = new PermissionHandler();
-            const permissionsMap = permissionHandler.getPermissions(req.user.role);
+            const permissionsMap = permissionHandler.getPermissions(role);
             for (let action of actions) {
                 if (!permissionsMap.has(action)) return res.status(403).send({message: "Forbidden"});
             }

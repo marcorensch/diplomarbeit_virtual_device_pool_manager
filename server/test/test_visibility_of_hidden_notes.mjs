@@ -5,19 +5,21 @@ import {app} from "../server.mjs";
 
 const {expect} = chai;
 
-const adminCredentials = {
-    username: "administrator",
-    password: "test"
-}
-
-const guestsAgent = supertest.agent(app);
-const registeredUserAgent = supertest.agent(app);
-const managerAgent = supertest.agent(app);
-const adminAgent = supertest.agent(app);
-let createdDeviceID;
-let createdManufacturerID;
-let createdMsisdnID;
 describe("Test visibility of hidden notes", () => {
+
+    const adminCredentials = {
+        username: "administrator",
+        password: "test"
+    }
+
+    const guestsAgent = supertest.agent(app);
+    const registeredUserAgent = supertest.agent(app);
+    const managerAgent = supertest.agent(app);
+    const adminAgent = supertest.agent(app);
+    let createdDeviceID;
+    let createdManufacturerID;
+    let createdMsisdnID;
+
     before(async () => {
         await adminAgent.get("/api/auth/logout");
         await adminAgent.post("/api/auth/login").send(adminCredentials);
@@ -51,12 +53,7 @@ describe("Test visibility of hidden notes", () => {
         createdMsisdnID = cn_response.body.id;
         await adminAgent.get("/api/auth/logout");
     });
-    after(async () => {
-        await adminAgent.post("/api/auth/login").send(adminCredentials);
-        await adminAgent.delete(`/api/devices/${createdDeviceID}`);
-        await adminAgent.delete(`/api/manufacturers/${createdManufacturerID}`);
-        await adminAgent.delete(`/api/admin/msisdns/${createdMsisdnID}`);
-    });
+
     describe("Guests should not see hidden notes", () => {
         before(async () => {
             await guestsAgent.get("/api/auth/logout");
@@ -302,5 +299,12 @@ describe("Test visibility of hidden notes", () => {
                 expect(response.body).to.have.property("hidden");
             });
         });
+    });
+
+    after(async () => {
+        await adminAgent.post("/api/auth/login").send(adminCredentials);
+        await adminAgent.delete(`/api/devices/${createdDeviceID}`);
+        await adminAgent.delete(`/api/manufacturers/${createdManufacturerID}`);
+        await adminAgent.delete(`/api/admin/msisdns/${createdMsisdnID}`);
     });
 });

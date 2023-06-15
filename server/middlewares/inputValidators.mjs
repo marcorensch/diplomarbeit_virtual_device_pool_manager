@@ -17,7 +17,7 @@ const deviceDataValidator = [
 ];
 
 const poolBuilderValidator = [
-    body('name').exists().withMessage("Name is required").isLength({min:1}).withMessage("Must be at least 1 character").escape().trim(),
+    body('name').exists().withMessage("Name is required").isLength({min:1}).withMessage("Name must be at least 1 character long").escape().trim(),
     body('category_id').exists().withMessage("Category is required").isNumeric().withMessage("Category must be a number"),
     body('parent_id').optional({checkFalsy: true}).isNumeric().withMessage("Parent must be a number"),
     body('description').optional().escape().trim(),

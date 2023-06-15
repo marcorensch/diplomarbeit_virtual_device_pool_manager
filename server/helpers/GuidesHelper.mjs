@@ -94,7 +94,7 @@ export default class GuidesHelper {
     static async updateGuide(id, guide) {
         const database = new DatabaseModel();
         const query = "UPDATE guides SET name = ?, description = ?, visible = ? WHERE id = ?";
-        const result = await database.query(query, [guide.name, guide.description, guide.visible, id]);
+        return await database.query(query, [guide.name, guide.description, guide.visible, id]);
     }
 
     static async deleteGuide(id) {

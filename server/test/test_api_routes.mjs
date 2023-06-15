@@ -776,12 +776,12 @@ describe("Test administrative PoolBuilder API Endpoints", () => {
             });
             expect(response.status).to.eql(400);
             expect(response.body).to.have.property("message");
-            expect(response.body.message).to.eql("Name cannot be empty");
+            expect(response.body.message).to.eql("Name must be at least 1 character long");
         });
 
         it("should return 400 with correct message when trying to create a location with non existing category_id", async () => {
             const response = await agent.post("/api/admin/poolbuilder/items").send({
-                name: "",
+                name: "My Test Item",
                 description: "test",
                 category_id: 99
             });
@@ -1212,13 +1212,16 @@ describe("Test GuideMe Manager administrative Routes", () => {
         await agent.post("/api/auth/login").send(adminCredentials);
     });
     describe("Test Guides Management", () => {
-        let createdGuideItem;
+        let createdGuideItemId;
         // Create a guide
         it("should return 200 when creating a guide", async () => {
-            const guideData = new GuideMeItem("GuideMe Test Name", "Test GuideMe Description", 0, 1);
+            const guideData = {name:"GuideMe Test Name", description:"Test GuideMe Description", visible:1};
+            const guideItem = new GuideMeItem();
+            guideItem.setData(guideData);
             const response = await agent.post("/api/admin/guides").send(guideData);
             expect(response.status).to.eql(200);
             expect(response.body).to.have.property("id");
+            createdGuideItemId = response.body.id;
         });
         // Get all guides
         it("should return 200 and an array containing exactly one guide when getting all guides", async () => {
@@ -1226,15 +1229,31 @@ describe("Test GuideMe Manager administrative Routes", () => {
             expect(response.status).to.eql(200);
             expect(response.body).to.have.property("guides");
             expect(response.body.guides).to.be.an("array").and.have.lengthOf(1);
-            createdGuideItem = response.body[0];
+            expect(response.body.guides[0]).to.have.property("id");
         });
         // Get a guide
+        it("should return 200 and a guide when getting a guide by its id", async () => {
+            const response = await agent.get(`/api/admin/guides/${createdGuideItemId}`);
+            expect(response.status).to.eql(200);
+            expect(response.body).to.have.property("guide");
+            expect(response.body.guide).to.have.property("id");
+            expect(response.body.guide.id).to.eql(createdGuideItemId);
+        });
         // Update a guide
+        it("should return 200 when updating a guide", async () => {
+            const guideData = {id: createdGuideItemId, name:"GuideMe New Test Name", description:"Updated Test GuideMe Description", visible:0};
+            const response = await agent.put(`/api/admin/guides/${createdGuideItemId}`).send(guideData);
+            expect(response.status).to.eql(200);
+        });
         // Delete a guide
+        it("should return 200 when deleting a guide", async () => {
+            const response = await agent.delete(`/api/admin/guides/${createdGuideItemId}`);
+            expect(response.status).to.eql(200);
+        });
     });
 
     describe("Test Guide Slides Management", () => {
-        let createdGuideItem;
+        let createdGuideItemId;
         before(async () => {
             // Create a guide
         });
