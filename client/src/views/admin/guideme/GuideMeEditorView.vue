@@ -88,7 +88,7 @@
           </div>
         </div>
       </div>
-      <div class="uk-margin">
+      <div v-if="guide.id" class="uk-margin">
         <div class="uk-card uk-card-default nxd-cursor-pointer" @click="handleShowDeviceSelectionModal">
           <div class="uk-flex uk-flex-middle uk-grid-small uk-grid">
             <div class="uk-width-expand">
