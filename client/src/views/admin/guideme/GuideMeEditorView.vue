@@ -31,7 +31,18 @@
                            type="text"
                            placeholder="Guide Name"
                            v-model="guide.name"
+                           :class="{
+                        'uk-form-invalid':
+                          v$.guide.name.$errors.length,
+                      }"
                     />
+                    <div
+                        v-for="error of v$.guide.name.$errors"
+                        :key="error"
+                        class="uk-text-danger"
+                    >
+                      {{ error.$message }}
+                    </div>
                   </div>
                 </div>
                 <div class="uk-width-expand">
@@ -131,6 +142,8 @@ import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import {useToast} from "vue-toastification";
 import DevicesSelectionModal from "@/components/guides/DevicesSelectionModal.vue";
 import GuideMeItem from "@/models/GuideMeItem.mjs";
+import { useVuelidate } from "@vuelidate/core";
+import { required } from "@vuelidate/validators";
 
 export default {
   name: "GuideMeEditorView",
@@ -138,12 +151,20 @@ export default {
   setup() {
     const auth = useAuthStore();
     const toast = useToast();
-    return {auth, toast};
+    const v$ = useVuelidate();
+    return {auth, toast, v$};
   },
   data() {
     return {
       guide: new GuideMeItem(),
       linkedDevices: [],
+    };
+  },
+  validations() {
+    return {
+      guide: {
+        name: {required},
+      },
     };
   },
   async mounted() {
@@ -171,6 +192,8 @@ export default {
       }
     },
     async handleSaveClicked() {
+      const validation = await this.v$.$validate();
+      if (!validation) return;
       try {
         if (this.guide.id) {
           await axios.put(`/api/admin/guides/${this.guide.id}`, this.guide);
