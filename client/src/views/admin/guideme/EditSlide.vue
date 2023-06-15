@@ -124,7 +124,7 @@
                 <div class="uk-margin-small-top">
                   <h5>Label</h5>
                   <input type="text" class="uk-input uk-width-1-1" id="slide-name-input" v-model="slide.name" :class="{
-                        'uk-form-invalid':
+                        'form-invalid':
                           v$.slide.name.$errors.length,
                       }">
                   <div
