@@ -74,7 +74,7 @@ const deviceSearchValidator = [
 ];
 
 const guideValidator = [
-    body('name').exists().withMessage("Name is required").isLength({min:5}).withMessage("Must be at least 5 characters").escape().trim(),
+    body('name').exists().withMessage("Name is required").isLength({min:5}).withMessage("Name must be at least 5 characters").escape().trim(),
     body('description').optional().escape().trim(),
     body('notes').optional().escape().trim(),
     (req, res, next) => {
@@ -86,7 +86,7 @@ const guideValidator = [
 
 const slideValidator = [
     query('action').optional().escape().trim(),
-    body('name').exists().withMessage("Name is required").escape().trim(),
+    body('name').exists().withMessage("Name is required").isLength({min:5}).withMessage("Name must be at least 5 characters").escape().trim(),
     body('uri').exists().withMessage("Content is required").trim(),
     body('content').exists().withMessage("Content is required").trim(),
     body('notes').optional().escape().trim(),

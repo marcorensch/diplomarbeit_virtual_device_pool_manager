@@ -123,7 +123,17 @@
                 </div>
                 <div class="uk-margin-small-top">
                   <h5>Label</h5>
-                  <input type="text" class="uk-input uk-width-1-1" id="slide-name-input" v-model="slide.name">
+                  <input type="text" class="uk-input uk-width-1-1" id="slide-name-input" v-model="slide.name" :class="{
+                        'uk-form-invalid':
+                          v$.slide.name.$errors.length,
+                      }">
+                  <div
+                      v-for="error of v$.slide.name.$errors"
+                      :key="error"
+                      class="uk-text-danger"
+                  >
+                    {{ error.$message }}
+                  </div>
                 </div>
                 <div class="uk-margin-small-top">
                   <h5>Image</h5>
@@ -307,13 +317,26 @@ import {v4 as uuidv4} from "uuid";
 import {ColorPicker} from "vue3-colorpicker";
 import NotAvailableMobile from "@/components/NotAvailableMobile.vue";
 import draggable from 'vuedraggable'
+import {useVuelidate} from "@vuelidate/core";
+import {required, minLength, helpers} from "@vuelidate/validators";
 
 export default {
   name: "EditSlide",
   components: {NotAvailableMobile, ColorPicker, FileManager, FontAwesomeIcon, draggable},
   setup() {
     const toast = useToast();
-    return {toast};
+    const v$ = useVuelidate();
+    return {toast, v$};
+  },
+  validations() {
+    return {
+      slide: {
+        name: {
+          required: helpers.withMessage("Label is required", required),
+          minLength: helpers.withMessage("Label must be at least 5 characters long", minLength(5)),
+        },
+      },
+    };
   },
   data() {
     return {
@@ -523,6 +546,8 @@ export default {
       }
     },
     async saveSlide(close) {
+      const validation = await this.v$.$validate();
+      if (!validation) return;
       this.slide.content = JSON.stringify(this.stageItems);
       try {
         const result = await axios.put(`/api/admin/guides/${this.$route.query.gid}/slides/${this.$route.params.id}`, this.slide);
