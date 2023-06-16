@@ -196,8 +196,11 @@
               <table class="uk-table uk-table-divider uk-table-hover uk-table-small">
                 <tbody>
                 <tr v-for="guide of device.guides" :key="guide.id" class="uk-position-relative">
-                  <td class="uk-width-expand">{{guide.name}}</td>
-                  <td class="uk-table-shrink">
+                  <td class="uk-width-expand uk-position-relative">
+                    {{guide.name}}
+                    <router-link :to="{'name': 'guide-front', params:{id: guide.id}}" class="uk-position-cover" target="_blank" />
+                  </td>
+                  <td class="uk-table-shrink uk-position-relative">
                     <font-awesome-icon class="uk-preserve-width" :icon="['fas', 'arrow-up-right-from-square']" />
                     <router-link :to="{'name': 'guide-front', params:{id: guide.id}}" class="uk-position-cover" target="_blank" />
                   </td>
