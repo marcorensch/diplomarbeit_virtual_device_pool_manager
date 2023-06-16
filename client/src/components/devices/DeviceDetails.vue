@@ -116,6 +116,17 @@
                       </div>
                     </td>
                   </tr>
+                <tr v-if="device.msisdns.length">
+                  <th class="uk-table-shrink">
+                    <span class="nxd-text-navy">MSISDN's:</span>
+                  </th>
+                  <td>
+                    <div v-for="msisdn of device.msisdns" :key="msisdn.id" :uk-tooltip="msisdn.sim_number">
+                      <span>{{ msisdn.msisdn }}</span>
+                      <font-awesome-icon @click="handleCopy(msisdn.sim_number)" uk-tooltip="Copy ICCID (SIM Number)" class="uk-margin-small-left uk-preserve-width nxd-text-navy nxd-cursor-pointer" :icon="['fas','sim-card']" />
+                    </div>
+                  </td>
+                </tr>
                 </tbody>
               </table>
             </div>
@@ -374,6 +385,8 @@ import { useAuthStore } from "@/stores/auth";
 import { useVuelidate } from "@vuelidate/core";
 import { helpers, required, url } from "@vuelidate/validators";
 import axios from "axios";
+import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
+import {useToast} from "vue-toastification";
 
 function linkAlreadySet(value) {
   return !this.device.weblinks.some((link) => link.uri === value);
@@ -385,11 +398,12 @@ function nameAlreadySet(value) {
 
 export default {
   name: "DeviceDetails",
-  components: {  },
+  components: {FontAwesomeIcon},
   setup() {
     const authStore = useAuthStore();
+    const toast = useToast();
     const v$ = useVuelidate();
-    return { authStore, v$ };
+    return { authStore, v$, toast };
   },
   data() {
     return {
@@ -435,6 +449,14 @@ export default {
   },
   mounted() {},
   methods: {
+    handleCopy(valueToCopy) {
+      try {
+        navigator.clipboard.writeText(valueToCopy);
+        this.toast("Copied to clipboard");
+      } catch (err) {
+        console.error("Failed to copy: ", err);
+      }
+    },
     canSeeCheckoutOption() {
       if (!this.authStore.getUser) return false;
       return !!this.authStore.hasPermission("canCheckoutInDevices");

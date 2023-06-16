@@ -81,7 +81,7 @@ import {
     faEye,
     faCloudArrowDown,
     faUnlink,
-    faEyeSlash,
+    faEyeSlash, faSimCard,
 } from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 
@@ -151,7 +151,8 @@ library.add(
     faCircleQuestion,
     faNoteSticky,
     faCheck,
-    faCloud
+    faCloud,
+    faSimCard
 );
 library.add(faBuilding, faCog, faArrowLeft, faCity, faLock, faCircle);
 
