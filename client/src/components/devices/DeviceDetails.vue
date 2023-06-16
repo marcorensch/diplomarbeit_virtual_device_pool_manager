@@ -26,9 +26,7 @@
               <div class="uk-h2 nxd-text-navy uk-margin-remove uk-text-light">
                 {{ device.name }}
               </div>
-              <table
-                class="uk-table uk-table-divider uk-table-small uk-table-middle uk-table-justify uk-table-align-top"
-              >
+              <table class="uk-table uk-table-divider uk-table-small uk-table-middle uk-table-justify">
                 <tbody>
                   <tr>
                     <th class="uk-table-shrink">
@@ -109,16 +107,16 @@
                     </td>
                   </tr>
                   <tr v-if="imeis.length">
-                    <th><span class="nxd-text-navy">IMEI</span></th>
+                    <th><span class="nxd-text-navy">IMEI:</span></th>
                     <td>
                       <div v-for="(imei, index) of imeis" :key="index">
                         {{ imei.imei }}
                       </div>
                     </td>
                   </tr>
-                <tr v-if="device.msisdns.length">
+                <tr v-if="device.msisdns?.length">
                   <th class="uk-table-shrink">
-                    <span class="nxd-text-navy">MSISDN's:</span>
+                    <span class="nxd-text-navy">MSISDN:</span>
                   </th>
                   <td>
                     <div v-for="msisdn of device.msisdns" :key="msisdn.id" :uk-tooltip="msisdn.sim_number">
@@ -134,19 +132,12 @@
           <div id="device-details-inner" uk-height-viewport="expand: true">
             <div class="uk-margin">
               <h3>Documents</h3>
-              <table
-                class="uk-table uk-table-divider uk-table-hover uk-table-small"
-              >
+              <div v-if="device.documents.length === 0">
+                <span>No documents</span>
+              </div>
+              <table v-else class="uk-table uk-table-divider uk-table-hover uk-table-small">
                 <tbody>
-                  <tr v-if="device.documents.length === 0">
-                    <td>No documents</td>
-                  </tr>
-                  <template v-else>
-                    <tr
-                      v-for="doc of device.documents"
-                      :key="doc.id"
-                      class="uk-position-relative"
-                    >
+                    <tr v-for="doc of device.documents" :key="doc.id" class="uk-position-relative">
                       <td>
                         <a
                           :href="'public/' + doc.uri"
@@ -161,7 +152,6 @@
                         {{ doc.name }}
                       </td>
                     </tr>
-                  </template>
                 </tbody>
               </table>
             </div>
@@ -193,13 +183,10 @@
                   </template>
                 </tbody>
               </table>
-              <div
-                class="uk-margin-small-top uk-flex uk-flex-right"
-                v-if="authStore.hasPermission('canCreateLinks')"
-              >
-                <a href="#" @click="showAddWeblinkModal(device)"
-                  ><font-awesome-icon :icon="['fas', 'plus']" /> Add Weblink</a
-                >
+              <div class="uk-margin-small-top uk-flex uk-flex-right" v-if="authStore.hasPermission('canCreateLinks')">
+                <a href="#" @click="showAddWeblinkModal(device)">
+                  <font-awesome-icon :icon="['fas', 'plus']" /> Add Weblink
+                </a>
               </div>
             </div>
             <div class="uk-margin">
