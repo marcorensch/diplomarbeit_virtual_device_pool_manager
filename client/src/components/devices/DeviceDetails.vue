@@ -160,22 +160,24 @@
               <table class="uk-table uk-table-divider uk-table-hover">
                 <tbody>
                   <tr class="uk-position-relative" v-if="['Smartphone', 'Simple Phone', 'Tablet'].includes(device.device_type_name)">
-                    <td class="uk-width-expand">
+                    <td class="uk-position-relative uk-width-expand">
                       <span uk-tooltip="Search Device on kimovil to see technical details">
                         Search Device on kimovil
                       </span>
+                      <a target="_blank" :title="'Search ' + device.name + ' on kimovil'" class="uk-position-cover" :href="buildKimovilLink(device)"></a>
                     </td>
-                    <td class="uk-table-shrink">
+                    <td class="uk-position-relative uk-table-shrink">
                       <font-awesome-icon class="uk-preserve-width" :icon="['fas', 'arrow-up-right-from-square']" />
                       <a target="_blank" :title="'Search ' + device.name + ' on kimovil'" class="uk-position-cover" :href="buildKimovilLink(device)"></a>
                     </td>
                   </tr>
                   <template v-for="link of device.weblinks" :key="link.id">
                     <tr class="uk-position-relative">
-                      <td class="uk-width-expand">
+                      <td class="uk-position-relative uk-width-expand">
                         <span :uk-tooltip="link.description">{{ link.name }}</span>
+                        <a :href="link.uri" :title="link.uri" class="uk-position-cover" target="_blank"></a>
                       </td>
-                      <td class="uk-table-shrink">
+                      <td class="uk-position-relative uk-table-shrink">
                         <font-awesome-icon class="uk-preserve-width" :icon="['fas', 'arrow-up-right-from-square']" />
                         <a :href="link.uri" :title="link.uri" class="uk-position-cover" target="_blank"></a>
                       </td>
@@ -183,7 +185,7 @@
                   </template>
                 </tbody>
               </table>
-              <div class="uk-margin-small-top uk-flex uk-flex-right" v-if="authStore.hasPermission('canCreateLinks')">
+              <div class="uk-position-relative uk-margin-small-top uk-flex uk-flex-right" v-if="authStore.hasPermission('canCreateLinks')">
                 <a href="#" @click="showAddWeblinkModal(device)">
                   <font-awesome-icon :icon="['fas', 'plus']" /> Add Weblink
                 </a>
