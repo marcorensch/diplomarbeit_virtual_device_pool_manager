@@ -138,7 +138,7 @@
               <table v-else class="uk-table uk-table-divider uk-table-hover uk-table-small">
                 <tbody>
                     <tr v-for="doc of device.documents" :key="doc.id" class="uk-position-relative">
-                      <td>
+                      <td class="uk-position-relative">
                         <a
                           :href="'public/' + doc.uri"
                           target="_blank"
