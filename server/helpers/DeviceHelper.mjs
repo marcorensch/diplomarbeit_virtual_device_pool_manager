@@ -122,7 +122,7 @@ export default class DeviceHelper {
             }
 
             try {
-                device.guides = await GuidesHelper.getGuidesByDeviceId(device.id);
+                device.guides = await GuidesHelper.getGuidesByDeviceId(device.id, true);
             } catch (e) {
                 console.log(e.message);
             }

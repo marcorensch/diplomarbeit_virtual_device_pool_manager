@@ -64,9 +64,12 @@ export default class GuidesHelper {
         return await database.query(query, [id]);
     }
 
-    static async getGuidesByDeviceId(device_id) {
+    static async getGuidesByDeviceId(device_id, excludeHiddenGuides = false) {
         const database = new DatabaseModel();
-        const query = "SELECT g.id, g.name, g.description FROM guides_devices AS gd LEFT JOIN guides as g ON gd.guide_id = g.id WHERE device_id = ?";
+        let query = "SELECT g.id, g.name, g.description FROM guides_devices AS gd LEFT JOIN guides as g ON gd.guide_id = g.id WHERE device_id = ?";
+        if (excludeHiddenGuides) {
+            query += " AND g.visible = 1";
+        }
         return await database.query(query, [device_id]);
     }
 
