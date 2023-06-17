@@ -183,7 +183,7 @@
     </div>
     <div class="uk-flex uk-grid-match">
       <div class="uk-width-medium uk-visible@m">
-        <div :ref="id + '-media-tree-container'" class="folder-list">
+        <div :ref="id + '-media-tree-container'" class="folder-list uk-overflow-hidden">
           <ul class="media-tree-root">
             <li class="media-tree-item media-tree-root-item">
               <a
