@@ -462,7 +462,7 @@ export default {
     },
     async handleKeyDown(e) {
       if (e.key === "Delete" || e.key === "Backspace") {
-        const inputFocused = document.activeElement.tagName === "INPUT";
+        const inputFocused = document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "TEXTAREA";
         if (this.selectedShapeName && !inputFocused) {
           await this.deleteShape();
         }
