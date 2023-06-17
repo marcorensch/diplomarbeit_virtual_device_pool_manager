@@ -106,7 +106,7 @@
                       <span>{{ createDateString(device.added) }}</span>
                     </td>
                   </tr>
-                  <tr v-if="imeis.length">
+                  <tr v-if="device.slot_id && imeis.length">
                     <th><span class="nxd-text-navy">IMEI:</span></th>
                     <td>
                       <div v-for="(imei, index) of imeis" :key="index">
@@ -114,7 +114,7 @@
                       </div>
                     </td>
                   </tr>
-                <tr v-if="device.msisdns?.length">
+                <tr v-if="device.slot_id && device.msisdns?.length">
                   <th class="uk-table-shrink">
                     <span class="nxd-text-navy">MSISDN:</span>
                   </th>

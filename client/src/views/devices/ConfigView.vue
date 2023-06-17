@@ -98,7 +98,7 @@
                   </div>
                 </div>
                 <div>
-                  <div class="uk-margin">
+                  <div class="uk-margin" v-if="device.slot_id">
                     <label for="model">IMEI's</label>
                     <div
                       :class="{ 'uk-margin-small-top': index > 0 }"
