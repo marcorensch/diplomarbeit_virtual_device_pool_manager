@@ -110,10 +110,6 @@ export const rolePermissions = {
         permissions.ACCESS_FILE_MANAGER,
         permissions.CREATE_FILE_MANAGER_ITEM,
 
-        permissions.ACCESS_MANUFACTURERS_LIST,
-        permissions.CREATE_MANUFACTURER,
-        permissions.DELETE_MANUFACTURER,
-        permissions.UPDATE_MANUFACTURER,
     ],
     [roles.GUEST]: [
         permissions.ACCESS_DEVICE_LIST,
