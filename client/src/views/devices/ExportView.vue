@@ -56,7 +56,12 @@
         </div>
       </div>
     </div>
-    <div class="uk-container uk-margin">
+    <div class="uk-container uk-margin uk-position-relative nxd-min-height-80vh">
+      <div class="nxd-loading-overlay uk-position-cover" v-if="loading">
+        <div class="uk-position-center">
+          <div uk-spinner="ratio:5"></div>
+        </div>
+      </div>
       <table class="uk-table uk-table-divider print-table">
         <thead>
         <th>Slot</th>
@@ -107,7 +112,6 @@
         </template>
         </tbody>
       </table>
-
     </div>
   </div>
 </template>
@@ -129,6 +133,7 @@ export default {
       slots: [],
       locations: [],
       showEmptySlots: true,
+      loading: false,
     }
   },
   mounted() {
@@ -144,21 +149,21 @@ export default {
       }
     },
     async getSlotsForLocation() {
+      this.slots = [];
       const locationId = document.getElementById('location-select').value;
       if (!locationId) {
-        this.slots = [];
         return;
       }
+      this.loading = true;
       try {
         const response = await axios.get(`/api/devicepool/items/${locationId}?deep=true`)
         this.buildTableData(response.data);
-        console.log(response)
       } catch (e) {
         console.log(e)
       }
+      this.loading = false;
     },
     buildTableData(data) {
-      console.log(data)
       const slots = [];
       data.children.forEach(cabinet => {
         const cabinetName = cabinet.name;

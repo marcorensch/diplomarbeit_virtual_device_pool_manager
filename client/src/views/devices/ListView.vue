@@ -164,7 +164,6 @@ export default {
       );
       this.devices = data.devices;
       this.total_count = data.total_count;
-      console.log(this.devices)
     },
     handleDeviceSelected(device) {
       this.$refs.deviceDetailsOffcanvas.show(device);
