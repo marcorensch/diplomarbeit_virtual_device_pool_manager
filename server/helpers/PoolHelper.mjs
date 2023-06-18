@@ -34,7 +34,7 @@ export default class PoolHelper {
 
     static async getItemsByParentId(parentId, deep) {
         const databaseModel = new DatabaseModel();
-        const query = `SELECT i.*, GROUP_CONCAT(d.id) AS device_ids, GROUP_CONCAT(d.name) AS device_names
+        const query = `SELECT i.*, GROUP_CONCAT(d.id) AS device_ids, GROUP_CONCAT(d.name) AS device_names, GROUP_CONCAT(d.added)  AS device_added
                        FROM builder_items AS i
                                 LEFT JOIN devices as d ON i.id = d.slot_id
                        WHERE parent_id = ?

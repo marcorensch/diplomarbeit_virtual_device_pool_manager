@@ -86,6 +86,11 @@
               </button>
             </div>
           </div>
+          <div v-if="authStore.hasPermission('canExportDeviceList')">
+            <router-link :to="{name: 'export-devices'}" class="uk-button uk-button-primary uk-flex uk-flex-middle">
+              <font-awesome-icon class="uk-preserve-width" :icon="['fas', 'file-export']" />
+            </router-link>
+          </div>
           <div
             v-if="
               (authStore.hasPermission('canCreateDevices') ||

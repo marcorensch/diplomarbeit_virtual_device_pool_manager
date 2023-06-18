@@ -13,6 +13,7 @@ export const permissions = {
     UPDATE_OWN_ACCOUNT: 'canUpdateOwnAccount',
     // Devices
     ACCESS_DEVICE_LIST: 'canAccessDevicesList',
+    EXPORT_DEVICE_LIST: 'canExportDeviceList',
     CREATE_DEVICES: 'canCreateDevices',
     DELETE_DEVICES: 'canDeleteDevices',
     UPDATE_DEVICES: 'canUpdateDevices',

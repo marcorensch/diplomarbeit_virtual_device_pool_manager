@@ -81,7 +81,7 @@ import {
     faEye,
     faCloudArrowDown,
     faUnlink,
-    faEyeSlash, faSimCard,
+    faEyeSlash, faSimCard, faFileExport, faPrint, faClipboard
 } from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 
@@ -152,8 +152,11 @@ library.add(
     faNoteSticky,
     faCheck,
     faCloud,
-    faSimCard
-);
+    faSimCard,
+    faFileExport,
+    faClipboard,
+    faPrint
+)
 library.add(faBuilding, faCog, faArrowLeft, faCity, faLock, faCircle);
 
 const pinia = createPinia();

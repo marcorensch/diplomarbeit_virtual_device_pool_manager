@@ -44,6 +44,25 @@ const routes = [
           }
         },
       },
+      {
+        path: "export",
+        name: "export-devices",
+        component: () => import("../views/devices/ExportView.vue"),
+        meta: { transition: "fade" },
+        beforeEnter: () => {
+          const authStore = useAuthStore();
+          if (!authStore.isLoggedIn) {
+            toast.error("You must be logged in to access this page");
+            return { name: "login" };
+          }
+          if (authStore.hasPermission("canExportDeviceList")) {
+            return true;
+          } else {
+            toast.error("You don't have permission to access this page");
+            return { path: "" };
+          }
+        },
+      },
 
       {
         path: "edit/:id",
