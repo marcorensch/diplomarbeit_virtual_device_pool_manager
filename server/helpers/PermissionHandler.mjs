@@ -67,7 +67,6 @@ export const rolePermissions = {
     [roles.ADMIN]: Object.values(permissions),
     [roles.MANAGER]: [
         permissions.ACCESS_DEVICE_LIST,
-        permissions.ACCESS_GUIDES,
 
         permissions.DELETE_OWN_ACCOUNT,
         permissions.UPDATE_OWN_ACCOUNT,
@@ -78,15 +77,14 @@ export const rolePermissions = {
         permissions.CREATE_LINKS,
         permissions.DELETE_LINKS,
         permissions.UPDATE_LINKS,
-        permissions.ACCESS_GUIDES,
 
         permissions.ACCESS_ADMIN,
-        permissions.ACCESS_DEVICE_LIST,
         permissions.ACCESS_MANUFACTURERS_LIST,
         permissions.CREATE_MANUFACTURER,
         permissions.DELETE_MANUFACTURER,
         permissions.UPDATE_MANUFACTURER,
         permissions.ACCESS_GUIDE_ME_MANAGER,
+        permissions.ACCESS_GUIDES,
         permissions.MANAGE_GUIDES,
         permissions.CREATE_GUIDES,
         permissions.DELETE_GUIDES,
@@ -106,7 +104,6 @@ export const rolePermissions = {
         permissions.UPDATE_VIRTUAL_DEVICES,
         permissions.CHECKOUT_IN_DEVICES,
         permissions.CREATE_LINKS,
-        permissions.ACCESS_GUIDES,
 
         permissions.ACCESS_FILE_MANAGER,
         permissions.CREATE_FILE_MANAGER_ITEM,
@@ -115,7 +112,6 @@ export const rolePermissions = {
     [roles.GUEST]: [
         permissions.ACCESS_DEVICE_LIST,
         permissions.ACCESS_GUIDES,
-        permissions.ACCESS_MANUFACTURERS_LIST,
     ]
 }
 
