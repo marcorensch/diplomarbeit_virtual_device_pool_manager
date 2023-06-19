@@ -128,7 +128,7 @@ router.get('/:guide_id/slides/:id', async (req, res) => {
     }
 });
 
-router.post('/:guide_id/slides', slideValidator, async (req, res) => {
+router.post('/:guide_id/slides', UserValidator.hasPermission('canUpdateGuides'), slideValidator, async (req, res) => {
     const slideData = req.body;
     slideData.content = slideData.content || "";
     slideData.notes = slideData.notes || "";
@@ -141,7 +141,7 @@ router.post('/:guide_id/slides', slideValidator, async (req, res) => {
     }
 });
 
-router.put('/:guide_id/slides/:id', UserValidator.hasPermission('canManageGuides'), slideValidator, async (req, res) => {
+router.put('/:guide_id/slides/:id', UserValidator.hasPermission('canUpdateGuides'), slideValidator, async (req, res) => {
     const slideData = req.body;
     const action = req.query.action || null;
     slideData.content = slideData.content || "";
@@ -157,7 +157,7 @@ router.put('/:guide_id/slides/:id', UserValidator.hasPermission('canManageGuides
     }
 });
 
-router.delete('/:guide_id/slides/:id', UserValidator.hasPermission('canManageGuides'), async (req, res) => {
+router.delete('/:guide_id/slides/:id', UserValidator.hasPermission('canUpdateGuides'), async (req, res) => {
     const guideId = req.params.guide_id; // Guide ID wird aktuell nicht verwendet
     const slideId = req.params.id;
     if(!slideId) return res.status(500).json({success: false, message: "Failed to delete slide"});
