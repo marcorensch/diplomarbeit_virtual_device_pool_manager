@@ -47,7 +47,7 @@ router.get("/categories", async (req, res) => {
     }
 });
 
-router.post("/items", poolBuilderValidator, async (req, res) => {
+router.post("/items", UserValidator.hasPermission('canCreatePoolBuilderItem'), poolBuilderValidator,  async (req, res) => {
     let categories;
     let builderItem;
     const data = req.body || false;
@@ -78,7 +78,7 @@ router.post("/items", poolBuilderValidator, async (req, res) => {
     }
 });
 
-router.put("/items/:id", poolBuilderValidator, async (req, res) => {
+router.put("/items/:id", UserValidator.hasPermission('canUpdatePoolBuilderItem'), poolBuilderValidator,  async (req, res) => {
     const id = req.params.id || null;
     const data = req.body || false;
     if (!id) return res.status(400).send({message: "No id specified"});
@@ -95,7 +95,7 @@ router.put("/items/:id", poolBuilderValidator, async (req, res) => {
     }
 });
 
-router.delete("/items/:id", async (req, res) => {
+router.delete("/items/:id", UserValidator.hasPermission('canDeletePoolBuilderItem'),async (req, res) => {
     const id = req.params.id || false;
     if (!id) return res.status(400).send({message: "No id specified"});
     try {
@@ -108,7 +108,7 @@ router.delete("/items/:id", async (req, res) => {
     }
 });
 
-router.post("/items/sort", async (req, res) => {
+router.post("/items/sort", UserValidator.hasPermission('canUpdatePoolBuilderItem'), async (req, res) => {
     const sortMap = req.body || false;
     if(!sortMap || !sortMap.length) return res.status(400).send({message: "No sort map specified"});
     for (const sortMapElement of sortMap) {
