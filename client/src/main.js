@@ -2,7 +2,7 @@ import {createApp, markRaw} from "vue";
 import App from "./App.vue";
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
-import "./registerServiceWorker";
+// import "./registerServiceWorker";
 import router from "./router";
 import VueKonva from "vue-konva";
 
