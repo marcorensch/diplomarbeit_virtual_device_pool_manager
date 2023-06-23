@@ -69,10 +69,29 @@ export default class FileManagerHelper {
                 throw(e)
             }
 
-            const query = `UPDATE manufacturers
-                           SET image = NULL
-                           WHERE image LIKE ?`;
-            const value = `%${el.fullPath}%`;
+            const target = el.fullPath.split("/")[0];
+            let query;
+            let value = `%${el.fullPath}%`;
+            switch (target) {
+                case "images":
+                    query = `UPDATE devices
+                         SET image = NULL
+                         WHERE image LIKE ?`;
+                    break;
+                case "logos":
+                    query = `UPDATE manufacturers
+                         SET image = NULL
+                         WHERE image LIKE ?`;
+                    break;
+                case "documents":
+                    query = `DELETE FROM device_documents WHERE uri LIKE ?`;
+                    break;
+                case "test":
+                    return;
+                default:
+                    throw({status: 500, message: `Cannot update database target ${target} unknown`})
+            }
+
             try {
                 await databaseModel.query(query, [value]);
             } catch (e) {
