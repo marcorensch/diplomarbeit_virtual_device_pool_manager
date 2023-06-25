@@ -1150,14 +1150,14 @@ describe("Test Device CheckIn / Out specific Endpoints of Devices", () => {
         expect(response.body.message).to.eql("Device checked out");
         expect(response.body).to.have.property("checked_out_by")
     });
-    it('should return 403 with message Device is already checked out when trying to checkout the device again', function () {
-        const response = agent.post(`/api/devices/${createdItem.id}/checkout`).send({notes: "test checkout"});
+    it('should return 403 with message Device is already checked out when trying to checkout the device again', async () => {
+        const response = await agent.post(`/api/devices/${createdItem.id}/checkout`).send({notes: "test checkout of already checked out device"});
         expect(response.status).to.eql(403);
         expect(response.body).to.have.property("message");
         expect(response.body.message).to.eql("Device is already checked out");
     });
-    it('should return 200 when checking in a device', function () {
-        const response = agent.post(`/api/devices/${createdItem.id}/checkin`);
+    it('should return 200 when checking in a device', async () => {
+        const response = await agent.post(`/api/devices/${createdItem.id}/checkin`);
         expect(response.status).to.eql(200);
         expect(response.body).to.have.property("message");
         expect(response.body.message).to.eql("Device checked in");

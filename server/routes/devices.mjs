@@ -324,11 +324,12 @@ router.post("/:id/checkout", UserValidator.validateTokens, UserValidator.setCook
 
     try {
         device = await DeviceHelper.getDeviceById(deviceId);
-        if (!device) return res.status(404).send({success: false, message: "Device not found"});
     } catch (e) {
         console.log(e.message);
         return res.status(500).send({success: false, message: e.message});
     }
+
+    if (!device) return res.status(404).send({success: false, message: "Device not found"});
 
     if (device.checked_out_by) return res.status(403).send({success: false, message: "Device is already checked out"});
 
