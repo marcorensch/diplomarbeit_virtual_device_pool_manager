@@ -76,6 +76,7 @@
         <table class="uk-table uk-table-divider">
           <thead>
             <th>MSISDN</th>
+            <th>Device</th>
             <th>ICCID</th>
             <th>Abo</th>
             <th class="uk-text-nowrap">Multi Device</th>
@@ -131,6 +132,7 @@ export default {
             number.visible = true;
           });
           this.numbers = response.data;
+          console.log(this.numbers);
         })
         .catch((error) => {
           console.log(error.response.status + " " + error.response.statusText);

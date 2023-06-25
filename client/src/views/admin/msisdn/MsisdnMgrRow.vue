@@ -1,6 +1,7 @@
 <template>
   <tr v-if="number.visible">
     <td class="uk-text-nowrap">{{ number.msisdn }}</td>
+    <td class="uk-text-nowrap">{{ number.device_name }}</td>
     <td class="uk-text-nowrap">{{ number.sim_number }}</td>
     <td class="uk-text-nowrap">{{ number.abonnement }}</td>
     <td>
@@ -41,6 +42,7 @@
         :key="md.id"
       >
         <td class="uk-text-nowrap">{{ md.msisdn }}</td>
+        <td class="uk-text-nowrap">{{ md.device_name }}</td>
         <td class="uk-text-nowrap">{{ md.sim_number }}</td>
         <td class="uk-text-nowrap">
           <span class="uk-text-meta">Multi Device</span>

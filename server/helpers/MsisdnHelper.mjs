@@ -24,7 +24,19 @@ export default class MsisdnHelper {
 
     static async getMsisdnsByParentId(parentId) {
         const database = new DatabaseModel();
-        const query = "SELECT a.*, b.name AS simTypeName FROM numbers as a LEFT JOIN sim_types AS b ON a.sim_type_id = b.id WHERE a.parent_id = ? ORDER BY a.abonnement ASC, a.msisdn ASC";
+        const query = `SELECT number.*,
+                              type.name   AS simTypeName,
+                              device.name AS device_name,
+                              device.id   AS device_id
+                       FROM numbers AS number
+                                LEFT JOIN
+                            sim_types AS type ON number.sim_type_id = type.id
+                                LEFT JOIN
+                            device_number AS dn ON number.id = dn.number_id
+                                LEFT JOIN
+                            devices AS device ON dn.device_id = device.id
+                       WHERE number.parent_id = ?
+                       ORDER BY number.abonnement, number.msisdn`;
         const numbersData = await database.query(query, [parentId]);
         if (numbersData.length === 0) return [];
         const numbers = [];
@@ -36,7 +48,19 @@ export default class MsisdnHelper {
 
     static async getAllMsisdns(parentOnly = false, flat = false) {
         const database = new DatabaseModel();
-        const query = "SELECT a.*, b.name AS simTypeName FROM numbers as a LEFT JOIN sim_types AS b ON a.sim_type_id = b.id WHERE a.parent_id IS NULL ORDER BY a.abonnement ASC, a.msisdn ASC"
+        const query = `SELECT number.*,
+                              type.name   AS simTypeName,
+                              device.name AS device_name,
+                              device.id   AS device_id
+                       FROM numbers AS number
+                                LEFT JOIN
+                            sim_types AS type ON number.sim_type_id = type.id
+                                LEFT JOIN
+                            device_number AS dn ON number.id = dn.number_id
+                                LEFT JOIN
+                            devices AS device ON dn.device_id = device.id
+                       WHERE number.parent_id IS NULL
+                       ORDER BY number.abonnement, number.msisdn`
         const numbersData = await database.query(query);
         if (numbersData.length === 0) return [];
         const numbers = [];

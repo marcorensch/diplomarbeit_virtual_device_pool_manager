@@ -15,6 +15,8 @@ export default class Msisdn {
         this.created_at = null;
         this.modified_at = null;
         this.multi_device = [];
+        this.device_name = null;
+        this.device_id = null;
     }
 
     setData(props) {
