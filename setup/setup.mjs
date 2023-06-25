@@ -74,7 +74,7 @@ const questions = [
         name: 'DATABASE_PASSWORD',
         message: 'Database password?',
         default() {
-            return 'root'
+            return ''
         }
     },
     {
@@ -118,7 +118,7 @@ const questions = [
         name: 'DATABASE_PASSWORD_TEST',
         message: 'Test database password?',
         default() {
-            return 'root'
+            return ''
         },
         when: (answers) => answers.createTestDatabase
     },
