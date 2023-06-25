@@ -925,7 +925,7 @@ describe("Test administrative PoolBuilder API Endpoints", () => {
 
 });
 
-describe("Test Devices Route", () => {
+describe("Test Devices API Endpoints", () => {
     const agent = supertest.agent(app);
     let createdItem;
     let itemFromDb;
@@ -1051,7 +1051,7 @@ describe("Test Devices Route", () => {
     });
 
 });
-describe("Test Weblinks Route", () => {
+describe("Test Weblinks specific API Endpoints of Devices", () => {
     const agent = supertest.agent(app);
     let createdItem;
     before(async () => {
@@ -1125,7 +1125,7 @@ describe("Test Weblinks Route", () => {
     });
 });
 
-describe("Test Device CheckIn / Out Routes", () => {
+describe("Test Device CheckIn / Out specific Endpoints of Devices", () => {
     const agent = supertest.agent(app);
     let createdItem;
     before(async () => {
@@ -1151,13 +1151,13 @@ describe("Test Device CheckIn / Out Routes", () => {
         expect(response.body).to.have.property("checked_out_by")
     });
     it('should return 403 with message Device is already checked out when trying to checkout the device again', function () {
-        return agent.post(`/api/devices/${createdItem.id}/checkout`).send({notes: "test checkout"});
+        const response = agent.post(`/api/devices/${createdItem.id}/checkout`).send({notes: "test checkout"});
         expect(response.status).to.eql(403);
         expect(response.body).to.have.property("message");
         expect(response.body.message).to.eql("Device is already checked out");
     });
     it('should return 200 when checking in a device', function () {
-        return agent.post(`/api/devices/${createdItem.id}/checkin`);
+        const response = agent.post(`/api/devices/${createdItem.id}/checkin`);
         expect(response.status).to.eql(200);
         expect(response.body).to.have.property("message");
         expect(response.body.message).to.eql("Device checked in");
