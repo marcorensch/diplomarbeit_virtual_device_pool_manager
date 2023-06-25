@@ -751,6 +751,7 @@ export default {
         )
         .then(() => {
           this.triggerFolderSelect(this.currentFolder.fullPath);
+          toast.success("Files uploaded successfully");
         })
         .catch((error) => {
           if (error.response.data.message)

@@ -103,10 +103,14 @@ router.post("/upload", UserValidator.hasPermission("canCreateFileManagerItem"), 
     if (!files || !files.length) return res.status(400).send({success: false, message: "No file was uploaded"});
 
     try {
-        await FileManagerHelper.upload(parentFolderPath, files);
+        await FileManagerHelper.upload(parentFolderPath, files, true);
         return res.status(201).send('ok');
     }catch (e) {
-        return res.status(500).send({success: false, message: e.message});
+        let errorsString = "";
+        if (e.errors) {
+            errorsString = e.errors.map((err) => { return err.message }).join(", ");
+        }
+        return res.status(500).send({success: false, message: errorsString || e.message});
     }
 
 

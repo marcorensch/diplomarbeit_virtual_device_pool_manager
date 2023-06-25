@@ -102,7 +102,7 @@ export default class FileManagerHelper {
         }
     }
 
-    static async upload(relativePath, files) {
+    static async upload(relativePath, files, overwriteExisting) {
         const absPath = path.join(publicDir, relativePath);
 
         if (!fs.existsSync(absPath)) {
@@ -114,10 +114,14 @@ export default class FileManagerHelper {
             }
         }
 
+        const fileExistWarnings = [];
+
         for (const file of files) {
+
             const absFilePath = path.join(absPath, file.originalname);
-            if (fs.existsSync(absFilePath)) {
-                throw({status: 400, message: "File already exists"})
+            if (fs.existsSync(absFilePath) && !overwriteExisting) {
+                fileExistWarnings.push({status: 409, message: `File ${file.originalname} already exists`});
+                continue;
             }
             try {
                 await fs.promises.rename(file.path, path.join(absPath, file.originalname));
@@ -125,6 +129,10 @@ export default class FileManagerHelper {
                 console.log(e);
                 throw({status: 500, message: "Error uploading file"});
             }
+        }
+
+        if(fileExistWarnings.length > 0) {
+            throw(fileExistWarnings);
         }
     }
 
