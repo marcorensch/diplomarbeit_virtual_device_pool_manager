@@ -797,7 +797,6 @@ export default {
             console.error(error);
           })
           .finally(() => {
-            console.log("finally called");
             this.triggerFolderSelect(this.currentFolder.fullPath);
           });
       }
