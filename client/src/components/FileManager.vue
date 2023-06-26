@@ -555,7 +555,7 @@ export default {
           },
         })
         .then((response) => {
-          this.files = response.data.files.map((file) => {
+          this.files = response.data.files.filter((file)=> file.name !== "index.html").map((file) => {
             file.choosen = false;
             file.visible = true;
             return file;
