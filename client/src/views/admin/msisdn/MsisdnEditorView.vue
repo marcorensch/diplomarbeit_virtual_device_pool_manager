@@ -322,7 +322,6 @@ export default {
     },
     async handleSaveClicked() {
       const formIsValid = await this.v$.$validate();
-      console.log(this.v$.$errors);
       if (!formIsValid) return;
 
       if (/\d+/.exec(this.item.parent_id)) {

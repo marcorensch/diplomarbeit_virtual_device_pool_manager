@@ -132,7 +132,6 @@ export default {
             number.visible = true;
           });
           this.numbers = response.data;
-          console.log(this.numbers);
         })
         .catch((error) => {
           console.log(error.response.status + " " + error.response.statusText);
@@ -145,7 +144,6 @@ export default {
       this.$router.push({ name: "msisdn-add" });
     },
     filterMsisdnList() {
-      console.log(this.search_msisdn)
       this.numbers.map((number) => {
         number.visible = this.filterMultiDevice(number) || this.filterChecks(number);
       });

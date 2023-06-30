@@ -186,8 +186,6 @@ export default {
     setStoredDeviceMsisdns() {
       this.storedDeviceMsisdns.forEach((stored) => {
         const found = this.findMsisdnByIdInArray(stored, this.availableMsisdns);
-        console.log(found);
-        console.log(this.availableMsisdns);
         if (found) {
           this.handleMsisdnChange(found, false);
         }
