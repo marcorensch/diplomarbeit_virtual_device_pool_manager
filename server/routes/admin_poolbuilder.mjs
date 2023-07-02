@@ -81,6 +81,7 @@ router.post("/items", UserValidator.hasPermission('canCreatePoolBuilderItem'), p
 router.put("/items/:id", UserValidator.hasPermission('canUpdatePoolBuilderItem'), poolBuilderValidator,  async (req, res) => {
     const id = req.params.id || null;
     const data = req.body || false;
+    data.name = data.name.replace(/[^a-z0-9 -]/ig, "")
     if (!id) return res.status(400).send({message: "No id specified"});
     if(parseInt(id) !== parseInt(data.id)) return res.status(400).send({message: "Invalid id specified"});
     const builderItem = new BuilderItem();

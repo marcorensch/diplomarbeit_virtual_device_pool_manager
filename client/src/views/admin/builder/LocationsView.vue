@@ -1,20 +1,23 @@
 <template>
   <div>
-    <h1><font-awesome-icon :icon="['fas', 'city']" /> Locations</h1>
+    <h1>
+      <font-awesome-icon :icon="['fas', 'city']"/>
+      Locations
+    </h1>
     <div
-      uk-scrollspy="target: > div .animate ; cls: uk-animation-fade; delay: 60"
+        uk-scrollspy="target: > div .animate ; cls: uk-animation-fade; delay: 60"
     >
       <div id="locations" uk-sortable="target: > div; animation: 150;">
         <template v-if="locations">
           <template v-for="location of locations" :key="location.id">
             <div
-              class="location-element uk-margin animate"
-              :data-id="location.id"
+                class="location-element uk-margin animate"
+                :data-id="location.id"
             >
               <div class="uk-card uk-card-default">
                 <div class="uk-card-header uk-position-relative uk-drag">
                   <h3 v-if="location.name">
-                    <font-awesome-icon :icon="['fas', 'building']" />
+                    <font-awesome-icon :icon="['fas', 'building']"/>
                     {{ location.name }}
                   </h3>
                   <h3 v-else class="uk-text-muted uk-text-italic">
@@ -23,7 +26,7 @@
                 </div>
                 <div class="uk-card-body">
                   <div
-                    class="uk-width-expand uk-padding uk-padding-remove-left uk-padding-remove-vertical"
+                      class="uk-width-expand uk-padding uk-padding-remove-left uk-padding-remove-vertical"
                   >
                     <div class="uk-child-width-1-2 uk-grid-small" uk-grid>
                       <div>
@@ -36,12 +39,12 @@
                   </div>
 
                   <div
-                    class="uk-position-cover select-location-div"
-                    @click="handleSwitchToLocation(location.id)"
+                      class="uk-position-cover select-location-div"
+                      @click="handleSwitchToLocation(location.id)"
                   >
                     <div class="uk-position-center-right uk-padding">
                       <span class="uk-text-large"
-                        ><font-awesome-icon
+                      ><font-awesome-icon
                           class="uk-preserve-width"
                           :icon="['fas', 'chevron-right']"
                       /></span>
@@ -50,12 +53,12 @@
                 </div>
                 <div class="uk-position-top-right">
                   <div
-                    class="uk-padding-small edit-div"
-                    @click="handleEditLocationClicked(location)"
+                      class="uk-padding-small edit-div"
+                      @click="handleEditLocationClicked(location)"
                   >
                     <font-awesome-icon
-                      class="uk-preserve-width"
-                      :icon="['fas', 'cog']"
+                        class="uk-preserve-width"
+                        :icon="['fas', 'cog']"
                     />
                   </div>
                 </div>
@@ -66,15 +69,16 @@
       </div>
 
       <div
-        class="uk-margin nxd-no-select"
-        uk-scrollspy="cls:uk-animation-fade;delay:200"
+          class="uk-margin nxd-no-select"
+          uk-scrollspy="cls:uk-animation-fade;delay:200"
       >
         <div
-          class="uk-card uk-card-body nx-card-add uk-card-hover uk-flex uk-flex-center"
-          @click="handleAddLocationClicked"
+            class="uk-card uk-card-body nx-card-add uk-card-hover uk-flex uk-flex-center"
+            @click="handleAddLocationClicked"
         >
           <div class="uk-text-large uk-width-auto">
-            <font-awesome-icon :icon="['fas', 'plus']" /> Add Location
+            <font-awesome-icon :icon="['fas', 'plus']"/>
+            Add Location
           </div>
         </div>
       </div>
@@ -83,18 +87,19 @@
       <div class="uk-modal-dialog uk-margin-auto-vertical">
         <template v-if="currentLocation">
           <button
-            class="uk-modal-close uk-modal-close-default"
-            uk-close
-            type="button"
+              class="uk-modal-close uk-modal-close-default"
+              uk-close
+              type="button"
           ></button>
           <div class="uk-modal-header">
             <h2 class="uk-modal-title">
               <font-awesome-icon
-                :icon="['fas', 'building']"
-                class="uk-margin-right"
+                  :icon="['fas', 'building']"
+                  class="uk-margin-right"
               />
               <template v-if="currentLocation && currentLocation.id"
-                >Edit {{ currentLocation.name }}</template
+              >Edit {{ currentLocation.name }}
+              </template
               >
               <template v-else>Add Location</template>
             </h2>
@@ -104,37 +109,42 @@
               <div class="uk-margin">
                 <label for="name" class="uk-form-label">Name</label>
                 <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  class="uk-input"
-                  v-model="currentLocation.name"
-                  placeholder="Location Name"
-                  @keydown.enter="handleModalSaveClicked"
+                    type="text"
+                    id="name"
+                    name="name"
+                    class="uk-input"
+                    v-model="currentLocation.name"
+                    placeholder="Location Name"
+                    @keydown.enter="handleModalSaveClicked"
                 />
+                <div v-if="v$.currentLocation.name.$errors.length" class="uk-text-danger uk-text-small">
+                  <div v-for="error in v$.currentLocation.name.$errors" :key="error.id">
+                    {{ error.$message }}
+                  </div>
+                </div>
               </div>
               <div class="uk-margin">
                 <label for="description" class="uk-form-label"
-                  >Description</label
+                >Description</label
                 >
                 <textarea
-                  id="description"
-                  name="description"
-                  type="textarea"
-                  class="uk-textarea"
-                  v-model="currentLocation.description"
-                  placeholder="Location Description"
+                    id="description"
+                    name="description"
+                    type="textarea"
+                    class="uk-textarea"
+                    v-model="currentLocation.description"
+                    placeholder="Location Description"
                 ></textarea>
               </div>
               <div class="uk-margin">
                 <label for="hidden" class="uk-form-label">Hidden Notes</label>
                 <textarea
-                  type="textarea"
-                  id="hidden"
-                  name="hidden"
-                  class="uk-textarea"
-                  v-model="currentLocation.hidden"
-                  placeholder="Hidden Notes"
+                    type="textarea"
+                    id="hidden"
+                    name="hidden"
+                    class="uk-textarea"
+                    v-model="currentLocation.hidden"
+                    placeholder="Hidden Notes"
                 ></textarea>
               </div>
               <div class="uk-margin">
@@ -142,26 +152,26 @@
                 <div>
                   <label for="cabinets-orientation">Cabinets Orientation</label>
                   <div
-                    class="uk-margin uk-grid-small uk-child-width-auto uk-grid"
+                      class="uk-margin uk-grid-small uk-child-width-auto uk-grid"
                   >
                     <label
-                      ><input
+                    ><input
                         class="uk-radio"
                         type="radio"
                         name="cabinets-orientation"
                         value="horizontal"
                         v-model="currentLocation.params.cabinetsOrientation"
-                      />
+                    />
                       Horizontal</label
                     >
                     <label
-                      ><input
+                    ><input
                         class="uk-radio"
                         type="radio"
                         name="cabinets-orientation"
                         value="vertical"
                         v-model="currentLocation.params.cabinetsOrientation"
-                      />
+                    />
                       Vertical</label
                     >
                   </div>
@@ -173,8 +183,8 @@
             <div class="uk-grid-small" uk-grid>
               <div v-if="currentLocation.id">
                 <button
-                  class="uk-button uk-button-danger"
-                  @click="handleModalDeleteClicked"
+                    class="uk-button uk-button-danger"
+                    @click="handleModalDeleteClicked"
                 >
                   Delete
                 </button>
@@ -183,16 +193,16 @@
                 <div class="uk-grid-small uk-flex uk-flex-right" uk-grid>
                   <div>
                     <button
-                      class="uk-button uk-button-secondary uk-modal-close"
+                        class="uk-button uk-button-secondary uk-modal-close"
                     >
                       Cancel
                     </button>
                   </div>
                   <div>
                     <button
-                      class="uk-button uk-button-primary"
-                      :class="{ 'uk-disabled': !currentLocation.name }"
-                      @click="handleModalSaveClicked"
+                        class="uk-button uk-button-primary"
+                        :class="{ 'uk-disabled': !currentLocation.name }"
+                        @click="handleModalSaveClicked"
                     >
                       Save
                     </button>
@@ -208,22 +218,38 @@
 </template>
 
 <script>
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import UIkit from "uikit";
 import BuilderItem from "@/models/BuilderItem.mjs";
-import { useBuilderItemStore } from "@/stores/builderItemStore";
-import { useBuilderCategoriesStore } from "@/stores/builderCategoriesStore";
+import {useBuilderItemStore} from "@/stores/builderItemStore";
+import {useBuilderCategoriesStore} from "@/stores/builderCategoriesStore";
+import {useVuelidate} from "@vuelidate/core";
+import {helpers, required} from "@vuelidate/validators";
 
 export default {
   name: "LocationsView",
-  components: { FontAwesomeIcon },
+  components: {FontAwesomeIcon},
   setup() {
     const categoriesStore = useBuilderCategoriesStore();
     const builderItemStore = useBuilderItemStore();
-
+    const v$ = useVuelidate();
     return {
       categoriesStore,
       builderItemStore,
+      v$,
+    };
+  },
+  validations() {
+    return {
+      currentLocation: {
+        name: {
+          required: helpers.withMessage("Name is required.", required),
+          validName: helpers.withMessage("Name can only contain numbers, letters spaces and dashes.", (value) => {
+            const regex = /[^a-z0-9 -]/ig;
+            return !regex.test(value) || value.trim().length !== 0;
+          })
+        },
+      },
     };
   },
   data() {
@@ -241,10 +267,10 @@ export default {
     this.handleModalFeatures();
     this.categories = await this.categoriesStore.loadCategories();
     this.locationCategoryId =
-      this.categoriesStore.findCategoryIdByName("Location");
+        this.categoriesStore.findCategoryIdByName("Location");
 
     this.locations = await this.builderItemStore.loadItems(
-      this.locationCategoryId
+        this.locationCategoryId
     );
   },
   methods: {
@@ -281,26 +307,30 @@ export default {
     },
     handleEditLocationClicked(location) {
       this.modalSaveOrDeleteClicked = false;
-      this.locationDataFallback = { ...location };
+      this.locationDataFallback = {...location};
       this.currentLocation = location;
       UIkit.modal("#location-config-modal").show();
     },
     async handleModalSaveClicked() {
+      this.v$.$touch();
+      const formIsValid = await this.v$.$validate();
+      if (!formIsValid) return;
+
       if (!this.currentLocation.name)
-        return UIkit.notification("Name is required", { status: "danger" });
+        return UIkit.notification("Name is required", {status: "danger"});
       this.modalSaveOrDeleteClicked = true;
       this.currentLocation.category_id = this.locationCategoryId;
-      const params = { ...this.currentLocation.params };
+      const params = {...this.currentLocation.params};
       this.currentLocation.params = JSON.stringify(this.currentLocation.params);
       if (this.currentLocation.id) {
         await this.builderItemStore.updateItem(this.currentLocation);
       } else {
         const status = await this.builderItemStore.saveItem(
-          this.currentLocation
+            this.currentLocation
         );
         if (status) {
           this.locations = await this.builderItemStore.loadItems(
-            this.locationCategoryId
+              this.locationCategoryId
           );
         }
       }
@@ -309,18 +339,18 @@ export default {
     },
     handleModalDeleteClicked() {
       UIkit.modal
-        .confirm(
-          "<h3>Sure?</h3>Are you sure you want to delete this location and all its structure? This cannot be undone. Linked devices will be kept but unlinked from this location.",
-          { stack: true }
-        )
-        .then(async () => {
-          await this.builderItemStore.deleteItem(this.currentLocation);
-          this.locations = await this.builderItemStore.loadItems(
-            this.locationCategoryId
-          );
-          this.modalSaveOrDeleteClicked = true;
-          UIkit.modal("#location-config-modal").hide();
-        });
+          .confirm(
+              "<h3>Sure?</h3>Are you sure you want to delete this location and all its structure? This cannot be undone. Linked devices will be kept but unlinked from this location.",
+              {stack: true}
+          )
+          .then(async () => {
+            await this.builderItemStore.deleteItem(this.currentLocation);
+            this.locations = await this.builderItemStore.loadItems(
+                this.locationCategoryId
+            );
+            this.modalSaveOrDeleteClicked = true;
+            UIkit.modal("#location-config-modal").hide();
+          });
     },
 
     handleSortable(container) {
@@ -337,7 +367,7 @@ export default {
       });
     },
     handleSwitchToLocation(id) {
-      this.$router.push({ path: `/admin/pool-builder/location/${id}` });
+      this.$router.push({path: `/admin/pool-builder/location/${id}`});
     },
   },
 };
