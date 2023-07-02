@@ -133,7 +133,7 @@
                     type="textarea"
                     class="uk-textarea"
                     v-model="currentLocation.description"
-                    placeholder="Location Description"
+                    placeholder="Description"
                 ></textarea>
               </div>
               <div class="uk-margin">

@@ -110,7 +110,7 @@
                   name="name"
                   class="uk-input"
                   v-model="currentSelectedItem.name"
-                  placeholder="Cabinet Name"
+                  placeholder="Slot Name"
                 />
               </div>
               <div class="uk-margin">
@@ -123,7 +123,7 @@
                   type="textarea"
                   class="uk-textarea"
                   v-model="currentSelectedItem.description"
-                  placeholder="Location Description"
+                  placeholder="Description"
                 ></textarea>
               </div>
               <div class="uk-margin">

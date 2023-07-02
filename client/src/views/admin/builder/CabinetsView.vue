@@ -134,7 +134,7 @@
                   type="textarea"
                   class="uk-textarea"
                   v-model="currentCabinet.description"
-                  placeholder="Cabinet Description"
+                  placeholder="Description"
                 ></textarea>
               </div>
               <div class="uk-margin">
