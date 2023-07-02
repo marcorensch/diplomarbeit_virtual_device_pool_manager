@@ -112,6 +112,11 @@
                   v-model="currentSelectedItem.name"
                   placeholder="Slot Name"
                 />
+                <div v-if="v$.currentSelectedItem.name.$errors.length" class="uk-text-danger uk-text-small">
+                  <div v-for="error in v$.currentSelectedItem.name.$errors" :key="error.id">
+                    {{ error.$message }}
+                  </div>
+                </div>
               </div>
               <div class="uk-margin">
                 <label for="description" class="uk-form-label"
@@ -183,6 +188,8 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { useBuilderItemStore } from "@/stores/builderItemStore";
 import { useToast } from "vue-toastification";
 import UIkit from "uikit";
+import { useVuelidate } from "@vuelidate/core";
+import { required, helpers } from "@vuelidate/validators";
 
 export default {
   name: "BuilderRow",
@@ -191,7 +198,8 @@ export default {
   setup() {
     const builderItemStore = useBuilderItemStore();
     const toast = useToast();
-    return { builderItemStore, toast };
+    const v$ = useVuelidate();
+    return { builderItemStore, toast, v$ };
   },
   props: {
     builderRow: {
@@ -206,6 +214,17 @@ export default {
       type: String,
       required: true,
     },
+  },
+  validations() {
+    return {
+      currentSelectedItem: {
+        name: { required,
+          validName: helpers.withMessage("Name can only contain numbers, letters spaces and dashes.", (value) => {
+            const regex = /[^a-z0-9 -]/ig;
+            return !regex.test(value) || value.trim().length !== 0;
+          }) },
+      },
+    };
   },
   data() {
     return {
@@ -262,6 +281,9 @@ export default {
       });
     },
     async handleModalSaveClicked() {
+      this.v$.$touch();
+      const formIsValid = await this.v$.$validate();
+      if (!formIsValid) return;
       await this.builderItemStore.updateItem(this.currentSelectedItem);
       this.currentSelectedItem = null;
       UIkit.modal("#slot-config-modal-" + this.builderRow.id).hide();
