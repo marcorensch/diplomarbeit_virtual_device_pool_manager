@@ -118,6 +118,11 @@
                   v-model="currentCabinet.name"
                   placeholder="Cabinet Name"
                 />
+                <div v-if="v$.currentCabinet.name.$errors.length" class="uk-text-danger uk-text-small">
+                  <div v-for="error in v$.currentCabinet.name.$errors" :key="error.id">
+                    {{ error.$message }}
+                  </div>
+                </div>
               </div>
               <div class="uk-margin">
                 <label for="description" class="uk-form-label"
@@ -189,6 +194,8 @@ import { useBuilderCategoriesStore } from "@/stores/builderCategoriesStore";
 import UIkit from "uikit";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import NotAvailableMobile from "@/components/NotAvailableMobile.vue";
+import { useVuelidate } from "@vuelidate/core";
+import { required, helpers } from "@vuelidate/validators";
 
 export default {
   name: "CabinetsView",
@@ -197,6 +204,20 @@ export default {
     return {
       builderItemStore: useBuilderItemStore(),
       categoriesStore: useBuilderCategoriesStore(),
+      v$: useVuelidate(),
+    };
+  },
+  validations() {
+    return {
+      currentCabinet: {
+        name: {
+          required: helpers.withMessage("Name is required.", required),
+          validName: helpers.withMessage("Name can only contain numbers, letters spaces and dashes.", (value) => {
+            const regex = /[^a-z0-9 -]/ig;
+            return !regex.test(value) || value.trim().length !== 0;
+          })
+        },
+      },
     };
   },
   data() {
@@ -273,6 +294,9 @@ export default {
       });
     },
     async handleModalSaveClicked() {
+      this.v$.$touch();
+      const formIsValid = await this.v$.$validate();
+      if (!formIsValid) return;
       this.modalSaveOrDeleteClicked = true;
       this.currentCabinet.category_id = this.cabinetsCategoryId;
       const params = { ...this.currentCabinet.params };
