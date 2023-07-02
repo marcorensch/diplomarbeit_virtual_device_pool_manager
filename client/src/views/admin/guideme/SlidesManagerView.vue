@@ -87,12 +87,10 @@
         </div>
       </div>
     </div>
-    <ControlsFooterWidget @cancel="handleCancelClicked" @save="handleSaveClicked" />
   </div>
 </template>
 
 <script>
-import ControlsFooterWidget from "@/components/ControlsFooterWidget.vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import GuideMeSlideItem from "@/models/GuideMeSlideItem.mjs";
 import {useToast} from "vue-toastification";
@@ -101,7 +99,7 @@ import axios from "axios";
 
 export default {
   name: "SlidesManagerView",
-  components: { FontAwesomeIcon, ControlsFooterWidget },
+  components: { FontAwesomeIcon },
   setup() {
     const toast = useToast();
     return { toast };
@@ -176,12 +174,7 @@ export default {
         console.log(err);
       }
     },
-    handleCancelClicked() {
-      this.$router.push({ name: "guides" });
-    },
-    handleSaveClicked() {
-      this.$router.push({ name: "guides" });
-    },
+
     async handleAddSlideClicked() {
       const slide = new GuideMeSlideItem();
       slide.guide_id = this.id;
