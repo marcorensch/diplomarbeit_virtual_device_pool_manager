@@ -28,7 +28,7 @@
                 {{ cabinet.name }}
               </h3>
               <h3 v-else class="uk-text-muted uk-text-italic">
-                Location Name...
+                Cabinet Name...
               </h3>
             </div>
             <div class="uk-card-body">
