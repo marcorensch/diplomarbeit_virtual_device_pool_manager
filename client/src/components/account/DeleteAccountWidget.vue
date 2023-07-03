@@ -3,7 +3,7 @@
     <div class="uk-card uk-card-default">
       <div class="uk-card-header">
         <h3 class="uk-card-title">
-          <font-awesome-icon :icon="['fas', 'trash']" /> Delete account
+          <font-awesome-icon :icon="['fas', 'trash']" /> Delete Account
         </h3>
       </div>
       <div class="uk-card-body">
